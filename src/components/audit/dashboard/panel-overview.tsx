@@ -190,203 +190,213 @@ export function PanelOverview({
         </ul>
       </div>
 
-      <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(circle at 90% 10%, rgba(45,212,191,.22), transparent 38%), radial-gradient(circle at 5% 100%, rgba(45,212,191,.1), transparent 38%)",
-          }}
-        />
-        <div className="relative">
-          <div className="flex items-center justify-between gap-3">
-            <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
-              <Sparkles className="h-3.5 w-3.5" />
-              Site Soul
-            </p>
-            <button
-              type="button"
-              onClick={() => onSelectTab("soul")}
-              className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-300/80 hover:text-teal-200"
-            >
-              Explore profile →
-            </button>
-          </div>
-          <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
-            {soul.name}
-          </h3>
-          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-300">
-            {soul.message}
-          </p>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-300/75">
-            {soul.evidence}
-          </p>
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,.92fr)] lg:items-start">
+        <div className="space-y-3">
+          <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle at 90% 10%, rgba(45,212,191,.22), transparent 38%), radial-gradient(circle at 5% 100%, rgba(45,212,191,.1), transparent 38%)",
+              }}
+            />
+            <div className="relative">
+              <div className="flex items-center justify-between gap-3">
+                <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Site Soul
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab("soul")}
+                  className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-300/80 hover:text-teal-200"
+                >
+                  Explore profile →
+                </button>
+              </div>
+              <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
+                {soul.name}
+              </h3>
+              <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-300">
+                {soul.message}
+              </p>
+              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-300/75">
+                {soul.evidence}
+              </p>
+            </div>
+          </section>
+
+          <OverviewCard title="Page essentials">
+            <div className="space-y-2">
+              <MetaRow
+                label="Title"
+                trailing={
+                  <CharBadge
+                    length={audit.title.length}
+                    max={audit.title.idealMax}
+                    status={audit.title.status}
+                  />
+                }
+              >
+                <span className="line-clamp-2">
+                  {audit.title.content ?? "Missing"}
+                </span>
+              </MetaRow>
+              <MetaRow
+                label="Description"
+                trailing={
+                  <CharBadge
+                    length={audit.description.length}
+                    max={audit.description.idealMax}
+                    status={audit.description.status}
+                  />
+                }
+              >
+                <span className="line-clamp-2">
+                  {audit.description.content ?? "Missing"}
+                </span>
+              </MetaRow>
+              <MetaRow
+                label="Keywords"
+                trailing={
+                  audit.keywords.content ? (
+                    <span className="font-mono text-[10px] tabular-nums text-slate-400">
+                      {audit.keywords.content.length} chars
+                    </span>
+                  ) : undefined
+                }
+              >
+                <span className="line-clamp-2">
+                  {audit.keywords.content ?? "Not set (optional)"}
+                </span>
+              </MetaRow>
+              <MetaRow label="Fetched URL">
+                <span className="line-clamp-1">{audit.url}</span>
+              </MetaRow>
+              <MetaRow label="Canonical">
+                <span className="line-clamp-1">
+                  {audit.canonical.href ?? "Missing"}
+                </span>
+              </MetaRow>
+            </div>
+          </OverviewCard>
         </div>
-      </section>
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,.75fr)]">
-        <OverviewCard title="Page essentials">
-          <div className="space-y-2">
-            <MetaRow
-              label="Title"
-              trailing={
-                <CharBadge
-                  length={audit.title.length}
-                  max={audit.title.idealMax}
-                  status={audit.title.status}
-                />
-              }
-            >
-              <span className="line-clamp-2">
-                {audit.title.content ?? "Missing"}
-              </span>
-            </MetaRow>
-            <MetaRow
-              label="Description"
-              trailing={
-                <CharBadge
-                  length={audit.description.length}
-                  max={audit.description.idealMax}
-                  status={audit.description.status}
-                />
-              }
-            >
-              <span className="line-clamp-2">
-                {audit.description.content ?? "Missing"}
-              </span>
-            </MetaRow>
-            <MetaRow
-              label="Keywords"
-              trailing={
-                audit.keywords.content ? (
-                  <span className="font-mono text-[10px] tabular-nums text-slate-400">
-                    {audit.keywords.content.length} chars
-                  </span>
-                ) : undefined
-              }
-            >
-              <span className="line-clamp-2">
-                {audit.keywords.content ?? "Not set (optional)"}
-              </span>
-            </MetaRow>
-            <MetaRow label="Fetched URL">
-              <span className="line-clamp-1">{audit.url}</span>
-            </MetaRow>
-            <MetaRow label="Canonical">
-              <span className="line-clamp-1">
-                {audit.canonical.href ?? "Missing"}
-              </span>
-            </MetaRow>
-          </div>
-        </OverviewCard>
-
-        <OverviewCard
-          title="Index & domain"
-          action={
-            <button
-              type="button"
-              onClick={() => onSelectTab("domain")}
-              className="text-[11px] font-semibold text-teal-700 hover:underline dark:text-teal-400"
-            >
-              Domain detail →
-            </button>
-          }
-        >
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-            <Fact
-              label="Robots tag"
-              value={audit.robotsMeta.content ?? "index, follow"}
-            />
-            <Fact
-              label="X-Robots-Tag"
-              value={audit.tech.xRobotsTag ?? "Not set"}
-            />
-            <Fact
-              label="robots.txt"
-              value={audit.robots.present ? "Available" : "Missing"}
-              tone={audit.robots.present ? "good" : "bad"}
-            />
-            <Fact
-              label="sitemap.xml"
-              value={audit.tech.sitemapPresent ? "Available" : "Missing"}
-              tone={audit.tech.sitemapPresent ? "good" : "bad"}
-            />
-            <Fact label="Domain created" value={fmtDate(audit.whois.createdAt)} />
-            <Fact label="Domain expires" value={fmtDate(audit.whois.expiresAt)} />
-            <Fact
-              label="Analytics"
-              value={analytics.length ? analytics.join(", ") : "Not detected"}
-            />
-            <Fact
-              label="Google AdSense"
-              value={hasAdsense ? "Detected" : "Not detected"}
-            />
-          </dl>
-        </OverviewCard>
-      </div>
-
-      <OverviewCard
-        title="Content snapshot"
-        action={
-          <button
-            type="button"
-            onClick={() => onSelectTab("structure")}
-            className="text-[11px] font-semibold text-teal-700 hover:underline dark:text-teal-400"
+        <div className="space-y-3">
+          <OverviewCard
+            title="Index & domain"
+            action={
+              <button
+                type="button"
+                onClick={() => onSelectTab("domain")}
+                className="text-[11px] font-semibold text-teal-700 hover:underline dark:text-teal-400"
+              >
+                Domain detail →
+              </button>
+            }
           >
-            Inspect structure →
-          </button>
-        }
-      >
-        <div className="divide-y divide-slate-200 dark:divide-slate-800">
-          <SnapshotRow
-            title="Content"
-            metrics={[
-              { label: "Words", value: audit.density.totalWords },
-              { label: "Language", value: audit.tech.lang ?? "—" },
-              {
-                label: "Read time",
-                value: `~${audit.extras.readingMinutes}m`,
-              },
-            ]}
-          />
-          <SnapshotRow
-            title="Headings"
-            metrics={[
-              {
-                label: "H1",
-                value: audit.headings.h1Count,
-                tone: audit.headings.h1Status,
-              },
-              { label: "H2", value: audit.headings.h2Count },
-              { label: "H3", value: audit.headings.h3Count },
-            ]}
-          />
-          <SnapshotRow
-            title="Images"
-            metrics={[
-              { label: "Total", value: audit.images.total },
-              { label: "Unique", value: uniqueImages },
-              {
-                label: "Missing alt",
-                value: audit.images.missingAlt,
-                tone: audit.images.missingAlt > 0 ? "fail" : "pass",
-              },
-              { label: "Missing title", value: imagesMissingTitle },
-            ]}
-          />
-          <SnapshotRow
-            title="Links"
-            metrics={[
-              { label: "Total", value: audit.links.total },
-              { label: "Unique", value: uniqueLinks },
-              { label: "Internal", value: audit.links.internal },
-              { label: "External", value: audit.links.external },
-              { label: "Dofollow", value: dofollow },
-              { label: "Nofollow", value: audit.links.nofollow },
-            ]}
-          />
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+              <Fact
+                label="Robots tag"
+                value={audit.robotsMeta.content ?? "index, follow"}
+              />
+              <Fact
+                label="X-Robots-Tag"
+                value={audit.tech.xRobotsTag ?? "Not set"}
+              />
+              <Fact
+                label="robots.txt"
+                value={audit.robots.present ? "Available" : "Missing"}
+                tone={audit.robots.present ? "good" : "bad"}
+              />
+              <Fact
+                label="sitemap.xml"
+                value={audit.tech.sitemapPresent ? "Available" : "Missing"}
+                tone={audit.tech.sitemapPresent ? "good" : "bad"}
+              />
+              <Fact
+                label="Domain created"
+                value={fmtDate(audit.whois.createdAt)}
+              />
+              <Fact
+                label="Domain expires"
+                value={fmtDate(audit.whois.expiresAt)}
+              />
+              <Fact
+                label="Analytics"
+                value={analytics.length ? analytics.join(", ") : "Not detected"}
+              />
+              <Fact
+                label="Google AdSense"
+                value={hasAdsense ? "Detected" : "Not detected"}
+              />
+            </dl>
+          </OverviewCard>
+
+          <OverviewCard
+            title="Content snapshot"
+            action={
+              <button
+                type="button"
+                onClick={() => onSelectTab("structure")}
+                className="text-[11px] font-semibold text-teal-700 hover:underline dark:text-teal-400"
+              >
+                Inspect structure →
+              </button>
+            }
+          >
+            <div className="divide-y divide-slate-200 dark:divide-slate-800">
+              <SnapshotRow
+                title="Content"
+                metrics={[
+                  { label: "Words", value: audit.density.totalWords },
+                  { label: "Language", value: audit.tech.lang ?? "—" },
+                  {
+                    label: "Read time",
+                    value: `~${audit.extras.readingMinutes}m`,
+                  },
+                ]}
+              />
+              <SnapshotRow
+                title="Headings"
+                metrics={[
+                  {
+                    label: "H1",
+                    value: audit.headings.h1Count,
+                    tone: audit.headings.h1Status,
+                  },
+                  { label: "H2", value: audit.headings.h2Count },
+                  { label: "H3", value: audit.headings.h3Count },
+                ]}
+              />
+              <SnapshotRow
+                title="Images"
+                metrics={[
+                  { label: "Total", value: audit.images.total },
+                  { label: "Unique", value: uniqueImages },
+                  {
+                    label: "Missing alt",
+                    value: audit.images.missingAlt,
+                    tone: audit.images.missingAlt > 0 ? "fail" : "pass",
+                  },
+                  { label: "Missing title", value: imagesMissingTitle },
+                ]}
+              />
+              <SnapshotRow
+                title="Links"
+                metrics={[
+                  { label: "Total", value: audit.links.total },
+                  { label: "Unique", value: uniqueLinks },
+                  { label: "Internal", value: audit.links.internal },
+                  { label: "External", value: audit.links.external },
+                  { label: "Dofollow", value: dofollow },
+                  { label: "Nofollow", value: audit.links.nofollow },
+                ]}
+              />
+            </div>
+          </OverviewCard>
         </div>
-      </OverviewCard>
+      </div>
 
       <div className="rounded-lg border border-slate-200 px-3 py-2.5 dark:border-slate-800">
         <div className="flex items-center justify-between gap-2">
