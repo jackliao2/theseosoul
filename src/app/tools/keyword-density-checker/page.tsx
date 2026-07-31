@@ -140,6 +140,7 @@ export default function KeywordDensityCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="Density is only a focus check — titles, GEO shape, and shares still matter."
         tools={[
           { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
           { href: "/tools/geo-content-checker", label: "GEO Content Checker" },

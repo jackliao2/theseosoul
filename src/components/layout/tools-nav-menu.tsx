@@ -6,8 +6,9 @@ import { ChevronDown } from "lucide-react";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
-const featured = TOOL_CATALOG.filter((t) => t.group === "featured");
-const rest = TOOL_CATALOG.filter((t) => t.group !== "featured");
+const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
+const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
+const content = TOOL_CATALOG.filter((t) => t.group === "content");
 
 export function ToolsNavMenu() {
   const [open, setOpen] = useState(false);
@@ -64,52 +65,103 @@ export function ToolsNavMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-0 top-full z-50 w-[22rem] pt-2 transition-[opacity,transform] duration-150",
+          "absolute left-1/2 top-full z-50 w-[min(28rem,calc(100vw-1.5rem))] -translate-x-1/2 pt-2 transition-[opacity,transform] duration-200 ease-out",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
-            : "pointer-events-none -translate-y-1 opacity-0"
+            : "pointer-events-none translate-y-1 opacity-0"
         )}
       >
-        <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-[color:var(--surface)] shadow-[0_16px_40px_-20px_rgba(15,23,42,0.35)] dark:border-slate-700 dark:shadow-[0_16px_40px_-18px_rgba(0,0,0,0.65)]">
-          {featured.map((item) => (
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-[color:var(--surface)] shadow-[0_24px_60px_-28px_rgba(15,23,42,0.45)] dark:border-slate-600/80 dark:shadow-[0_28px_70px_-24px_rgba(0,0,0,0.75)]">
+          {/* Atmosphere */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 0% 0%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 55%), radial-gradient(ellipse 50% 40% at 100% 100%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 50%)",
+            }}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-grain opacity-30 dark:opacity-20" />
+
+          <div className="relative p-3">
             <Link
-              key={item.href}
-              href={item.href}
+              href={featured.href}
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block border-b border-slate-100 px-4 py-3 transition-colors hover:bg-teal-800/[0.06] dark:border-slate-800 dark:hover:bg-teal-400/10"
+              className="group flex items-stretch gap-3 overflow-hidden rounded-xl bg-[#0b1220] px-3.5 py-3 text-left transition-transform duration-200 hover:scale-[1.01] dark:bg-[#0a1018]"
             >
-              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-teal-800 dark:text-teal-300">
-                Start here
+              <span className="flex w-1 shrink-0 rounded-full bg-teal-400/90" />
+              <span className="min-w-0 flex-1">
+                <span className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-teal-300/90">
+                  Whole site
+                </span>
+                <span className="mt-0.5 block font-display text-[15px] font-bold tracking-tight text-white">
+                  {featured.title}
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-400">
+                  {featured.short}
+                </span>
               </span>
-              <span className="mt-0.5 block text-sm font-semibold text-slate-900 dark:text-slate-50">
-                {item.title}
+              <span className="self-center font-display text-lg text-teal-300/80 transition-transform group-hover:translate-x-0.5">
+                ↗
               </span>
             </Link>
-          ))}
 
-          <ul className="grid grid-cols-2 gap-x-1 gap-y-0.5 p-2">
-            {rest.map((item) => (
-              <li key={item.href}>
+            <div className="mt-3 grid grid-cols-2 gap-1">
+              {checkers.map((item, i) => (
                 <Link
+                  key={item.href}
                   href={item.href}
                   role="menuitem"
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-2.5 py-2 text-[13px] font-medium leading-snug text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+                  className="group rounded-xl px-3 py-2.5 transition-colors hover:bg-white/70 dark:hover:bg-white/[0.06]"
                 >
-                  {item.title.replace(/ Checker$/, "")}
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-[13px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                      {item.nav}
+                    </span>
+                    <span className="font-mono text-[9px] tabular-nums text-slate-300 transition-colors group-hover:text-teal-700 dark:text-slate-600 dark:group-hover:text-teal-300">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </span>
+                  <span className="mt-0.5 block text-[11px] leading-snug text-slate-500 dark:text-slate-400">
+                    {item.short}
+                  </span>
                 </Link>
-              </li>
+              ))}
+            </div>
+
+            {content.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="mt-1 flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/70 dark:hover:bg-white/[0.06]"
+              >
+                <span>
+                  <span className="font-display text-[13px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    {item.nav}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-slate-500 dark:text-slate-400">
+                    {item.short}
+                  </span>
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-teal-800/70 dark:text-teal-300/70">
+                  GEO
+                </span>
+              </Link>
             ))}
-          </ul>
+          </div>
 
           <Link
             href="/tools"
             onClick={() => setOpen(false)}
-            className="flex items-center justify-between border-t border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-semibold text-teal-800 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/60 dark:text-teal-300 dark:hover:bg-slate-900"
+            className="relative flex items-center justify-between border-t border-slate-200/80 px-4 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-teal-800/[0.05] hover:text-teal-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-teal-400/[0.06] dark:hover:text-teal-200"
           >
-            All free tools
-            <span aria-hidden>→</span>
+            <span>See the full toolkit</span>
+            <span className="font-display text-teal-800 dark:text-teal-300">
+              →
+            </span>
           </Link>
         </div>
       </div>
@@ -137,15 +189,30 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
         />
       </button>
       {expanded ? (
-        <div className="mb-1 ml-2 space-y-0.5 border-l border-slate-200 pl-2 dark:border-slate-700">
-          {TOOL_CATALOG.map((item) => (
+        <div className="mb-1 ml-1 space-y-0.5 border-l-2 border-teal-800/25 pl-2 dark:border-teal-400/25">
+          <Link
+            href={featured.href}
+            onClick={onNavigate}
+            className="block rounded-lg px-3 py-2"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-wider text-teal-800 dark:text-teal-300">
+              Whole site
+            </span>
+            <span className="mt-0.5 block text-sm font-semibold text-slate-900 dark:text-slate-50">
+              {featured.title}
+            </span>
+          </Link>
+          {checkers.concat(content).map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={onNavigate}
               className="block rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             >
-              {item.title}
+              {item.nav}
+              <span className="mt-0.5 block text-[11px] text-slate-400">
+                {item.short}
+              </span>
             </Link>
           ))}
           <Link
@@ -153,7 +220,7 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
             onClick={onNavigate}
             className="block rounded-lg px-3 py-2 text-sm font-semibold text-teal-800 dark:text-teal-300"
           >
-            All free tools →
+            See the full toolkit →
           </Link>
         </div>
       ) : null}

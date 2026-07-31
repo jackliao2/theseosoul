@@ -138,6 +138,7 @@ export default function RedirectCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="After the hop chain, confirm the landing URL is the one you want indexed."
         tools={[
           { href: "/tools/canonical-checker", label: "Canonical Tag Checker" },
           { href: "/tools/robots-txt-checker", label: "Robots.txt Checker" },

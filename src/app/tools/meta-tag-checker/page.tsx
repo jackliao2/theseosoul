@@ -140,6 +140,7 @@ export default function MetaTagCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="Snippets are one layer — check social cards, focus phrases, and indexability too."
         tools={[
           { href: "/tools/open-graph-checker", label: "Open Graph Checker" },
           {

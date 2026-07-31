@@ -160,6 +160,7 @@ export default function RobotsTxtCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="robots.txt only controls crawl access — check indexing and preferred URLs next."
         tools={[
           { href: "/tools/noindex-checker", label: "Noindex Checker" },
           { href: "/tools/redirect-checker", label: "Redirect Checker" },

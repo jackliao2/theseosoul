@@ -137,6 +137,7 @@ export default function GeoContentCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="Citation-ready prose still needs crawl access and clear search/social snippets."
         tools={[
           {
             href: "/tools/keyword-density-checker",

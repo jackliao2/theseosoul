@@ -133,6 +133,7 @@ export default function OpenGraphCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="Social cards should echo the search snippet and the preferred URL."
         tools={[
           { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
           {

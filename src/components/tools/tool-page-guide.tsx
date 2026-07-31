@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { getToolByHref } from "@/lib/tools/catalog";
 
 export type ToolFaq = { q: string; a: string };
 
@@ -130,40 +131,75 @@ export function ToolFaqSection({ faqs }: { faqs: ToolFaq[] }) {
   );
 }
 
-export function ToolRelated({ tools }: { tools: RelatedTool[] }) {
+export function ToolRelated({
+  tools,
+  hint = "Same diagnosis, different angle — these usually come next.",
+}: {
+  tools: RelatedTool[];
+  hint?: string;
+}) {
   return (
-    <section className="mt-14 border-t border-slate-300/70 pt-12 dark:border-slate-700">
-      <h2 className="font-display text-xl font-bold text-slate-900 dark:text-slate-50">
-        Related free tools
+    <section className="mt-14 border-t border-slate-300/70 pt-10 dark:border-slate-700">
+      <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+        Keep going
+      </p>
+      <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+        What to check next
       </h2>
-      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
-        {tools.map((t) => (
-          <li key={t.href}>
-            <Link
-              href={t.href}
-              className="text-teal-800 hover:underline dark:text-teal-300"
-            >
-              {t.label} →
-            </Link>
-          </li>
-        ))}
-        <li>
-          <Link
-            href="/tools"
-            className="text-teal-800 hover:underline dark:text-teal-300"
-          >
-            All free SEO tools →
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/#home-audit-url"
-            className="text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Full website SEO checker →
-          </Link>
-        </li>
+      <p className="mt-1.5 max-w-md text-sm text-slate-500 dark:text-slate-400">
+        {hint}
+      </p>
+
+      <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+        {tools.map((t) => {
+          const catalog = getToolByHref(t.href);
+          const title = catalog?.nav ?? t.label.replace(/ Checker$/, "");
+          const short = catalog?.short;
+          return (
+            <li key={t.href}>
+              <Link
+                href={t.href}
+                className="group flex h-full flex-col justify-between rounded-xl border border-slate-300/60 px-3.5 py-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/35 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/30 dark:hover:bg-teal-400/[0.05]"
+              >
+                <span className="flex items-start justify-between gap-2">
+                  <span className="font-display text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    {title}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="mt-0.5 text-sm text-teal-800/50 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-teal-800 dark:text-teal-300/40 dark:group-hover:text-teal-300"
+                  >
+                    ↗
+                  </span>
+                </span>
+                {short ? (
+                  <span className="mt-1 text-xs leading-snug text-slate-500 dark:text-slate-400">
+                    {short}
+                  </span>
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
+
+      <p className="mt-5 text-sm text-slate-500 dark:text-slate-400">
+        Need the whole picture?{" "}
+        <Link
+          href="/#home-audit-url"
+          className="font-semibold text-slate-800 underline decoration-teal-700/40 underline-offset-2 hover:decoration-teal-700 dark:text-slate-200 dark:decoration-teal-300/40 dark:hover:decoration-teal-300"
+        >
+          Run a full audit
+        </Link>
+        {" · "}
+        <Link
+          href="/tools"
+          className="font-semibold text-slate-800 underline decoration-teal-700/40 underline-offset-2 hover:decoration-teal-700 dark:text-slate-200 dark:decoration-teal-300/40 dark:hover:decoration-teal-300"
+        >
+          browse every tool
+        </Link>
+        .
+      </p>
     </section>
   );
 }

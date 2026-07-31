@@ -134,6 +134,7 @@ export default function NoindexCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="If the page never gets fetched, or signals disagree, check these next."
         tools={[
           { href: "/tools/robots-txt-checker", label: "Robots.txt Checker" },
           { href: "/tools/canonical-checker", label: "Canonical Tag Checker" },

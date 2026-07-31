@@ -140,6 +140,7 @@ export default function CanonicalCheckerPage() {
       <ToolFaqSection faqs={faqs} />
 
       <ToolRelated
+        hint="Canonicals and redirects should agree — then confirm the page can be indexed."
         tools={[
           { href: "/tools/redirect-checker", label: "Redirect Checker" },
           { href: "/tools/noindex-checker", label: "Noindex Checker" },
