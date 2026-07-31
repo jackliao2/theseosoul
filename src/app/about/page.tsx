@@ -7,11 +7,12 @@ import {
   ContentTitle,
 } from "@/components/layout/content-page";
 import { SiteWordmark } from "@/components/brand/site-mark";
+import { SOUL_ARCHETYPES } from "@/lib/audit/soul";
 import { SITE_EMAIL, SITE_NAME } from "@/lib/audit/types";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: `What ${SITE_NAME} is, how free technical SEO audits work, and what we intentionally leave out.`,
+  title: "About TheSeoSoul — Free SEO Audits & Site Soul",
+  description: `What ${SITE_NAME} is: free technical SEO + GEO audits, shareable reports, Site Soul profiles, and an honest free tier without fake traffic charts.`,
   alternates: { canonical: "/about" },
 };
 
@@ -58,7 +59,7 @@ const covered = [
 const notCovered = [
   {
     title: "Domain Authority / traffic charts",
-    body: "Those need paid third-party databases. We won’t invent fake scores.",
+    body: "Those need paid third-party databases. We won’t invent fake scores on the free tier.",
   },
   {
     title: "Full-site crawl of every URL",
@@ -88,6 +89,14 @@ const steps = [
   },
 ];
 
+const freeTools = [
+  { href: "/tools/domain-history", label: "Domain history" },
+  { href: "/tools/adsense-readiness-checker", label: "AdSense readiness" },
+  { href: "/tools/robots-txt-checker", label: "Robots.txt" },
+  { href: "/tools/meta-tag-checker", label: "Meta tags" },
+  { href: "/tools/geo-content-checker", label: "GEO content" },
+];
+
 export default function AboutPage() {
   return (
     <ContentPage wide>
@@ -96,9 +105,9 @@ export default function AboutPage() {
       </ContentEyebrow>
       <ContentTitle>About TheSeoSoul</ContentTitle>
       <ContentLead>
-        Free technical SEO audits with shareable report URLs. Paste any public
-        domain — we fetch the live page, score on-page health and GEO readiness,
-        and publish a dashboard you can send to clients.
+        A free technical SEO checker that publishes a real report URL — not a
+        locked popup. Paste any public domain, get on-page + GEO signals, a Site
+        Soul profile, and something you can actually send to a client.
       </ContentLead>
 
       <div className="mt-10 flex flex-wrap gap-3">
@@ -115,6 +124,35 @@ export default function AboutPage() {
           Browse tools
         </Link>
       </div>
+
+      <section className="mt-16">
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
+          Why this exists
+        </h2>
+        <div className="mt-4 max-w-3xl space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <p>
+            Most free SEO checkers bury the result behind signup walls, or dump
+            everything into a private modal you can’t share. Agencies and
+            freelancers still need a clean link: “here’s what we found on your
+            site.”
+          </p>
+          <p>
+            {SITE_NAME} is built around that link. We fetch public HTML and
+            related public files, score what we can prove, and publish a
+            dashboard at{" "}
+            <code className="rounded bg-slate-200/70 px-1.5 py-0.5 text-[13px] dark:bg-slate-800">
+              /audit/[domain]
+            </code>
+            . The free tier stays honest: no invented Domain Authority, no fake
+            traffic graphs.
+          </p>
+          <p>
+            The name is literal. “Seo” is the craft. “Soul” is the part a bare
+            score misses — what kind of presence the site has when Meta,
+            Structure, Technical, and GEO are read together.
+          </p>
+        </div>
+      </section>
 
       <section className="mt-16">
         <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
@@ -135,6 +173,59 @@ export default function AboutPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section
+        id="site-soul"
+        className="mt-16 border-t border-slate-300/70 pt-12 dark:border-slate-800"
+      >
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">
+          Site Soul
+        </p>
+        <h2 className="mt-2 font-display text-2xl font-bold text-slate-900 dark:text-white">
+          Beyond the score
+        </h2>
+        <div className="mt-4 max-w-3xl space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <p>
+            A 72/100 tells you the page performed okay. It does not tell you
+            whether the site feels like a precise Architect, a clear Beacon, a
+            Hidden Gem buried by crawl issues, or a Rising Voice still finding
+            its shape.
+          </p>
+          <p>
+            Site Soul is a rule-based profile included in every free report. We
+            look at Meta, Structure, Technical, and GEO subscores plus content
+            depth, crawl, and indexing signals — then map the pattern to one of
+            11 archetypes. No LLM improvisation; the same inputs produce the
+            same soul.
+          </p>
+        </div>
+
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+          {SOUL_ARCHETYPES.map((soul) => (
+            <li
+              key={soul.id}
+              className="rounded-lg border border-slate-200/90 px-3.5 py-3 dark:border-slate-800"
+            >
+              <p className="font-display text-sm font-semibold text-slate-900 dark:text-white">
+                {soul.name}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                {soul.essence}
+              </p>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-sm text-slate-500">
+          See it on a live report:{" "}
+          <Link
+            href="/audit/theseosoul.com?tab=soul"
+            className="font-semibold text-teal-800 hover:underline dark:text-teal-400"
+          >
+            theseosoul.com Site Soul →
+          </Link>
+        </p>
       </section>
 
       <section className="mt-16">
@@ -188,9 +279,40 @@ export default function AboutPage() {
 
       <section className="mt-16 border-t border-slate-300/70 pt-12 dark:border-slate-800">
         <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
+          Free tools around the audit
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          When you only need one answer, use a focused checker. Each has its own
+          page, explanation, and FAQ — the full audit is still fastest when you
+          want the whole picture.
+        </p>
+        <ul className="mt-6 flex flex-wrap gap-2">
+          {freeTools.map((tool) => (
+            <li key={tool.href}>
+              <Link
+                href={tool.href}
+                className="inline-flex rounded-md border border-slate-300/80 px-3 py-1.5 text-sm font-semibold text-slate-800 hover:border-teal-700/40 hover:text-teal-900 dark:border-slate-700 dark:text-slate-100 dark:hover:border-teal-400/40 dark:hover:text-teal-200"
+              >
+                {tool.label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <Link
+              href="/tools"
+              className="inline-flex rounded-md bg-teal-800/10 px-3 py-1.5 text-sm font-semibold text-teal-900 hover:bg-teal-800/15 dark:bg-teal-400/10 dark:text-teal-200"
+            >
+              All tools →
+            </Link>
+          </li>
+        </ul>
+      </section>
+
+      <section className="mt-16 border-t border-slate-300/70 pt-12 dark:border-slate-800">
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
           Shareable reports ≠ mass indexing
         </h2>
-        <div className="mt-4 space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+        <div className="mt-4 max-w-3xl space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
           <p>
             A report URL is a product feature so you can send{" "}
             <code className="rounded bg-slate-200/70 px-1.5 py-0.5 text-[13px] dark:bg-slate-800">
@@ -205,7 +327,7 @@ export default function AboutPage() {
               noindex,follow
             </code>
             . Only a small curated set of example domains appears in our
-            sitemap.
+            sitemap — including our own site and a couple of demos.
           </p>
         </div>
       </section>
