@@ -7,7 +7,7 @@ export type ToolCatalogItem = {
   nav: string;
   /** One-line scan text for the hub / related tiles */
   short: string;
-  group: "featured" | "checkers" | "content";
+  group: "featured" | "growth" | "checkers" | "content";
 };
 
 export const TOOL_CATALOG: ToolCatalogItem[] = [
@@ -17,6 +17,13 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     nav: "Full audit",
     short: "Meta · Structure · Technical · GEO in one report",
     group: "featured",
+  },
+  {
+    href: "/tools/adsense-readiness-checker",
+    title: "AdSense Readiness Checker",
+    nav: "AdSense readiness",
+    short: "Trust pages, content sample & approval prep",
+    group: "growth",
   },
   {
     href: "/tools/robots-txt-checker",

@@ -8,6 +8,7 @@ import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
 const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
+const growth = TOOL_CATALOG.filter((t) => t.group === "growth");
 const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
 const content = TOOL_CATALOG.filter((t) => t.group === "content");
 
@@ -129,6 +130,28 @@ export function ToolsNavMenu() {
               ))}
             </div>
 
+            {growth.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="mt-1 flex items-center justify-between gap-3 rounded-xl border border-teal-800/15 bg-teal-800/[0.04] px-3 py-2.5 transition-colors hover:border-teal-800/30 hover:bg-teal-800/[0.08] dark:border-teal-400/15 dark:bg-teal-400/[0.05] dark:hover:border-teal-400/30"
+              >
+                <span>
+                  <span className="font-display text-[13px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    {item.nav}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-slate-500 dark:text-slate-400">
+                    {item.short}
+                  </span>
+                </span>
+                <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-800 dark:text-teal-300">
+                  New
+                </span>
+              </Link>
+            ))}
+
             {content.map((item) => (
               <Link
                 key={item.href}
@@ -197,7 +220,7 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
               {featured.title}
             </span>
           </AuditCtaLink>
-          {checkers.concat(content).map((item) => (
+          {growth.concat(checkers, content).map((item) => (
             <Link
               key={item.href}
               href={item.href}

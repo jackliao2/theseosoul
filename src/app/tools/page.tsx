@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "Which free tool should I start with?",
-    a: "Start with the full technical SEO audit for a shareable report. Use robots.txt, meta, canonical, density, Open Graph, noindex, and redirect checkers when you need a focused diagnosis.",
+    a: "Start with the full technical SEO audit for a shareable report. Use the AdSense readiness checker for monetization preparation, or the focused robots.txt, meta, canonical, density, Open Graph, noindex, and redirect tools for a specific diagnosis.",
   },
   {
     q: "Do you offer a free robots txt checker and keyword density tool?",
@@ -31,9 +31,9 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Free SEO Tools — No Signup | Robots, Meta, Density & More",
+  title: "Free SEO Tools — Audit, AdSense Readiness, Robots & More",
   description:
-    "Free SEO tools with no registration: website SEO checker, robots txt checker, meta tag checker, canonical checker, keyword density, Open Graph, noindex, redirects, and GEO content checker.",
+    "Free SEO tools with no registration: website SEO audit, AdSense readiness checker, robots.txt, meta tags, canonical, keyword density, Open Graph, noindex, redirects, and GEO.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "free seo tools",
@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     "robots txt checker",
     "meta tag checker",
     "canonical tag checker",
+    "adsense readiness checker",
   ],
   openGraph: {
     title: "Free SEO Tools — No Signup",
@@ -54,6 +55,7 @@ export const metadata: Metadata = {
 };
 
 const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
+const growthTools = TOOL_CATALOG.filter((t) => t.group === "growth");
 const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
 const contentTools = TOOL_CATALOG.filter((t) => t.group === "content");
 
@@ -144,6 +146,22 @@ export default function ToolsPage() {
           <ArrowUpRight className="h-3.5 w-3.5" />
         </span>
       </Link>
+
+      <section className="mt-8">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="font-display text-base font-bold text-slate-900 dark:text-slate-50">
+            Growth & monetization
+          </h2>
+          <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-700 dark:text-teal-300">
+            New
+          </span>
+        </div>
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {growthTools.map((tool) => (
+            <ToolTile key={tool.href} {...tool} />
+          ))}
+        </div>
+      </section>
 
       <section className="mt-10">
         <div className="mb-3 flex items-baseline justify-between gap-3">
