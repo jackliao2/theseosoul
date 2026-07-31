@@ -127,22 +127,6 @@ export function Footer() {
                 Terms
               </Link>
             </li>
-            <li>
-              <Link
-                href="/sitemap.xml"
-                className="hover:text-teal-700 dark:hover:text-teal-300"
-              >
-                Sitemap
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/robots.txt"
-                className="hover:text-teal-700 dark:hover:text-teal-300"
-              >
-                Robots
-              </Link>
-            </li>
           </ul>
         </div>
       </div>
