@@ -52,6 +52,19 @@ export default async function AuditTwitterImage({ params }: Props) {
           <div
             style={{
               display: "flex",
+              marginBottom: 18,
+              color: "#5eead4",
+              fontSize: 18,
+              fontWeight: 700,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+            }}
+          >
+            Shareable Site Soul report
+          </div>
+          <div
+            style={{
+              display: "flex",
               fontSize: 56,
               fontWeight: 800,
               letterSpacing: -1,
@@ -68,7 +81,7 @@ export default async function AuditTwitterImage({ params }: Props) {
               color: "#cbd5e1",
             }}
           >
-            Free technical SEO audit report
+            Meta · Structure · Technical · GEO
           </div>
         </div>
         <div
@@ -78,7 +91,7 @@ export default async function AuditTwitterImage({ params }: Props) {
             color: "#94a3b8",
           }}
         >
-          theseosoul.com/audit/{domain}
+          Discover what helps this site get found · theseosoul.com/audit/{domain}
         </div>
       </div>
     ),

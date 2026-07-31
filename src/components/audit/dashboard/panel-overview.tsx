@@ -1,9 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ExternalLink } from "lucide-react";
+import { ArrowRight, CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
 import { CharBadge } from "@/components/audit/dashboard/char-badge";
 import { ScoreRing } from "@/components/ui/score-ring";
+import {
+  getPrimaryAction,
+  getSoulProfile,
+} from "@/lib/audit/soul";
 import { computeSubScores } from "@/lib/audit/subscores";
 import type { AuditResult, AuditTabId, CheckStatus } from "@/lib/audit/types";
 import { cn } from "@/lib/utils";
@@ -89,6 +93,8 @@ export function PanelOverview({
   const warnings = audit.issues.filter((i) => i.severity === "warning").length;
   const attention = attentionItems(audit);
   const subs = computeSubScores(audit);
+  const soul = getSoulProfile(audit);
+  const primaryAction = getPrimaryAction(audit);
 
   const uniqueImages =
     audit.images.unique ??
@@ -181,6 +187,85 @@ export function PanelOverview({
           </li>
         ))}
       </ul>
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at 90% 10%, rgba(45,212,191,.22), transparent 38%), radial-gradient(circle at 5% 100%, rgba(45,212,191,.1), transparent 38%)",
+            }}
+          />
+          <div className="relative">
+            <div className="flex items-center justify-between gap-3">
+              <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+                <Sparkles className="h-3.5 w-3.5" />
+                Site Soul
+              </p>
+              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                Rule-based
+              </span>
+            </div>
+            <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
+              {soul.name}
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-300">
+              {soul.message}
+            </p>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-300/75">
+              {soul.evidence}
+            </p>
+          </div>
+        </section>
+
+        <section
+          className={cn(
+            "rounded-xl border p-4",
+            primaryAction.urgent
+              ? "border-amber-300/70 bg-amber-50/55 dark:border-amber-900/60 dark:bg-amber-950/20"
+              : "border-emerald-300/70 bg-emerald-50/55 dark:border-emerald-900/60 dark:bg-emerald-950/20"
+          )}
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className={cn(
+                "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                primaryAction.urgent
+                  ? "bg-amber-500/15 text-amber-800 dark:text-amber-300"
+                  : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+              )}
+            >
+              {primaryAction.urgent ? (
+                <ArrowRight className="h-4 w-4" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                {primaryAction.urgent
+                  ? "If you fix one thing today"
+                  : "Today’s priority"}
+              </p>
+              <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                {primaryAction.title}
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                {primaryAction.fix}
+              </p>
+              <button
+                type="button"
+                onClick={() => onSelectTab(primaryAction.tab)}
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 hover:underline dark:text-teal-300"
+              >
+                {primaryAction.urgent ? "See why it matters" : "Review all checks"}
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,.75fr)]">
         <OverviewCard title="Page essentials">

@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { Check, Copy, Download, Link2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  getPrimaryAction,
+  getSoulProfile,
+} from "@/lib/audit/soul";
 import type { AuditResult } from "@/lib/audit/types";
 import { auditCanonicalUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
@@ -27,9 +31,16 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
   }
 
   async function copySummary() {
+    const soul = getSoulProfile(audit);
+    const priority = getPrimaryAction(audit);
     const lines = [
       `TheSeoSoul SEO Audit — ${audit.domain}`,
       `Score: ${audit.score}/100 (Grade ${audit.grade})`,
+      `Site Soul: ${soul.name}`,
+      soul.message,
+      priority.urgent
+        ? `Fix first: ${priority.title} — ${priority.fix}`
+        : "Priority: No urgent issues today.",
       `URL: ${audit.url}`,
       `Title: ${audit.title.content ?? "N/A"} (${audit.title.length})`,
       `Description: ${audit.description.content ?? "N/A"} (${audit.description.length})`,
@@ -47,11 +58,12 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
 
   async function share() {
     const url = auditCanonicalUrl(audit.domain);
+    const soul = getSoulProfile(audit);
     if (navigator.share) {
       try {
         await navigator.share({
           title: `${audit.domain} SEO Audit`,
-          text: `${audit.domain} scored ${audit.score}/100 (${audit.grade}) on TheSeoSoul.`,
+          text: `${audit.domain} scored ${audit.score}/100 (${audit.grade}). Site Soul: ${soul.name} — ${soul.message}`,
           url,
         });
         return;
