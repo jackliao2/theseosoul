@@ -2,20 +2,51 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ContentPage } from "@/components/layout/content-page";
-import { SITE_NAME } from "@/lib/audit/types";
+import {
+  ToolFaqJsonLd,
+  ToolFaqSection,
+} from "@/components/tools/tool-page-guide";
+import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+
+const PAGE_PATH = "/tools";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
+
+const faqs = [
+  {
+    q: "Are these SEO tools really free?",
+    a: `${SITE_NAME} free tools need no registration. They run on live HTML and public signals we can fetch — not invented Domain Authority or fake traffic charts.`,
+  },
+  {
+    q: "Which free tool should I start with?",
+    a: "Start with the full technical SEO audit for a shareable report. Use robots.txt, meta, canonical, density, Open Graph, noindex, and redirect checkers when you need a focused diagnosis.",
+  },
+  {
+    q: "Do you offer a free robots txt checker and keyword density tool?",
+    a: "Yes — both are live: robots.txt checker for crawl rules and AI bot blocks, and keyword density checker for URL or pasted drafts.",
+  },
+];
 
 export const metadata: Metadata = {
-  title: "Free SEO Tools — No Signup",
+  title: "Free SEO Tools — No Signup | Robots, Meta, Density & More",
   description:
-    "Free SEO tools with no registration: website SEO checker, meta tag checker, canonical checker, robots txt checker, keyword density, Open Graph, noindex, redirects, and GEO content checker.",
-  alternates: { canonical: "/tools" },
+    "Free SEO tools with no registration: website SEO checker, robots txt checker, meta tag checker, canonical checker, keyword density, Open Graph, noindex, redirects, and GEO content checker.",
+  alternates: { canonical: PAGE_PATH },
   keywords: [
     "free seo tools",
     "seo tools free",
     "free seo checker",
     "keyword density checker",
     "robots txt checker",
+    "meta tag checker",
+    "canonical tag checker",
   ],
+  openGraph: {
+    title: "Free SEO Tools — No Signup",
+    description:
+      "Honest free SEO utilities: robots.txt, meta, canonical, density, OG, redirects, GEO.",
+    url: PAGE_PATH,
+    type: "website",
+  },
 };
 
 const groups = [
@@ -122,15 +153,22 @@ const coming = [
 export default function ToolsPage() {
   return (
     <ContentPage className="max-w-6xl">
+      <ToolFaqJsonLd
+        faqs={faqs}
+        pageUrl={PAGE_URL}
+        name={`${SITE_NAME} Free SEO Tools`}
+      />
       <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
         Free tools · no registration
       </p>
       <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
-        SEO & GEO tools you can use today
+        Free SEO tools — no signup
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
-        {SITE_NAME} ships honest free utilities from live HTML and public
-        signals. No invented Domain Authority. No fake traffic charts.
+        {SITE_NAME} ships honest free SEO utilities from live HTML and public
+        signals: robots txt checker, meta tag checker, canonical, keyword
+        density, Open Graph, noindex, redirects, and GEO. No invented Domain
+        Authority. No fake traffic charts.
       </p>
 
       <div className="mt-12 space-y-14">
@@ -172,6 +210,22 @@ export default function ToolsPage() {
           </section>
         ))}
       </div>
+
+      <section className="mt-14 max-w-2xl">
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-50">
+          How to use this free SEO tools hub
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          Run the full audit when you want a shareable Overview with Meta,
+          Structure, Technical, and GEO subscores. Drop into a single checker
+          when you already know the failure mode — for example robots.txt after
+          a deploy, canonicals after a migration, or density while editing a
+          draft. Every tool links back to related checks so you can finish the
+          diagnosis without leaving {SITE_NAME}.
+        </p>
+      </section>
+
+      <ToolFaqSection faqs={faqs} />
 
       <section className="mt-14">
         <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
