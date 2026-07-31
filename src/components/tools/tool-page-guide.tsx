@@ -16,6 +16,19 @@ export function ToolFaqJsonLd({
   pageUrl: string;
   name: string;
 }) {
+  const normalized = pageUrl.replace(/\/$/, "");
+  const isHub = normalized === `${SITE_URL}/tools`;
+  const breadcrumbItems = isHub
+    ? [
+        { name: "Home", item: SITE_URL },
+        { name: "Free tools", item: `${SITE_URL}/tools` },
+      ]
+    : [
+        { name: "Home", item: SITE_URL },
+        { name: "Free tools", item: `${SITE_URL}/tools` },
+        { name, item: pageUrl },
+      ];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -27,6 +40,15 @@ export function ToolFaqJsonLd({
         operatingSystem: "Web",
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbItems.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.item,
+        })),
       },
       {
         "@type": "FAQPage",

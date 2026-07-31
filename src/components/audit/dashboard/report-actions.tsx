@@ -11,23 +11,49 @@ import type { AuditResult } from "@/lib/audit/types";
 import { auditCanonicalUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
-export function ReportActions({ audit }: { audit: AuditResult }) {
-  const [copied, setCopied] = useState<"link" | "json" | "summary" | null>(
-    null
-  );
+type FlashKind = "link" | "json" | "summary";
 
-  function flash(kind: "link" | "json" | "summary") {
+async function writeClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+export function ReportActions({ audit }: { audit: AuditResult }) {
+  const [copied, setCopied] = useState<FlashKind | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  function flash(kind: FlashKind) {
     setCopied(kind);
+    setError(null);
     setTimeout(() => setCopied(null), 1600);
   }
 
+  function fail(message: string) {
+    setError(message);
+    setTimeout(() => setError(null), 2800);
+  }
+
   async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(auditCanonicalUrl(audit.domain));
-      flash("link");
-    } catch {
-      // ignore
-    }
+    const ok = await writeClipboard(auditCanonicalUrl(audit.domain));
+    if (ok) flash("link");
+    else fail("Couldn’t copy link — select the URL bar instead.");
   }
 
   async function copySummary() {
@@ -48,12 +74,9 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
       `Issues: ${audit.issues.length}`,
       `Fetched: ${audit.fetchedAt}`,
     ];
-    try {
-      await navigator.clipboard.writeText(lines.join("\n"));
-      flash("summary");
-    } catch {
-      // ignore
-    }
+    const ok = await writeClipboard(lines.join("\n"));
+    if (ok) flash("summary");
+    else fail("Couldn’t copy summary.");
   }
 
   async function share() {
@@ -67,8 +90,9 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
           url,
         });
         return;
-      } catch {
-        // fall through
+      } catch (err) {
+        // User dismissed the sheet — don't treat as failure.
+        if (err instanceof DOMException && err.name === "AbortError") return;
       }
     }
     await copyLink();
@@ -88,16 +112,17 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
   }
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="relative flex items-center gap-0.5">
       <Button
         variant="ghost"
         size="icon"
         onClick={share}
         aria-label="Share report"
-        className="h-8 w-8"
+        title="Share"
+        className="h-9 w-9 sm:h-8 sm:w-8"
       >
         {copied === "link" ? (
-          <Check className="h-4 w-4" />
+          <Check className="h-4 w-4 text-emerald-600" />
         ) : (
           <Share2 className="h-4 w-4" />
         )}
@@ -107,20 +132,25 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
         size="icon"
         onClick={copyLink}
         aria-label="Copy link"
-        className="hidden h-8 w-8 sm:inline-flex"
+        title="Copy link"
+        className="h-9 w-9 sm:h-8 sm:w-8"
       >
-        <Link2 className="h-4 w-4" />
+        {copied === "link" ? (
+          <Check className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <Link2 className="h-4 w-4" />
+        )}
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={copySummary}
         aria-label="Copy summary"
-        className="h-8 w-8"
         title="Copy summary"
+        className="h-9 w-9 sm:h-8 sm:w-8"
       >
         {copied === "summary" ? (
-          <Check className="h-4 w-4" />
+          <Check className="h-4 w-4 text-emerald-600" />
         ) : (
           <Copy className="h-4 w-4" />
         )}
@@ -130,14 +160,35 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
         size="icon"
         onClick={downloadJson}
         aria-label="Download JSON"
-        className={cn("h-8 w-8", "hidden sm:inline-flex")}
+        title="Download JSON"
+        className={cn("h-9 w-9 sm:h-8 sm:w-8", "hidden sm:inline-flex")}
       >
         {copied === "json" ? (
-          <Check className="h-4 w-4" />
+          <Check className="h-4 w-4 text-emerald-600" />
         ) : (
           <Download className="h-4 w-4" />
         )}
       </Button>
+
+      {copied || error ? (
+        <p
+          role="status"
+          className={cn(
+            "absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium shadow-sm",
+            error
+              ? "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-200"
+              : "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+          )}
+        >
+          {error
+            ? error
+            : copied === "link"
+              ? "Link copied"
+              : copied === "summary"
+                ? "Summary copied"
+                : "JSON downloaded"}
+        </p>
+      ) : null}
     </div>
   );
 }

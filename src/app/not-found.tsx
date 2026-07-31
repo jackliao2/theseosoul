@@ -9,7 +9,7 @@ export default function NotFound() {
         Page not found
       </h1>
       <p className="mt-3 text-slate-600 dark:text-slate-400">
-        That URL isn’t on {SITE_NAME}. Try a free audit instead.
+        That URL isn’t on {SITE_NAME}. Try a free audit or browse the tools.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
@@ -23,6 +23,18 @@ export default function NotFound() {
           className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
         >
           Free audit
+        </Link>
+        <Link
+          href="/tools"
+          className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+        >
+          Free tools
+        </Link>
+        <Link
+          href="/about"
+          className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-5 text-sm font-semibold text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+        >
+          About
         </Link>
       </div>
     </div>

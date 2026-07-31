@@ -56,10 +56,10 @@ export function PanelGeo({ audit }: { audit: AuditResult }) {
             AI crawlers, schema, answer-first, freshness
           </p>
           <Link
-            href="/tools"
+            href="/tools/geo-content-checker"
             className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:underline dark:text-teal-400"
           >
-            Free tools hub →
+            GEO content checker →
           </Link>
         </div>
       </div>

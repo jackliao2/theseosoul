@@ -4,7 +4,8 @@
 ## Site
 - Homepage: https://theseosoul.com/
 - Free tools: https://theseosoul.com/tools
-- About: https://theseosoul.com/about
+- About (incl. Site Soul): https://theseosoul.com/about
+- About · Site Soul archetypes: https://theseosoul.com/about#site-soul
 - Contact: https://theseosoul.com/contact
 - Privacy: https://theseosoul.com/privacy
 - Terms: https://theseosoul.com/terms
@@ -12,10 +13,13 @@
 ## Primary product
 - Full technical SEO audit (paste any public URL): https://theseosoul.com/#home-audit-url
 - Shareable reports live at /audit/[domain]. Most reports are noindex; only curated examples are listed in the sitemap.
+- Example report: https://theseosoul.com/audit/theseosoul.com
+- Site Soul: every free report includes a rule-based archetype (11 profiles) from Meta, Structure, Technical, GEO, and crawl signals — see https://theseosoul.com/about#site-soul
 
 ## Free tools
 - AdSense readiness: https://theseosoul.com/tools/adsense-readiness-checker
 - Domain history (Wayback + WHOIS): https://theseosoul.com/tools/domain-history
+- SEO site ladder (10 capability stages): https://theseosoul.com/tools/seo-ladder
 - Robots.txt checker: https://theseosoul.com/tools/robots-txt-checker
 - Meta tag checker: https://theseosoul.com/tools/meta-tag-checker
 - Canonical checker: https://theseosoul.com/tools/canonical-checker

@@ -58,6 +58,15 @@ export function SidebarNav({
           </>
         ) : null}
       </nav>
+
+      <div className="border-t border-slate-200 px-2 py-2 dark:border-slate-800">
+        <Link
+          href="/tools"
+          className="block rounded-md px-2 py-1.5 text-[12px] font-semibold text-teal-800 hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-teal-950/50"
+        >
+          Free tools →
+        </Link>
+      </div>
     </aside>
   );
 }

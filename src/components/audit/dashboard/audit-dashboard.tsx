@@ -16,6 +16,7 @@ import { PanelDomain } from "@/components/audit/dashboard/panel-domain";
 import { PanelLocked } from "@/components/audit/dashboard/panel-locked";
 import { DashboardSearch } from "@/components/audit/dashboard/dashboard-search";
 import { ReportActions } from "@/components/audit/dashboard/report-actions";
+import { PanelRelatedTools } from "@/components/audit/dashboard/panel-related-tools";
 import { resolveAuditTabId } from "@/components/audit/dashboard/nav-config";
 import { rememberRecentDomain } from "@/components/home/recent-audits";
 import { Button } from "@/components/ui/button";
@@ -161,6 +162,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
           )}
         >
           {renderPanel(active, audit, selectTab)}
+          <PanelRelatedTools tab={active} />
         </div>
       </div>
     </div>
