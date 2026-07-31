@@ -5,6 +5,7 @@ export type SeoGrade = "A" | "B" | "C" | "D" | "F";
 /** Primary dashboard tabs (merged groups — not a 1:1 AITDK clone). */
 export type AuditTabId =
   | "overview"
+  | "soul"
   | "issues"
   | "structure"
   | "keywords"

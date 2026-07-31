@@ -1,20 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
-
-const archetypes = [
-  "The Beacon",
-  "The Powerhouse",
-  "The Architect",
-  "The Storyteller",
-  "The Pathfinder",
-  "The Minimalist",
-  "The Specialist",
-  "The Craftsperson",
-  "The Hidden Gem",
-  "The Ghost",
-  "The Rising Voice",
-] as const;
+import { SOUL_ARCHETYPES } from "@/lib/audit/soul";
 
 export function SiteSoulSection() {
   return (
@@ -102,12 +89,12 @@ export function SiteSoulSection() {
           </div>
 
           <ul className="mt-3 flex flex-wrap gap-1.5">
-            {archetypes.map((archetype) => (
+            {SOUL_ARCHETYPES.map((archetype) => (
               <li
-                key={archetype}
+                key={archetype.id}
                 className="rounded-full border border-white/[0.08] px-2.5 py-1 font-mono text-[9px] text-slate-500"
               >
-                {archetype}
+                {archetype.name}
               </li>
             ))}
           </ul>

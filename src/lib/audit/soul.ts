@@ -15,6 +15,64 @@ export type SoulArchetypeId =
   | "ghost"
   | "rising-voice";
 
+export const SOUL_ARCHETYPES: ReadonlyArray<{
+  id: SoulArchetypeId;
+  name: string;
+  essence: string;
+}> = [
+  { id: "beacon", name: "The Beacon", essence: "Balanced and discoverable" },
+  {
+    id: "powerhouse",
+    name: "The Powerhouse",
+    essence: "Three dimensions operating at a high level",
+  },
+  {
+    id: "architect",
+    name: "The Architect",
+    essence: "Structure and technical discipline",
+  },
+  {
+    id: "storyteller",
+    name: "The Storyteller",
+    essence: "A strong voice with depth",
+  },
+  {
+    id: "pathfinder",
+    name: "The Pathfinder",
+    essence: "GEO readiness leads the way",
+  },
+  {
+    id: "minimalist",
+    name: "The Minimalist",
+    essence: "Lean content, deliberate signals",
+  },
+  {
+    id: "specialist",
+    name: "The Specialist",
+    essence: "One exceptional discipline",
+  },
+  {
+    id: "craftsperson",
+    name: "The Craftsperson",
+    essence: "Thoughtful work across every layer",
+  },
+  {
+    id: "hidden-gem",
+    name: "The Hidden Gem",
+    essence: "Substance obscured by technical gaps",
+  },
+  {
+    id: "ghost",
+    name: "The Ghost",
+    essence: "Alive but restricted from discovery",
+  },
+  {
+    id: "rising-voice",
+    name: "The Rising Voice",
+    essence: "A foundation still taking shape",
+  },
+];
+
 export type SoulProfile = {
   id: SoulArchetypeId;
   name: string;

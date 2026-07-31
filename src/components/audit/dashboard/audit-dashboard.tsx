@@ -6,6 +6,7 @@ import { Menu, RefreshCw, X } from "lucide-react";
 import Link from "next/link";
 import { SidebarNav } from "@/components/audit/dashboard/sidebar-nav";
 import { PanelOverview } from "@/components/audit/dashboard/panel-overview";
+import { PanelSoul } from "@/components/audit/dashboard/panel-soul";
 import { PanelIssues } from "@/components/audit/dashboard/panel-issues";
 import { PanelGeo } from "@/components/audit/dashboard/panel-geo";
 import { PanelDensity } from "@/components/audit/dashboard/panel-density";
@@ -174,6 +175,8 @@ function renderPanel(
   switch (active) {
     case "overview":
       return <PanelOverview audit={audit} onSelectTab={onSelectTab} />;
+    case "soul":
+      return <PanelSoul audit={audit} onSelectTab={onSelectTab} />;
     case "issues":
       return <PanelIssues audit={audit} />;
     case "structure":

@@ -203,9 +203,13 @@ export function PanelOverview({
                 <Sparkles className="h-3.5 w-3.5" />
                 Site Soul
               </p>
-              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
-                Rule-based · 11 profiles
-              </span>
+              <button
+                type="button"
+                onClick={() => onSelectTab("soul")}
+                className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-300/80 hover:text-teal-200"
+              >
+                Explore profile →
+              </button>
             </div>
             <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
               {soul.name}
