@@ -1,0 +1,11 @@
+---
+description: Ship product changes to production by default
+alwaysApply: true
+---
+
+# Deploy by default
+
+- After finishing product work that the user asked for, **commit and push to `main`** without asking whether to deploy.
+- Do not ask “要不要推上线 / should I push?” — Vercel deploys from `main`.
+- Still only commit when the work is ready (or the user asked to commit); then push in the same turn.
+- Do not force-push, amend pushed commits, or skip hooks unless the user explicitly requests it.
