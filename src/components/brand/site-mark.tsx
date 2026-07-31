@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils";
 import {
-  MARK_SOUL,
-  MARK_SOUL_INNER,
+  MARK_BAR_1,
+  MARK_BAR_2,
+  MARK_BAR_3,
+  MARK_FLAME,
+  MARK_FLAME_INNER,
   MARK_SPARK,
   MARK_VIEWBOX,
 } from "@/components/brand/mark-geometry";
@@ -56,8 +59,29 @@ export function SiteWordmark({
   );
 }
 
+/** Shared glyph: rising SEO signal + soul flame + spark. */
+export function MarkGlyph({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox={MARK_VIEWBOX}
+      className={className}
+      fill="none"
+      aria-hidden
+    >
+      {/* SEO — rank signal */}
+      <path d={MARK_BAR_1} fill="#2dd4bf" fillOpacity="0.45" />
+      <path d={MARK_BAR_2} fill="#2dd4bf" fillOpacity="0.72" />
+      <path d={MARK_BAR_3} fill="#2dd4bf" />
+      {/* Soul — flame + spark */}
+      <path d={MARK_FLAME} fill="#5eead4" />
+      <path d={MARK_FLAME_INNER} fill="#0b1220" fillOpacity="0.35" />
+      <path d={MARK_SPARK} fill="#ccfbf1" />
+    </svg>
+  );
+}
+
 /**
- * Brand mark: soul droplet + spark — static, no orbit/spinner arcs.
+ * Brand mark: SEO signal bars + soul flame — Seo + Soul in one glyph.
  */
 export function SiteLogo({
   size = "md",
@@ -75,16 +99,8 @@ export function SiteLogo({
       )}
       aria-hidden
     >
-      <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(45,212,191,0.28),transparent_55%)]" />
-      <svg
-        viewBox={MARK_VIEWBOX}
-        className="relative h-[78%] w-[78%]"
-        fill="none"
-      >
-        <path d={MARK_SOUL} fill="#2dd4bf" />
-        <path d={MARK_SOUL_INNER} fill="#0b1220" fillOpacity="0.42" />
-        <path d={MARK_SPARK} fill="#ccfbf1" />
-      </svg>
+      <span className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(45,212,191,0.32),transparent_52%),radial-gradient(circle_at_25%_80%,rgba(45,212,191,0.12),transparent_50%)]" />
+      <MarkGlyph className="relative h-[82%] w-[82%]" />
     </span>
   );
 }
