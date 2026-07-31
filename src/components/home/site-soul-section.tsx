@@ -44,7 +44,7 @@ export function SiteSoulSection() {
               <ArrowUpRight className="h-3.5 w-3.5" />
             </AuditCtaLink>
             <Link
-              href="/audit/shopify.com"
+              href="/audit/theseosoul.com"
               className="text-sm font-semibold text-slate-300 transition-colors hover:text-white"
             >
               See one in a report →

@@ -91,10 +91,10 @@ const steps = [
 export default function AboutPage() {
   return (
     <ContentPage wide>
-      <ContentEyebrow>About</ContentEyebrow>
-      <ContentTitle>
-        <SiteWordmark size="lg" className="justify-start" />
-      </ContentTitle>
+      <ContentEyebrow>
+        <SiteWordmark size="sm" className="justify-start" />
+      </ContentEyebrow>
+      <ContentTitle>About TheSeoSoul</ContentTitle>
       <ContentLead>
         Free technical SEO audits with shareable report URLs. Paste any public
         domain — we fetch the live page, score on-page health and GEO readiness,

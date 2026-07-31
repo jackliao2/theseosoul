@@ -56,7 +56,7 @@ export function FeaturesSection() {
             </p>
           </div>
           <Link
-            href="/audit/shopify.com"
+            href="/audit/theseosoul.com"
             className="shrink-0 text-sm font-semibold text-teal-800 hover:underline dark:text-teal-300"
           >
             Open example report →

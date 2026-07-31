@@ -8,18 +8,69 @@ import { HeroSearch } from "@/components/home/hero-search";
 import { HeroVisual } from "@/components/home/hero-visual";
 import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
+import { HOME_FAQS } from "@/lib/home-faqs";
 
 const examples = [
-  "shopify.com",
+  "theseosoul.com",
   "stripe.com",
   "vercel.com",
   "github.com",
   "notion.so",
 ];
 
+const featuredTools = [
+  {
+    href: "/tools/domain-history",
+    title: "Domain history",
+    short: "Wayback chapters + WHOIS second-hand check",
+  },
+  {
+    href: "/tools/adsense-readiness-checker",
+    title: "AdSense readiness",
+    short: "Trust pages, disclosures & content sample",
+  },
+  {
+    href: "/tools/robots-txt-checker",
+    title: "Robots.txt",
+    short: "Crawl rules, sitemaps, AI bot blocks",
+  },
+  {
+    href: "/tools/meta-tag-checker",
+    title: "Meta tags",
+    short: "Title, description & SERP preview",
+  },
+  {
+    href: "/tools/geo-content-checker",
+    title: "GEO content",
+    short: "Citation-readiness for drafts",
+  },
+  {
+    href: "/about",
+    title: "About",
+    short: "What we check — and what we won’t invent",
+  },
+] as const;
+
 export default function HomePage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: HOME_FAQS.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <div className="relative overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-glow" />
         <div className="pointer-events-none absolute inset-0 bg-grain" />
@@ -123,6 +174,68 @@ export default function HomePage() {
       </section>
 
       <FeaturesSection />
+
+      <section
+        id="free-tools"
+        className="border-t border-slate-300/70 dark:border-slate-700"
+      >
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-teal-800 dark:text-teal-300">
+                Free tools
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
+                Useful pages, not just a homepage form
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                Each tool has its own URL, explanation, and FAQ — the full audit
+                is still the fastest path when you want the whole picture.
+              </p>
+            </div>
+            <Link
+              href="/tools"
+              className="text-sm font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              All tools →
+            </Link>
+          </div>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredTools.map((tool) => (
+              <li key={tool.href}>
+                <Link
+                  href={tool.href}
+                  className="group flex h-full flex-col rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/50 px-4 py-3.5 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:hover:border-teal-400/35"
+                >
+                  <span className="font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
+                    {tool.title}
+                  </span>
+                  <span className="mt-1 text-xs leading-snug text-slate-500">
+                    {tool.short}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sm text-slate-500">
+            Questions?{" "}
+            <Link
+              href="/contact"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              Contact us
+            </Link>
+            {" · "}
+            <Link
+              href="/audit/theseosoul.com"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              See our own audit report
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
 
       <section
         id="why"

@@ -7,13 +7,14 @@ import { Header } from "@/components/layout/header";
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isTool = pathname.startsWith("/audit");
+  const isAudit = pathname.startsWith("/audit");
 
   return (
     <>
-      <Header compact={isTool} />
+      <Header compact={isAudit} />
       <main className="flex-1">{children}</main>
-      {isTool ? null : <Footer />}
+      {/* Keep footer on audit reports so curated examples still pass PageRank to About/Tools/Contact. */}
+      <Footer />
     </>
   );
 }

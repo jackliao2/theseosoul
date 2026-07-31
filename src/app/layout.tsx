@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist_Mono, Source_Sans_3 } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
-import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -80,26 +80,33 @@ export default function RootLayout({
     "@graph": [
       {
         "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
         name: SITE_NAME,
         url: SITE_URL,
         description:
           "Free technical SEO audit and inspection reports for any domain.",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `${SITE_URL}/audit/{domain}`,
-          "query-input": "required name=domain",
-        },
+        publisher: { "@id": `${SITE_URL}/#organization` },
       },
       {
         "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
         name: SITE_NAME,
         url: SITE_URL,
+        email: SITE_EMAIL,
+        logo: `${SITE_URL}/icon`,
+        contactPoint: {
+          "@type": "ContactPoint",
+          email: SITE_EMAIL,
+          contactType: "customer support",
+          url: `${SITE_URL}/contact`,
+        },
       },
       {
         "@type": "SoftwareApplication",
         name: SITE_NAME,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
+        url: SITE_URL,
         offers: {
           "@type": "Offer",
           price: "0",
@@ -107,43 +114,7 @@ export default function RootLayout({
         },
         description:
           "Automated on-page SEO, GEO readiness, keyword density, WHOIS, and technical audits.",
-      },
-      {
-        "@type": "FAQPage",
-        mainEntity: [
-          {
-            "@type": "Question",
-            name: "Is TheSeoSoul free — and what isn’t?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "The technical SEO + GEO audit is free with no signup. Domain Authority, traffic charts, and backlink indexes need paid data and are planned for a later Pro tier — not invented on the free tier.",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "How does an audit work?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "We fetch live HTML and related public resources, parse SEO and GEO signals server-side, score Meta / Structure / Technical / GEO, then publish a shareable dashboard at /audit/[domain].",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "How is this different from other free SEO tools?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Results live on a shareable report URL instead of a private popup, combining classic on-page SEO with GEO readiness and honest tech probes — without fake traffic or authority scores.",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "Are audit pages indexed by Google?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Reports are shareable for humans, but most use noindex; only curated example reports are listed in the sitemap.",
-            },
-          },
-        ],
+        publisher: { "@id": `${SITE_URL}/#organization` },
       },
     ],
   };

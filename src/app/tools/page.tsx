@@ -118,7 +118,7 @@ export default function ToolsPage() {
           </p>
         </div>
         <Link
-          href="/audit/stripe.com"
+          href="/audit/theseosoul.com"
           className="shrink-0 text-sm font-semibold text-teal-800 hover:underline dark:text-teal-300"
         >
           See example report →

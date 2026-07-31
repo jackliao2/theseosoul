@@ -41,26 +41,34 @@ export function Footer() {
             </li>
             <li>
               <Link
-                href="/#features"
+                href="/tools/domain-history"
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
-                Features
+                Domain history
               </Link>
             </li>
             <li>
               <Link
-                href="/#how-it-works"
+                href="/tools/adsense-readiness-checker"
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
-                How it works
+                AdSense readiness
               </Link>
             </li>
             <li>
               <Link
-                href="/audit/shopify.com"
+                href="/tools/robots-txt-checker"
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
-                Example Report
+                Robots.txt checker
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/audit/theseosoul.com"
+                className="hover:text-teal-700 dark:hover:text-teal-300"
+              >
+                Example report
               </Link>
             </li>
           </ul>

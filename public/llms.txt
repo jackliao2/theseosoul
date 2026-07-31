@@ -1,0 +1,29 @@
+# TheSeoSoul
+> Free technical SEO + GEO audit with shareable report URLs. Honest free tier — no invented Domain Authority or traffic charts.
+
+## Site
+- Homepage: https://theseosoul.com/
+- Free tools: https://theseosoul.com/tools
+- About: https://theseosoul.com/about
+- Contact: https://theseosoul.com/contact
+- Privacy: https://theseosoul.com/privacy
+- Terms: https://theseosoul.com/terms
+
+## Primary product
+- Full technical SEO audit (paste any public URL): https://theseosoul.com/#home-audit-url
+- Shareable reports live at /audit/[domain]. Most reports are noindex; only curated examples are listed in the sitemap.
+
+## Free tools
+- AdSense readiness: https://theseosoul.com/tools/adsense-readiness-checker
+- Domain history (Wayback + WHOIS): https://theseosoul.com/tools/domain-history
+- Robots.txt checker: https://theseosoul.com/tools/robots-txt-checker
+- Meta tag checker: https://theseosoul.com/tools/meta-tag-checker
+- Canonical checker: https://theseosoul.com/tools/canonical-checker
+- Keyword density: https://theseosoul.com/tools/keyword-density-checker
+- Open Graph checker: https://theseosoul.com/tools/open-graph-checker
+- Noindex checker: https://theseosoul.com/tools/noindex-checker
+- Redirect checker: https://theseosoul.com/tools/redirect-checker
+- GEO content checker: https://theseosoul.com/tools/geo-content-checker
+
+## Contact
+- Email: hello@theseosoul.com

@@ -452,12 +452,13 @@ export const SITE_HOST = (() => {
 })();
 export const SITE_EMAIL = "hello@theseosoul.com";
 
-/** Domains allowed in sitemap + default indexable audit pages. */
+/**
+ * Domains allowed in sitemap + default indexable audit pages.
+ * Keep this small and first-party-heavy — indexing many mega-brand
+ * /audit/{brand} URLs reads like parasitic SEO.
+ */
 export const INDEXABLE_AUDIT_DOMAINS = [
-  "shopify.com",
+  "theseosoul.com",
   "stripe.com",
-  "notion.so",
   "vercel.com",
-  "github.com",
-  "cloudflare.com",
 ] as const;

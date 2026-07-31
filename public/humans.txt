@@ -1,0 +1,14 @@
+/* TEAM */
+Site: TheSeoSoul
+Contact: hello@theseosoul.com
+Location: Remote
+
+/* SITE */
+Last update: 2026-07-31
+Standards: HTML5, CSS, JSON-LD
+Software: Next.js, Vercel
+Doctype: HTML5
+
+/* NOTE */
+Built as a free technical SEO + GEO audit product with shareable reports.
+We measure public HTML and public signals — we do not invent traffic or Domain Authority on the free tier.
