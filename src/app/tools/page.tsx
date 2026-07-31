@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { ContentPage } from "@/components/layout/content-page";
 import {
-  ToolFaqJsonLd,
-  ToolFaqSection,
-} from "@/components/tools/tool-page-guide";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ContentPage } from "@/components/layout/content-page";
+import { ToolFaqJsonLd } from "@/components/tools/tool-page-guide";
+import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 
 const PAGE_PATH = "/tools";
@@ -49,206 +53,162 @@ export const metadata: Metadata = {
   },
 };
 
-const groups = [
-  {
-    name: "On-page & technical",
-    blurb: "What we can prove from a live fetch — no signup.",
-    tools: [
-      {
-        href: "/#home-audit-url",
-        title: "Technical SEO Audit",
-        blurb:
-          "Shareable /audit report: Meta, Structure, Technical, GEO subscores + Why/Fix issues.",
-        cta: "Run free audit",
-      },
-      {
-        href: "/tools/robots-txt-checker",
-        title: "Robots.txt Checker",
-        blurb:
-          "Free robots txt checker — crawl-all rules, Sitemap lines, AI bot blocks (GPTBot, ClaudeBot, more).",
-        cta: "Check robots.txt",
-      },
-      {
-        href: "/tools/meta-tag-checker",
-        title: "Meta Tag Checker",
-        blurb:
-          "Title & meta description from a live URL (length status) plus Google-style SERP preview / simulator.",
-        cta: "Check meta tags",
-      },
-      {
-        href: "/tools/canonical-checker",
-        title: "Canonical Tag Checker",
-        blurb:
-          "See if canonical is present, self-referencing, or pointing to another host/URL.",
-        cta: "Check canonical",
-      },
-      {
-        href: "/tools/keyword-density-checker",
-        title: "Keyword Density Checker",
-        blurb:
-          "1–3 word phrase frequencies from a URL or pasted draft, plus optional focus keyword.",
-        cta: "Check density",
-      },
-      {
-        href: "/tools/open-graph-checker",
-        title: "Open Graph Checker",
-        blurb:
-          "Validate og:title / description / image and Twitter Cards with a live share preview.",
-        cta: "Check Open Graph",
-      },
-      {
-        href: "/tools/noindex-checker",
-        title: "Noindex Checker",
-        blurb:
-          "Read meta robots, googlebot meta, and X-Robots-Tag to see if a URL is indexable.",
-        cta: "Check noindex",
-      },
-      {
-        href: "/tools/redirect-checker",
-        title: "Redirect Checker",
-        blurb:
-          "Trace every hop and status code to the final URL — catch long chains before crawlers do.",
-        cta: "Check redirects",
-      },
-    ],
-  },
-  {
-    name: "Content & GEO",
-    blurb: "Citation-friendly writing and AI crawler readiness.",
-    tools: [
-      {
-        href: "/tools/geo-content-checker",
-        title: "GEO Content Checker",
-        blurb:
-          "Rule-based citation readiness: structure, facts, clarity, authority — no ChatGPT API.",
-        cta: "Score content",
-      },
-      {
-        href: "/audit/stripe.com",
-        title: "Example audit report",
-        blurb:
-          "Live dashboard for a public domain — Overview through Domain tabs.",
-        cta: "View example",
-      },
-    ],
-  },
-] as const;
+const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
+const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
+const contentTools = TOOL_CATALOG.filter((t) => t.group === "content");
 
 const coming = [
-  {
-    title: "Backlink checker / monitor",
-    blurb:
-      "Needs paid link indexes. Pro later — not inventing referring domains free.",
-  },
-  {
-    title: "Rank / AI Overview tracking",
-    blurb: "SERP scraping and AI Overview presence need paid crawl infra.",
-  },
-  {
-    title: "TF*IDF / full-site crawl",
-    blurb: "Semantic content tooling and multi-URL crawls are heavier products.",
-  },
+  "Backlink checker (needs paid link indexes)",
+  "Rank / AI Overview tracking",
+  "TF*IDF / full-site crawl",
 ] as const;
+
+function ToolTile({
+  href,
+  title,
+  short,
+}: {
+  href: string;
+  title: string;
+  short: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex flex-col justify-between rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/60 px-4 py-3.5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/40 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/35 dark:hover:bg-teal-400/[0.06]"
+    >
+      <div>
+        <h3 className="font-display text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
+          {title}
+        </h3>
+        <p className="mt-1 text-xs leading-snug text-slate-500 dark:text-slate-400">
+          {short}
+        </p>
+      </div>
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 opacity-80 transition-opacity group-hover:opacity-100 dark:text-teal-300">
+        Open
+        <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </span>
+    </Link>
+  );
+}
 
 export default function ToolsPage() {
   return (
-    <ContentPage className="max-w-6xl">
+    <ContentPage className="max-w-5xl py-10 sm:py-12">
       <ToolFaqJsonLd
         faqs={faqs}
         pageUrl={PAGE_URL}
         name={`${SITE_NAME} Free SEO Tools`}
       />
-      <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-        Free tools · no registration
-      </p>
-      <h1 className="mt-3 max-w-2xl font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
-        Free SEO tools — no signup
-      </h1>
-      <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
-        {SITE_NAME} ships honest free SEO utilities from live HTML and public
-        signals: robots txt checker, meta tag checker, canonical, keyword
-        density, Open Graph, noindex, redirects, and GEO. No invented Domain
-        Authority. No fake traffic charts.
-      </p>
 
-      <div className="mt-12 space-y-14">
-        {groups.map((group) => (
-          <section key={group.name}>
-            <h2 className="font-display text-xl font-bold text-slate-900 dark:text-slate-50">
-              {group.name}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              {group.blurb}
-            </p>
-            <ol className="mt-4 divide-y divide-slate-300/70 border-y border-slate-300/70 dark:divide-slate-700 dark:border-slate-700">
-              {group.tools.map((tool, i) => (
-                <li
-                  key={tool.href}
-                  className="grid gap-3 py-6 md:grid-cols-[2.5rem_1fr_auto] md:items-center md:gap-6"
-                >
-                  <p className="font-mono text-sm text-teal-800 dark:text-teal-300">
-                    {String(i + 1).padStart(2, "0")}
-                  </p>
-                  <div className="min-w-0">
-                    <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {tool.title}
-                    </h3>
-                    <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      {tool.blurb}
-                    </p>
-                  </div>
-                  <Link
-                    href={tool.href}
-                    className="inline-flex h-10 items-center justify-center gap-1.5 self-start rounded-md bg-teal-800 px-4 text-sm font-semibold text-white transition-colors hover:bg-teal-700 dark:bg-teal-400 dark:text-slate-950 dark:hover:bg-teal-300 md:self-center"
-                  >
-                    {tool.cta}
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ))}
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-xl">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+            Free · no registration
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
+            Free SEO tools
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            Live HTML checks only — no fake DA or traffic. Pick a checker or run
+            the full audit.
+          </p>
+        </div>
+        <Link
+          href="/audit/stripe.com"
+          className="shrink-0 text-sm font-semibold text-teal-800 hover:underline dark:text-teal-300"
+        >
+          See example report →
+        </Link>
       </div>
 
-      <section className="mt-14 max-w-2xl">
-        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-slate-50">
-          How to use this free SEO tools hub
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-          Run the full audit when you want a shareable Overview with Meta,
-          Structure, Technical, and GEO subscores. Drop into a single checker
-          when you already know the failure mode — for example robots.txt after
-          a deploy, canonicals after a migration, or density while editing a
-          draft. Every tool links back to related checks so you can finish the
-          diagnosis without leaving {SITE_NAME}.
-        </p>
+      {/* Primary CTA — one clear entry */}
+      <Link
+        href={featured.href}
+        className="mt-8 flex items-center justify-between gap-4 rounded-xl border border-teal-800/25 bg-gradient-to-br from-teal-800/[0.08] to-transparent px-5 py-4 transition-colors hover:border-teal-800/45 dark:border-teal-400/25 dark:from-teal-400/[0.1] dark:hover:border-teal-400/40"
+      >
+        <div>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-teal-800/80 dark:text-teal-300/80">
+            Start here
+          </p>
+          <h2 className="mt-1 font-display text-lg font-bold text-slate-900 dark:text-slate-50">
+            {featured.title}
+          </h2>
+          <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">
+            {featured.short}
+          </p>
+        </div>
+        <span className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md bg-teal-800 px-4 text-sm font-semibold text-white dark:bg-teal-400 dark:text-slate-950">
+          Run audit
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+      </Link>
+
+      <section className="mt-10">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="font-display text-base font-bold text-slate-900 dark:text-slate-50">
+            Page checkers
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {checkers.length} tools
+          </p>
+        </div>
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {checkers.map((tool) => (
+            <ToolTile key={tool.href} {...tool} />
+          ))}
+        </div>
       </section>
 
-      <ToolFaqSection faqs={faqs} />
-
-      <section className="mt-14">
-        <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-          Off-page · coming later
-        </p>
-        <h2 className="mt-2 font-display text-2xl font-bold text-slate-900 dark:text-slate-50">
-          Worth building — with real data
+      <section className="mt-8">
+        <h2 className="mb-3 font-display text-base font-bold text-slate-900 dark:text-slate-50">
+          Content & GEO
         </h2>
-        <ul className="mt-6 divide-y divide-slate-200 border-t border-slate-200 dark:divide-slate-700 dark:border-slate-700">
-          {coming.map((item) => (
-            <li
-              key={item.title}
-              className="grid gap-1 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6"
-            >
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {item.title}
-              </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {item.blurb}
-              </p>
-            </li>
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {contentTools.map((tool) => (
+            <ToolTile key={tool.href} {...tool} />
           ))}
-        </ul>
+        </div>
+      </section>
+
+      <section className="mt-10 border-t border-slate-300/70 pt-6 dark:border-slate-700">
+        <details className="group">
+          <summary className="cursor-pointer list-none font-display text-sm font-semibold text-slate-700 marker:content-none dark:text-slate-200 [&::-webkit-details-marker]:hidden">
+            <span className="inline-flex items-center gap-2">
+              Coming later
+              <span className="text-xs font-normal text-slate-400 group-open:hidden">
+                (backlinks, ranks…)
+              </span>
+            </span>
+          </summary>
+          <ul className="mt-3 space-y-1.5 text-sm text-slate-500 dark:text-slate-400">
+            {coming.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-slate-400" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </details>
+      </section>
+
+      <section className="mt-8 border-t border-slate-300/70 pt-6 dark:border-slate-700">
+        <h2 className="font-display text-base font-bold text-slate-900 dark:text-slate-50">
+          FAQ
+        </h2>
+        <Accordion type="single" collapsible className="mt-2">
+          {faqs.map((f) => (
+            <AccordionItem key={f.q} value={f.q}>
+              <AccordionTrigger className="text-slate-900 dark:text-slate-50">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-slate-600 dark:text-slate-300">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </section>
     </ContentPage>
   );

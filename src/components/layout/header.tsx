@@ -5,10 +5,13 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { SiteBrand } from "@/components/brand/site-mark";
+import {
+  ToolsMobileNav,
+  ToolsNavMenu,
+} from "@/components/layout/tools-nav-menu";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/tools", label: "Tools" },
   { href: "/#features", label: "Features" },
   { href: "/#faq", label: "FAQ" },
   { href: "/about", label: "About" },
@@ -42,6 +45,7 @@ export function Header({ compact = false }: { compact?: boolean }) {
         <nav className="flex items-center gap-1 sm:gap-2">
           {!compact ? (
             <>
+              <ToolsNavMenu />
               {NAV.map((item) => (
                 <Link
                   key={item.href}
@@ -82,6 +86,7 @@ export function Header({ compact = false }: { compact?: boolean }) {
       {!compact && open ? (
         <div className="border-t border-slate-200 bg-[color:var(--surface)] px-4 py-3 dark:border-slate-700 md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1">
+            <ToolsMobileNav onNavigate={() => setOpen(false)} />
             {NAV.map((item) => (
               <Link
                 key={item.href}
