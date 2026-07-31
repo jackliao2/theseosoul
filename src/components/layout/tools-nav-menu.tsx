@@ -8,9 +8,12 @@ import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
 const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
-const growth = TOOL_CATALOG.filter((t) => t.group === "growth");
+const spotlights = TOOL_CATALOG.filter((t) => t.spotlight);
+const moreTools = TOOL_CATALOG.filter(
+  (t) =>
+    (t.group === "growth" || t.group === "content") && !t.spotlight
+);
 const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
-const content = TOOL_CATALOG.filter((t) => t.group === "content");
 
 export function ToolsNavMenu() {
   const [open, setOpen] = useState(false);
@@ -67,7 +70,7 @@ export function ToolsNavMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-1/2 top-full z-50 w-[min(34rem,calc(100vw-1.5rem))] -translate-x-1/2 pt-2 transition-[opacity,transform] duration-200 ease-out",
+          "absolute left-1/2 top-full z-50 w-[min(36rem,calc(100vw-1.5rem))] -translate-x-1/2 pt-2 transition-[opacity,transform] duration-200 ease-out",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-1 opacity-0"
@@ -82,7 +85,7 @@ export function ToolsNavMenu() {
             }}
           />
 
-          <div className="relative grid grid-cols-[11.5rem_minmax(0,1fr)]">
+          <div className="relative grid grid-cols-[13.5rem_minmax(0,1fr)]">
             <div className="border-r border-slate-200/80 bg-[#0b1220] p-3 dark:border-slate-700">
               <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-300/80">
                 Start here
@@ -99,28 +102,50 @@ export function ToolsNavMenu() {
                 </span>
               </AuditCtaLink>
 
-              <div className="mt-4 space-y-0.5 border-t border-white/10 pt-3">
-                {[...growth, ...content].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    role="menuitem"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1.5 text-[13px] font-semibold text-slate-200 transition-colors hover:bg-white/5 hover:text-white"
-                  >
-                    <span className="truncate">{item.nav}</span>
-                    {item.group === "growth" ? (
-                      <span className="shrink-0 font-mono text-[8px] font-semibold uppercase tracking-wider text-teal-300">
-                        New
+              <div className="mt-4 border-t border-white/10 pt-3">
+                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-300/70">
+                  Highlights
+                </p>
+                <div className="mt-2 space-y-1">
+                  {spotlights.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      role="menuitem"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-lg px-1.5 py-2 transition-colors hover:bg-white/5"
+                    >
+                      <span className="block font-display text-[13px] font-bold tracking-tight text-white">
+                        {item.nav}
                       </span>
-                    ) : (
-                      <span className="shrink-0 font-mono text-[8px] uppercase tracking-wider text-slate-500">
-                        GEO
+                      <span className="mt-0.5 block text-[11px] leading-snug text-slate-400">
+                        {item.short}
                       </span>
-                    )}
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
+
+              {moreTools.length > 0 ? (
+                <div className="mt-3 space-y-0.5 border-t border-white/10 pt-3">
+                  {moreTools.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      role="menuitem"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1.5 text-[13px] font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
+                    >
+                      <span className="truncate">{item.nav}</span>
+                      {item.group === "content" ? (
+                        <span className="shrink-0 font-mono text-[8px] uppercase tracking-wider text-slate-500">
+                          GEO
+                        </span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="p-3">
@@ -185,7 +210,17 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
           >
             {featured.nav}
           </AuditCtaLink>
-          {growth.concat(content, checkers).map((item) => (
+          {spotlights.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className="block rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              {item.nav}
+            </Link>
+          ))}
+          {moreTools.concat(checkers).map((item) => (
             <Link
               key={item.href}
               href={item.href}
