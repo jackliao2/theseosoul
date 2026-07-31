@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -134,63 +134,58 @@ export function AdsenseReadinessForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <form
         onSubmit={onSubmit}
-        className="relative overflow-hidden rounded-2xl bg-[#0b1220] p-5 text-white sm:p-7"
+        className="relative overflow-hidden rounded-2xl bg-[#0b1220] p-6 text-white sm:p-8"
       >
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 55% 130% at 100% 0%, rgba(45,212,191,.2), transparent 62%)",
+              "radial-gradient(ellipse 70% 100% at 85% -10%, rgba(45,212,191,.22), transparent 55%)",
           }}
         />
-        <div className="relative grid gap-6 lg:grid-cols-[minmax(16rem,.65fr)_minmax(0,1.35fr)] lg:items-end">
-          <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
-              Live public-site pre-check
-            </p>
-            <h2 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl">
-              Is your site ready to request review?
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">
-              One domain. No login. Around 25 evidence-backed checks.
-            </p>
-          </div>
-          <div>
-            <label
-              htmlFor="adsense-readiness-url"
-              className="text-sm font-semibold text-slate-200"
+        <div className="relative mx-auto max-w-3xl">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+            Live public-site pre-check
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+            Check a website
+          </h2>
+          <label
+            htmlFor="adsense-readiness-url"
+            className="mt-6 block text-sm font-semibold text-slate-200"
+          >
+            Domain or any page URL
+          </label>
+          <div className="mt-2.5 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            <input
+              id="adsense-readiness-url"
+              type="text"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              placeholder="example.com"
+              autoComplete="url"
+              autoFocus
+              className="h-14 min-w-0 flex-1 rounded-xl border border-white/15 bg-white px-5 text-lg text-slate-900 outline-none ring-teal-300/50 placeholder:text-slate-400 focus:ring-2"
+              required
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-xl bg-teal-400 px-7 text-sm font-bold text-slate-950 hover:bg-teal-300 disabled:cursor-wait disabled:opacity-70 sm:min-w-[11.5rem]"
             >
-              Website domain
-            </label>
-            <div className="mt-2 flex flex-col gap-2.5 sm:flex-row">
-              <input
-                id="adsense-readiness-url"
-                type="text"
-                value={url}
-                onChange={(event) => setUrl(event.target.value)}
-                placeholder="example.com or any page on your site"
-                className="h-13 min-w-0 flex-1 rounded-lg border border-white/15 bg-white px-4 text-base text-slate-900 outline-none ring-teal-300/40 placeholder:text-slate-400 focus:ring-2"
-                required
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex h-13 items-center justify-center gap-2 rounded-lg bg-teal-400 px-6 text-sm font-bold text-slate-950 hover:bg-teal-300 disabled:cursor-wait disabled:opacity-70"
-              >
-                {loading ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin" />
-                ) : null}
-                {loading ? "Checking site…" : "Run readiness check"}
-              </button>
-            </div>
-            <p className="mt-2.5 text-sm leading-relaxed text-slate-400">
-              We return to the homepage, inspect public trust files and pages,
-              then sample up to eight unique content URLs.
-            </p>
+              {loading ? (
+                <LoaderCircle className="h-4 w-4 animate-spin" />
+              ) : null}
+              {loading ? "Checking…" : "Run check"}
+            </button>
           </div>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400">
+            No login · ~25 evidence checks · homepage, trust pages, then up to
+            eight content URLs
+          </p>
         </div>
       </form>
 
@@ -214,40 +209,25 @@ function ProgressPanel({ current }: { current: number }) {
     <section
       aria-live="polite"
       aria-busy="true"
-      className="overflow-hidden rounded-xl border border-teal-800/20 bg-[#0b1220] text-white"
+      className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/40"
     >
-      <div className="h-1 bg-white/10">
+      <div className="h-1 bg-slate-100 dark:bg-slate-800">
         <div
-          className="h-full bg-teal-400 transition-[width] duration-700"
+          className="h-full bg-teal-600 transition-[width] duration-700 dark:bg-teal-400"
           style={{
             width: `${Math.max(12, ((current + 1) / PROGRESS_STEPS.length) * 100)}%`,
           }}
         />
       </div>
-      <div className="grid gap-5 p-5 sm:grid-cols-[auto_1fr] sm:items-center">
-        <LoaderCircle className="h-8 w-8 animate-spin text-teal-300" />
-        <div>
-          <p className="font-display text-lg font-bold">Reading the public site</p>
-          <p className="mt-1 text-sm text-slate-400">
+      <div className="flex items-center gap-4 px-5 py-5">
+        <LoaderCircle className="h-6 w-6 shrink-0 animate-spin text-teal-700 dark:text-teal-300" />
+        <div className="min-w-0">
+          <p className="font-display text-base font-bold text-slate-900 dark:text-white">
+            Reading the public site
+          </p>
+          <p className="mt-0.5 text-sm text-slate-500">
             {PROGRESS_STEPS[current]}…
           </p>
-          <ol className="mt-3 flex flex-wrap gap-1.5">
-            {PROGRESS_STEPS.map((step, index) => (
-              <li
-                key={step}
-                className={cn(
-                  "rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider",
-                  index < current
-                    ? "border-emerald-400/25 bg-emerald-400/10 text-emerald-300"
-                    : index === current
-                      ? "border-teal-300/35 bg-teal-300/10 text-teal-200"
-                      : "border-white/10 text-slate-600"
-                )}
-              >
-                {index < current ? "Done" : index + 1}
-              </li>
-            ))}
-          </ol>
         </div>
       </div>
     </section>
@@ -266,203 +246,261 @@ function ReadinessReport({
   const fixes = result.checks
     .filter((item) => item.status === "fix")
     .sort((a, b) => impactRank(a.impact) - impactRank(b.impact));
+  const reviews = result.checks.filter((item) => item.status === "review");
 
   return (
-    <div className="space-y-4">
-      <section className="relative overflow-hidden rounded-2xl bg-[#0b1220] p-5 text-white sm:p-6">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 65% 120% at 100% 0%, rgba(45,212,191,.2), transparent 58%)",
-          }}
-        />
-        <div className="relative grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
-          <ScoreRing
-            score={result.score}
-            size="md"
-            label={`AdSense readiness score ${result.score} out of 100`}
-            className="[&_span]:text-white"
-          />
-          <div className="min-w-0">
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-teal-300">
-              AdSense readiness · public signals
-            </p>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight">
-              {result.verdict}
-            </h2>
-            <p className="mt-1 truncate text-sm text-slate-400">
-              {result.domain} · {result.sampledPages.length} content pages sampled
-            </p>
-            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
-              <Metric value={result.summary.passed} label="passed" tone="good" />
-              <Metric value={result.summary.fixes} label="fixes" tone="bad" />
-              <Metric value={result.summary.reviews} label="owner reviews" />
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/30">
+      {/* 1 — Verdict */}
+      <header className="border-b border-slate-200 bg-[#0b1220] px-5 py-6 text-white sm:px-8 sm:py-7 dark:border-slate-800">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-5">
+            <ScoreRing
+              score={result.score}
+              size="md"
+              label={`AdSense readiness score ${result.score} out of 100`}
+              className="[&_span]:text-white"
+            />
+            <div className="min-w-0">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+                Readiness report
+              </p>
+              <h2 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                {result.verdict}
+              </h2>
+              <p className="mt-1 truncate text-sm text-slate-400">
+                {result.domain}
+                <span className="mx-1.5 text-slate-600">·</span>
+                {result.sampledPages.length} pages sampled
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onCopy}
-            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-white/15 px-3 text-xs font-semibold text-slate-200 hover:border-teal-300/40 hover:text-white"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-white/15 px-3.5 text-xs font-semibold text-slate-200 hover:border-teal-300/40 hover:text-white sm:self-center"
           >
             <Copy className="h-3.5 w-3.5" />
             {copied ? "Copied" : "Copy report"}
           </button>
         </div>
-      </section>
 
-      <p className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/25 dark:text-amber-200">
-        {result.note}
-      </p>
+        <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-white/10 pt-5 sm:max-w-md">
+          <Stat value={result.summary.passed} label="Passed" />
+          <Stat
+            value={result.summary.fixes}
+            label="To fix"
+            tone={result.summary.fixes > 0 ? "bad" : undefined}
+          />
+          <Stat value={result.summary.reviews} label="Confirm" />
+        </dl>
+        <p className="mt-4 max-w-2xl text-xs leading-relaxed text-slate-500">
+          {result.note}
+        </p>
+      </header>
 
-      <section className="rounded-lg border border-slate-200 bg-slate-50/55 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/30">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-            Every finding below links to the Google document used to define or
-            support that check.
-          </p>
-          <div className="flex flex-wrap gap-1.5 font-mono text-[10px] uppercase tracking-wider">
-            <span className="rounded bg-teal-800/10 px-2 py-1 text-teal-800 dark:bg-teal-300/10 dark:text-teal-300">
-              Direct requirement
-            </span>
-            <span className="rounded bg-blue-800/10 px-2 py-1 text-blue-800 dark:bg-blue-300/10 dark:text-blue-300">
-              Google guidance
-            </span>
-            <span className="rounded bg-slate-200 px-2 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              Supporting signal
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-slate-200 p-5 dark:border-slate-800 sm:p-6">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-rose-600 dark:text-rose-300">
-              Fix before requesting review
+      {/* 2 — Main line: fix → confirm → evidence */}
+      <div className="divide-y divide-slate-200 dark:divide-slate-800">
+        <ReportStep
+          step="01"
+          title="Fix these first"
+          subtitle={
+            fixes.length
+              ? `${fixes.length} public signal${fixes.length === 1 ? "" : "s"} before requesting review`
+              : "No automated public fixes were flagged"
+          }
+        >
+          {fixes.length ? (
+            <ol className="space-y-0">
+              {fixes.map((item, index) => (
+                <li
+                  key={item.id}
+                  className="grid gap-3 border-t border-slate-100 py-5 first:border-t-0 first:pt-0 dark:border-slate-800/80 sm:grid-cols-[2.25rem_minmax(0,1fr)]"
+                >
+                  <span className="font-display text-xl font-bold tabular-nums text-rose-600 dark:text-rose-300">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-base font-bold text-slate-900 dark:text-white">
+                        {item.title}
+                      </p>
+                      <ImpactPill impact={item.impact} />
+                    </div>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
+                      {item.evidence}
+                    </p>
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-slate-800 dark:text-slate-200">
+                      {item.recommendation}
+                    </p>
+                    <FindingReference check={item} quiet />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm text-emerald-700 dark:text-emerald-300">
+              Public crawl and trust signals look clear. Continue with the
+              owner-only confirmations below.
             </p>
-            <h3 className="mt-1 font-display text-2xl font-bold text-slate-900 dark:text-white">
-              {fixes.length
-                ? `${fixes.length} public signal${fixes.length === 1 ? "" : "s"} need work`
-                : "No automated fixes found"}
-            </h3>
-          </div>
-        </div>
-        {fixes.length ? (
-          <ol className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
-            {fixes.map((item, index) => (
-              <li
-                key={item.id}
-                className="grid gap-2 py-4 first:pt-0 last:pb-0 sm:grid-cols-[2rem_minmax(0,1fr)]"
-              >
-                <span className="font-display text-lg font-bold text-rose-600 dark:text-rose-300">
-                  {index + 1}
-                </span>
-                <div>
-                  <p className="text-base font-bold text-slate-900 dark:text-white">
+          )}
+        </ReportStep>
+
+        <ReportStep
+          step="02"
+          title="Confirm yourself"
+          subtitle="Google can still reject for account, rights, traffic, or policy reasons this crawl cannot see"
+        >
+          <ul className="space-y-4">
+            {reviews.map((item) => (
+              <li key={item.id} className="flex gap-3">
+                <CircleHelp className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
                     {item.title}
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                    {item.evidence}
-                  </p>
-                  <p className="mt-1.5 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
                     {item.recommendation}
                   </p>
-                  <FindingReference check={item} />
+                  <FindingReference check={item} quiet />
                 </div>
               </li>
             ))}
-          </ol>
-        ) : (
-          <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">
-            Continue with the owner-only policy and account checks below.
-          </p>
-        )}
-      </section>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        {ADSENSE_GROUPS.map((group) => {
-          const checks = result.checks.filter((item) => item.group === group.id);
-          return (
-            <CheckGroup
-              key={group.id}
-              title={group.label}
-              description={group.description}
-              checks={checks}
-            />
-          );
-        })}
-      </div>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <section className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
-            Trust pages found
-          </h3>
-          <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
-            {result.trustPages.map((page) => (
-              <li
-                key={page.kind}
-                className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0"
-              >
-                <span className="text-sm text-slate-700 dark:text-slate-300">
-                  {page.label}
-                </span>
-                {page.url ? (
-                  <a
-                    href={page.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:underline dark:text-teal-300"
-                  >
-                    Found
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  <span className="text-xs font-semibold text-rose-600 dark:text-rose-300">
-                    Not found
-                  </span>
-                )}
-              </li>
-            ))}
           </ul>
-        </section>
+        </ReportStep>
 
-        <section className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
-            Content sample
-          </h3>
-          {result.sampledPages.length ? (
-            <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
-              {result.sampledPages.map((page) => (
-                <li key={page.url} className="py-2 first:pt-0 last:pb-0">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <a
-                      href={page.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="min-w-0 truncate text-sm font-semibold text-slate-800 hover:text-teal-700 dark:text-slate-200 dark:hover:text-teal-300"
-                    >
-                      {page.title}
-                    </a>
-                    <span className="shrink-0 font-mono text-[11px] text-slate-500">
-                      ~{page.words} words
+        <ReportStep
+          step="03"
+          title="Full checklist"
+          subtitle="Every automated check, grouped by area — expand only what you need"
+        >
+          <div className="space-y-2">
+            {ADSENSE_GROUPS.map((group) => {
+              const checks = result.checks.filter(
+                (item) => item.group === group.id
+              );
+              const groupFixes = checks.filter(
+                (item) => item.status === "fix"
+              ).length;
+              return (
+                <CheckGroup
+                  key={group.id}
+                  title={group.label}
+                  description={group.description}
+                  checks={checks}
+                  defaultOpen={groupFixes > 0}
+                />
+              );
+            })}
+          </div>
+        </ReportStep>
+
+        <ReportStep
+          step="04"
+          title="Evidence from this run"
+          subtitle="Trust pages and content sample used for the score"
+        >
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                Trust pages
+              </h4>
+              <ul className="mt-3 space-y-0 divide-y divide-slate-100 dark:divide-slate-800">
+                {result.trustPages.map((page) => (
+                  <li
+                    key={page.kind}
+                    className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+                  >
+                    <span className="text-sm text-slate-700 dark:text-slate-300">
+                      {page.label}
                     </span>
-                  </div>
-                  <p className="mt-1 truncate font-mono text-[10px] text-slate-400">
-                    {new URL(page.url).pathname}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-2 text-sm text-slate-500">
-              No eligible content pages could be sampled.
-            </p>
-          )}
-        </section>
+                    {page.url ? (
+                      <a
+                        href={page.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:underline dark:text-teal-300"
+                      >
+                        Open
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      <span className="text-xs font-semibold text-rose-600 dark:text-rose-300">
+                        Missing
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                Content sample
+              </h4>
+              {result.sampledPages.length ? (
+                <ul className="mt-3 space-y-0 divide-y divide-slate-100 dark:divide-slate-800">
+                  {result.sampledPages.map((page) => (
+                    <li key={page.url} className="py-2.5 first:pt-0 last:pb-0">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <a
+                          href={page.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="min-w-0 truncate text-sm font-semibold text-slate-800 hover:text-teal-700 dark:text-slate-200 dark:hover:text-teal-300"
+                        >
+                          {page.title}
+                        </a>
+                        <span className="shrink-0 font-mono text-[11px] tabular-nums text-slate-400">
+                          ~{page.words}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 truncate font-mono text-[10px] text-slate-400">
+                        {new URL(page.url).pathname}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-slate-500">
+                  No eligible content pages could be sampled.
+                </p>
+              )}
+            </div>
+          </div>
+        </ReportStep>
       </div>
     </div>
+  );
+}
+
+function ReportStep({
+  step,
+  title,
+  subtitle,
+  children,
+}: {
+  step: string;
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="px-5 py-7 sm:px-8 sm:py-8">
+      <div className="mb-5 flex items-start gap-4">
+        <span className="font-mono text-[11px] font-semibold tracking-[0.16em] text-teal-700 dark:text-teal-300">
+          {step}
+        </span>
+        <div className="min-w-0">
+          <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white">
+            {title}
+          </h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-500">
+            {subtitle}
+          </p>
+        </div>
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -470,36 +508,41 @@ function CheckGroup({
   title,
   description,
   checks,
+  defaultOpen = false,
 }: {
   title: string;
   description: string;
   checks: AdsenseReadinessCheck[];
+  defaultOpen?: boolean;
 }) {
   const fixes = checks.filter((item) => item.status === "fix").length;
   const passed = checks.filter((item) => item.status === "pass").length;
   return (
-    <details className="group overflow-hidden rounded-xl border border-slate-200 bg-white/50 dark:border-slate-800 dark:bg-slate-950/20">
-      <summary className="flex cursor-pointer list-none items-center gap-4 p-4 marker:content-none sm:p-5 [&::-webkit-details-marker]:hidden">
+    <details
+      open={defaultOpen}
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-900/25"
+    >
+      <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 marker:content-none [&::-webkit-details-marker]:hidden">
         <div className="min-w-0 flex-1">
-          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
+          <h4 className="text-sm font-bold text-slate-900 dark:text-white">
             {title}
-          </h3>
-          <p className="mt-1 text-sm text-slate-500">{description}</p>
+          </h4>
+          <p className="mt-0.5 text-xs text-slate-500">{description}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           {fixes ? (
-            <span className="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
-              {fixes} to fix
+            <span className="rounded-md bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+              {fixes} fix
             </span>
           ) : (
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-              {passed} passed
+            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+              {passed} ok
             </span>
           )}
           <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
         </div>
       </summary>
-      <ul className="divide-y divide-slate-200 border-t border-slate-200 px-4 dark:divide-slate-800 dark:border-slate-800 sm:px-5">
+      <ul className="divide-y divide-slate-200 border-t border-slate-200 bg-white/70 px-4 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-950/40">
         {checks.map((item) => (
           <CheckRow key={item.id} check={item} />
         ))}
@@ -512,7 +555,7 @@ function CheckRow({ check: item }: { check: AdsenseReadinessCheck }) {
   const meta = statusMeta[item.status];
   const Icon = meta.icon;
   return (
-    <li className="py-4">
+    <li className="py-3.5">
       <div className="flex items-start gap-3">
         <span
           className={cn(
@@ -530,48 +573,84 @@ function CheckRow({ check: item }: { check: AdsenseReadinessCheck }) {
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
             {item.evidence}
           </p>
-          <FindingReference check={item} />
+          <FindingReference check={item} quiet />
         </div>
       </div>
     </li>
   );
 }
 
-function FindingReference({ check }: { check: AdsenseReadinessCheck }) {
+function FindingReference({
+  check,
+  quiet,
+}: {
+  check: AdsenseReadinessCheck;
+  quiet?: boolean;
+}) {
   return (
     <a
       href={check.reference.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 hover:underline dark:text-teal-300"
+      className={cn(
+        "mt-2 inline-flex items-center gap-1 text-xs hover:underline",
+        quiet
+          ? "font-medium text-slate-400 hover:text-teal-700 dark:hover:text-teal-300"
+          : "font-semibold text-teal-700 dark:text-teal-300"
+      )}
     >
       <span className="text-slate-400">{check.reference.relation} ·</span>
       {check.reference.label}
-      <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+      <ExternalLink className="h-2.5 w-2.5 shrink-0 opacity-70" />
     </a>
   );
 }
 
-function Metric({
+function ImpactPill({ impact }: { impact: AdsenseReadinessCheck["impact"] }) {
+  if (impact === "critical") {
+    return (
+      <span className="rounded bg-rose-50 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+        Critical
+      </span>
+    );
+  }
+  if (impact === "important") {
+    return (
+      <span className="rounded bg-amber-50 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+        Important
+      </span>
+    );
+  }
+  return (
+    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+      Advisory
+    </span>
+  );
+}
+
+function Stat({
   value,
   label,
   tone,
 }: {
   value: number;
   label: string;
-  tone?: "good" | "bad";
+  tone?: "bad";
 }) {
   return (
-    <p
-      className={cn(
-        "text-slate-400",
-        tone === "good" && "text-emerald-300",
-        tone === "bad" && value > 0 && "text-rose-300"
-      )}
-    >
-      <span className="font-bold tabular-nums text-current">{value}</span>{" "}
-      {label}
-    </p>
+    <div>
+      <dt className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          "mt-0.5 font-display text-2xl font-bold tabular-nums text-white",
+          tone === "bad" && value > 0 && "text-rose-300"
+        )}
+      >
+        {value}
+      </dd>
+    </div>
   );
 }
 
