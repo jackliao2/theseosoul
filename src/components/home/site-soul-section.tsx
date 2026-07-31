@@ -4,8 +4,13 @@ import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 
 const archetypes = [
   "The Beacon",
+  "The Powerhouse",
   "The Architect",
   "The Storyteller",
+  "The Pathfinder",
+  "The Minimalist",
+  "The Specialist",
+  "The Craftsperson",
   "The Hidden Gem",
   "The Ghost",
   "The Rising Voice",
@@ -41,8 +46,9 @@ export function SiteSoulSection() {
             hidden gem waiting to be found—or something still finding its voice.
           </p>
           <p className="mt-3 text-xs leading-relaxed text-slate-500">
-            Determined from Meta, Structure, Technical, GEO, crawl, and indexing
-            signals. Rule-based, transparent, and included in every free report.
+            Chosen from 11 profiles using Meta, Structure, Technical, GEO,
+            content depth, crawl, and indexing signals. Rule-based, transparent,
+            and included in every free report.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-4">

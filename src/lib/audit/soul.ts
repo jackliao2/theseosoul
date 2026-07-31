@@ -4,8 +4,13 @@ import type { AuditResult, AuditTabId, IssueCheckCard } from "@/lib/audit/types"
 
 export type SoulArchetypeId =
   | "beacon"
+  | "powerhouse"
   | "architect"
   | "storyteller"
+  | "pathfinder"
+  | "minimalist"
+  | "specialist"
+  | "craftsperson"
   | "hidden-gem"
   | "ghost"
   | "rising-voice";
@@ -15,6 +20,18 @@ export type SoulProfile = {
   name: string;
   message: string;
   evidence: string;
+};
+
+export type SoulSignals = {
+  score: number;
+  meta: number;
+  structure: number;
+  technical: number;
+  geo: number;
+  wordCount: number;
+  criticalIssues: number;
+  indexingRestricted: boolean;
+  crawlRestricted: boolean;
 };
 
 export type PrimaryAction = {
@@ -43,67 +60,166 @@ export function getSoulProfile(audit: AuditResult): SoulProfile {
     (issue) => issue.severity === "critical"
   ).length;
 
-  if (noindex || crawlBlocked) {
+  return classifySoul({
+    score: audit.score,
+    meta: scores.meta,
+    structure: scores.structure,
+    technical: scores.technical,
+    geo: scores.geo,
+    wordCount: audit.density.totalWords,
+    criticalIssues: critical,
+    indexingRestricted: noindex,
+    crawlRestricted: crawlBlocked,
+  });
+}
+
+/**
+ * Eleven ordered archetypes. Hard access problems win first, then balanced
+ * excellence, strong-but-uneven profiles, dominant specialties, and defaults.
+ */
+export function classifySoul(signals: SoulSignals): SoulProfile {
+  const {
+    score,
+    meta,
+    structure,
+    technical,
+    geo,
+    wordCount,
+    criticalIssues,
+    indexingRestricted,
+    crawlRestricted,
+  } = signals;
+  const dimensions = [meta, structure, technical, geo];
+  const strongest = Math.max(...dimensions);
+  const weakest = Math.min(...dimensions);
+  const spread = strongest - weakest;
+  const strongDimensions = dimensions.filter((value) => value >= 85).length;
+
+  if (indexingRestricted || crawlRestricted) {
     return {
       id: "ghost",
       name: "The Ghost",
       message:
         "The page is alive, but its crawl or indexing signals make it difficult to discover.",
-      evidence: noindex ? "Indexing restricted" : "Crawl access restricted",
+      evidence: indexingRestricted
+        ? "Indexing restricted"
+        : "Crawl access restricted",
     };
   }
 
-  const contentAverage = Math.round(
-    (scores.meta + scores.structure + scores.geo) / 3
-  );
-  if (contentAverage >= 65 && scores.technical < 55) {
+  const contentAverage = Math.round((meta + structure + geo) / 3);
+  if (contentAverage >= 65 && technical < 55) {
     return {
       id: "hidden-gem",
       name: "The Hidden Gem",
       message:
         "There is real substance here; technical gaps are keeping some of it out of view.",
-      evidence: `Content ${contentAverage} · Technical ${scores.technical}`,
+      evidence: `Content ${contentAverage} · Technical ${technical}`,
     };
   }
 
   if (
-    audit.score >= 80 &&
-    critical === 0 &&
-    Math.min(...Object.values(scores)) >= 65
+    score >= 82 &&
+    criticalIssues === 0 &&
+    weakest >= 70 &&
+    spread <= 22
   ) {
     return {
       id: "beacon",
       name: "The Beacon",
       message:
         "Clear, discoverable, and well signposted for both people and crawlers.",
-      evidence: `SEO ${audit.score} · GEO ${scores.geo}`,
+      evidence: `Balanced profile · SEO ${score} · GEO ${geo}`,
+    };
+  }
+
+  if (score >= 75 && strongDimensions >= 3) {
+    return {
+      id: "powerhouse",
+      name: "The Powerhouse",
+      message:
+        "Multiple systems are operating at a high level; one weaker layer is holding back an otherwise formidable presence.",
+      evidence: `Meta ${meta} · Technical ${technical} · GEO ${geo}`,
     };
   }
 
   if (
-    scores.technical >= 68 &&
-    scores.structure >= 68 &&
-    scores.technical + scores.structure >= scores.meta + scores.geo
+    technical >= 75 &&
+    structure >= 70 &&
+    technical + structure >= meta + geo - 10
   ) {
     return {
       id: "architect",
       name: "The Architect",
       message:
         "A disciplined technical foundation gives this page a strong, dependable shape.",
-      evidence: `Structure ${scores.structure} · Technical ${scores.technical}`,
+      evidence: `Structure ${structure} · Technical ${technical}`,
     };
   }
 
   if (
-    scores.meta + scores.geo > scores.structure + scores.technical ||
-    (audit.density.totalWords >= 500 && scores.meta >= 60)
+    geo >= 85 &&
+    geo >= Math.max(meta, structure, technical) + 12
+  ) {
+    return {
+      id: "pathfinder",
+      name: "The Pathfinder",
+      message:
+        "AI-readiness is leading the way, while classic SEO signals still have room to catch up.",
+      evidence: `GEO leads at ${geo} · SEO ${score}`,
+    };
+  }
+
+  if (
+    wordCount >= 650 &&
+    meta >= 70 &&
+    geo >= 65 &&
+    technical < 85
   ) {
     return {
       id: "storyteller",
       name: "The Storyteller",
       message:
         "The page has a clear voice; stronger technical signals can help it travel further.",
-      evidence: `Meta ${scores.meta} · GEO ${scores.geo}`,
+      evidence: `${wordCount} words · Meta ${meta} · GEO ${geo}`,
+    };
+  }
+
+  if (wordCount < 250 && meta >= 70 && technical >= 70) {
+    return {
+      id: "minimalist",
+      name: "The Minimalist",
+      message:
+        "Lean and deliberate: the page says little, but its essential signals are carefully placed.",
+      evidence: `${wordCount} words · Meta ${meta} · Technical ${technical}`,
+    };
+  }
+
+  if (strongest >= 85 && spread >= 28) {
+    const lead =
+      strongest === meta
+        ? "Meta"
+        : strongest === structure
+          ? "Structure"
+          : strongest === technical
+            ? "Technical"
+            : "GEO";
+    return {
+      id: "specialist",
+      name: "The Specialist",
+      message:
+        "One discipline stands out clearly; strengthening the quieter layers will make the whole site more resilient.",
+      evidence: `${lead} leads at ${strongest} · spread ${spread} points`,
+    };
+  }
+
+  if (weakest >= 60 && criticalIssues <= 1) {
+    return {
+      id: "craftsperson",
+      name: "The Craftsperson",
+      message:
+        "Thoughtful work is visible across the page, even if the final polish is still underway.",
+      evidence: `All four layers at 60+ · SEO ${score}`,
     };
   }
 
@@ -112,7 +228,7 @@ export function getSoulProfile(audit: AuditResult): SoulProfile {
     name: "The Rising Voice",
     message:
       "The foundations are taking shape, with a few clear opportunities to become easier to find.",
-    evidence: `SEO ${audit.score} · GEO ${scores.geo}`,
+    evidence: `SEO ${score} · GEO ${geo}`,
   };
 }
 

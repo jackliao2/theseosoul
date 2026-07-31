@@ -204,7 +204,7 @@ export function PanelOverview({
                 Site Soul
               </p>
               <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
-                Rule-based
+                Rule-based · 11 profiles
               </span>
             </div>
             <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
