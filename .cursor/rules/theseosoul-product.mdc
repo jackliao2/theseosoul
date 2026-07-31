@@ -1,0 +1,23 @@
+---
+description: theSEOsoul product decisions — indexing, contact, brand
+alwaysApply: true
+---
+
+# TheSeoSoul product rules
+
+## Brand & contact
+- Brand display: `The` + **Seo** + `Soul` (wordmark via SiteWordmark). Canonical name: `TheSeoSoul`.
+- Logo mark: abstract orbit/pulse SVG — never a “TS” / “tS” letter monogram.
+- Public contact email: `hello@theseosoul.com` — use this on Contact, Privacy, Terms, About, Footer.
+
+## Audit URL indexing (important)
+- Shareable `/audit/[domain]` reports are a product feature; **mass-indexing them is not**.
+- Do **not** push thousands of thin templated audit URLs into Google via sitemap or default `index`.
+- Default: new/random audit pages should be `noindex,follow` (still shareable for humans).
+- Sitemap should only include curated/seed/high-value domains — never a full mirror of every audited domain.
+- Never bulk-crawl the web just to grow indexed report pages.
+
+## Positioning
+- Free technical SEO + GEO audit with shareable report URLs.
+- Honest free tier — no fake traffic/backlink charts.
+- Paid traffic/backlinks/SERP later; do not invent those APIs.
