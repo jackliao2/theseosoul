@@ -3,14 +3,12 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
-/** Domain history lives in the top nav — keep it out of this list. */
+/** Pinned in the top nav — keep out of the Tools list. */
 const PINNED_HREF = "/tools/domain-history";
 
-const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
 const dropdownTools = TOOL_CATALOG.filter(
   (t) =>
     t.href !== PINNED_HREF &&
@@ -72,27 +70,13 @@ export function ToolsNavMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-0 top-full z-50 w-56 pt-2 transition-[opacity,transform] duration-150 ease-out",
+          "absolute left-0 top-full z-50 w-52 pt-2 transition-[opacity,transform] duration-150 ease-out",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-1 opacity-0"
         )}
       >
         <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-[color:var(--surface)] py-1.5 shadow-[0_16px_40px_-20px_rgba(15,23,42,0.35)] dark:border-slate-600 dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.6)]">
-          <AuditCtaLink
-            onNavigate={() => setOpen(false)}
-            className="block px-3 py-2 text-left transition-colors hover:bg-teal-800/[0.06] dark:hover:bg-white/[0.05]"
-          >
-            <span className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
-              {featured.nav}
-            </span>
-            <span className="mt-0.5 block text-[11px] leading-snug text-slate-500 dark:text-slate-400">
-              {featured.short}
-            </span>
-          </AuditCtaLink>
-
-          <div className="my-1 border-t border-slate-200/80 dark:border-slate-700" />
-
           {dropdownTools.map((item) => (
             <Link
               key={item.href}
@@ -142,12 +126,6 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
       </button>
       {expanded ? (
         <div className="mb-1 ml-1 space-y-0.5 border-l-2 border-teal-800/25 pl-2 dark:border-teal-400/25">
-          <AuditCtaLink
-            onNavigate={onNavigate}
-            className="block rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-900 dark:text-slate-50"
-          >
-            {featured.nav}
-          </AuditCtaLink>
           {dropdownTools.map((item) => (
             <Link
               key={item.href}

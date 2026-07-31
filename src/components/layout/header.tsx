@@ -51,7 +51,7 @@ export function Header({ compact = false }: { compact?: boolean }) {
             <>
               <ToolsNavMenu />
               <Link href="/tools/domain-history" className={navLinkClass}>
-                Domain history
+                Domain History
               </Link>
               {NAV.map((item) => (
                 <Link key={item.href} href={item.href} className={navLinkClass}>
@@ -78,7 +78,7 @@ export function Header({ compact = false }: { compact?: boolean }) {
                 href="/tools/domain-history"
                 className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white lg:inline-block"
               >
-                Domain history
+                Domain History
               </Link>
               <Link
                 href="/#home-audit-url"
@@ -109,7 +109,7 @@ export function Header({ compact = false }: { compact?: boolean }) {
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
             >
-              Domain history
+              Domain History
             </Link>
             <ToolsMobileNav onNavigate={() => setOpen(false)} />
             {!compact ? (
