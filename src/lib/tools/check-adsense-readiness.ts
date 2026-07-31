@@ -16,8 +16,16 @@ import type {
   AdsenseTrustPage,
 } from "@/lib/tools/adsense-readiness-types";
 
-const MAX_SAMPLE_PAGES = 5;
+const MAX_SAMPLE_PAGES = 8;
 const SAMPLE_TIMEOUT_MS = 8_000;
+
+/** Practical readiness bars — not published Google word-count minima. */
+const HOME_WORDS_MIN = 300;
+const CONTENT_MEDIAN_MIN = 500;
+const DEEP_CONTENT_MEDIAN = 800;
+const THIN_WORDS = 300;
+const MIN_SAMPLE_PAGES = 5;
+const MIN_CONTENT_INVENTORY = 12;
 
 const GOOGLE_REFERENCES = {
   siteReady: {
@@ -123,11 +131,14 @@ function referenceFor(id: string): AdsenseFindingReference {
   if (id === "traffic-quality") return GOOGLE_REFERENCES.invalidTraffic;
   if (
     id === "homepage-content" ||
+    id === "site-purpose" ||
     id === "content-depth" ||
+    id === "deep-content" ||
     id === "thin-pages" ||
     id === "placeholders" ||
     id === "page-headings" ||
-    id === "unique-titles"
+    id === "unique-titles" ||
+    id === "content-inventory"
   ) {
     return GOOGLE_REFERENCES.notApproved;
   }
@@ -140,7 +151,9 @@ function referenceFor(id: string): AdsenseFindingReference {
   ) {
     return GOOGLE_REFERENCES.notReady;
   }
-  if (id === "navigation") return GOOGLE_REFERENCES.siteReady;
+  if (id === "navigation" || id === "trust-bundle") {
+    return GOOGLE_REFERENCES.siteReady;
+  }
   if (id === "adsense-code") return GOOGLE_REFERENCES.notReady;
   return GOOGLE_REFERENCES.publisherPolicies;
 }
@@ -389,6 +402,17 @@ async function discoverSitemapPages(
   };
 }
 
+function pageKey(value: string, origin: string): string | null {
+  try {
+    const url = new URL(value, origin);
+    const host = url.hostname.replace(/^www\./, "").toLowerCase();
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    return `${host}${path}`;
+  } catch {
+    return null;
+  }
+}
+
 function contentCandidates(
   sitemapPages: string[],
   homeLinks: ReturnType<typeof parseLinks>["items"],
@@ -401,23 +425,27 @@ function contentCandidates(
     ...sitemapPages,
     ...homeLinks.filter((link) => link.internal).map((link) => link.href),
   ];
+  const seen = new Set<string>();
+  const unique: string[] = [];
 
-  return Array.from(
-    new Set(
-      candidates.flatMap((value) => {
-        try {
-          const url = new URL(value, origin);
-          url.hash = "";
-          if (!isSameSite(url.toString(), origin)) return [];
-          if (url.pathname === rootPath || url.pathname === "/") return [];
-          if (excluded.test(`${url.pathname}${url.search}`)) return [];
-          return [url.toString()];
-        } catch {
-          return [];
-        }
-      })
-    )
-  ).slice(0, MAX_SAMPLE_PAGES);
+  for (const value of candidates) {
+    try {
+      const url = new URL(value, origin);
+      url.hash = "";
+      url.search = "";
+      if (!isSameSite(url.toString(), origin)) continue;
+      if (url.pathname === rootPath || url.pathname === "/") continue;
+      if (excluded.test(url.pathname)) continue;
+      const key = pageKey(url.toString(), origin);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      unique.push(url.toString());
+    } catch {
+      // skip invalid URLs
+    }
+  }
+
+  return unique;
 }
 
 async function samplePage(url: string): Promise<AdsenseSamplePage | null> {
@@ -449,7 +477,7 @@ function median(values: number[]): number {
 
 function scoreChecks(checks: AdsenseReadinessCheck[]): number {
   const weights: Record<AdsenseCheckImpact, number> = {
-    critical: 3,
+    critical: 4,
     important: 2,
     advisory: 1,
   };
@@ -460,7 +488,29 @@ function scoreChecks(checks: AdsenseReadinessCheck[]): number {
   const earned = measured
     .filter((item) => item.status === "pass")
     .reduce((sum, item) => sum + weights[item.impact], 0);
-  return possible ? Math.round((earned / possible) * 100) : 0;
+  let score = possible ? Math.round((earned / possible) * 100) : 0;
+
+  const criticalFixes = measured.filter(
+    (item) => item.status === "fix" && item.impact === "critical"
+  ).length;
+  if (criticalFixes >= 3) score = Math.min(score, 34);
+  else if (criticalFixes === 2) score = Math.min(score, 44);
+  else if (criticalFixes === 1) score = Math.min(score, 58);
+
+  return score;
+}
+
+function hasClearSitePurpose(title: string, words: number): boolean {
+  const normalized = title.replace(/\s+/g, " ").trim().toLowerCase();
+  if (!normalized || normalized === "untitled") return false;
+  if (
+    /^(home|homepage|welcome|index|website|example domain|domain|my site|site)$/i.test(
+      normalized
+    )
+  ) {
+    return false;
+  }
+  return words >= HOME_WORDS_MIN;
 }
 
 export async function checkAdsenseReadiness(
@@ -486,6 +536,9 @@ export async function checkAdsenseReadiness(
     robots.sitemapDirectives
   );
 
+  const inventoryUrls = contentCandidates(sitemap.pages, links.items, origin);
+  const sampleTargets = inventoryUrls.slice(0, MAX_SAMPLE_PAGES);
+
   const [trustPages, sampledResults] = await Promise.all([
     Promise.all(
       TRUST_DEFINITIONS.map((definition) =>
@@ -496,13 +549,18 @@ export async function checkAdsenseReadiness(
         )
       )
     ),
-    Promise.all(
-      contentCandidates(sitemap.pages, links.items, origin).map(samplePage)
-    ),
+    Promise.all(sampleTargets.map(samplePage)),
   ]);
 
+  const sampledSeen = new Set<string>();
   const sampledPages = sampledResults.filter(
-    (page): page is AdsenseSamplePage => Boolean(page)
+    (page): page is AdsenseSamplePage => {
+      if (!page) return false;
+      const key = pageKey(page.url, origin);
+      if (!key || sampledSeen.has(key)) return false;
+      sampledSeen.add(key);
+      return true;
+    }
   );
   const checks: AdsenseReadinessCheck[] = [];
   const https = new URL(homepage.finalUrl).protocol === "https:";
@@ -600,10 +658,10 @@ export async function checkAdsenseReadiness(
       "navigation",
       "access",
       "Homepage has useful internal navigation",
-      links.internal >= 3 ? "pass" : "fix",
+      links.internal >= 5 ? "pass" : "fix",
       "important",
       `${links.internal} internal link(s) were found on the homepage.`,
-      "Add clear navigation to the main content and trust pages."
+      "Add clear navigation to the main content sections and trust pages."
     )
   );
 
@@ -617,7 +675,7 @@ export async function checkAdsenseReadiness(
         "trust",
         `${definition.label} is accessible`,
         page.found ? "pass" : required ? "fix" : "info",
-        required ? "important" : "advisory",
+        required ? "critical" : "advisory",
         page.found
           ? `Found a public ${definition.label.toLowerCase()} page.`
           : `No public ${definition.label.toLowerCase()} page was found from navigation or common paths.`,
@@ -630,6 +688,33 @@ export async function checkAdsenseReadiness(
   }
 
   const privacy = trustByKind.get("privacy");
+  const about = trustByKind.get("about");
+  const contact = trustByKind.get("contact");
+  const trustBundleReady = Boolean(
+    privacy?.found && about?.found && contact?.found
+  );
+  checks.push(
+    check(
+      "trust-bundle",
+      "trust",
+      "Core trust pages are all present",
+      trustBundleReady ? "pass" : "fix",
+      "critical",
+      trustBundleReady
+        ? "Privacy, About, and Contact pages were all found."
+        : `Missing: ${
+            [
+              !privacy?.found ? "Privacy" : null,
+              !about?.found ? "About" : null,
+              !contact?.found ? "Contact" : null,
+            ]
+              .filter(Boolean)
+              .join(", ") || "core trust pages"
+          }.`,
+      "Publish Privacy, About, and Contact pages and link them from the site footer or navigation."
+    )
+  );
+
   const privacyText = privacy?.text?.toLowerCase() ?? "";
   const privacySignals = [
     /cookie/.test(privacyText),
@@ -643,7 +728,7 @@ export async function checkAdsenseReadiness(
       "privacy-disclosure",
       "trust",
       "Privacy page covers advertising disclosures",
-      privacy?.found && privacySignalCount >= 3 ? "pass" : "fix",
+      privacy?.found && privacySignalCount >= 4 ? "pass" : "fix",
       "critical",
       privacy?.found
         ? `${privacySignalCount}/4 disclosure signals found: cookies, Google, advertising, and opt-out guidance.`
@@ -655,10 +740,12 @@ export async function checkAdsenseReadiness(
 
   const sampleCount = sampledPages.length;
   const sampleMedian = median(sampledPages.map((page) => page.words));
-  const thinPages = sampledPages.filter((page) => page.words < 150);
+  const thinPages = sampledPages.filter((page) => page.words < THIN_WORDS);
   const placeholderPages = sampledPages.filter((page) => page.placeholder);
   const missingH1 = sampledPages.filter((page) => page.h1Count === 0);
   const indexableSamples = sampledPages.filter((page) => !page.noindex);
+  const homeTitle = $("title").first().text().replace(/\s+/g, " ").trim();
+  const sitePurposeClear = hasClearSitePurpose(homeTitle, homeWords);
   const titled = sampledPages
     .map((page) => page.title.trim().toLowerCase())
     .filter((title) => title && title !== "untitled");
@@ -666,44 +753,73 @@ export async function checkAdsenseReadiness(
 
   checks.push(
     check(
+      "site-purpose",
+      "content",
+      "Homepage explains the site’s purpose",
+      sitePurposeClear ? "pass" : "fix",
+      "critical",
+      sitePurposeClear
+        ? `Homepage title “${homeTitle}” plus about ${homeWords.toLocaleString()} readable words suggest a clear public purpose.`
+        : `Homepage title “${homeTitle || "Untitled"}” and ${homeWords.toLocaleString()} readable words do not clearly explain what the site is for.`,
+      "State what the site does, who it serves, and what visitors can find — on the homepage itself."
+    ),
+    check(
       "homepage-content",
       "content",
       "Homepage has readable substance",
-      homeWords >= 150 ? "pass" : "fix",
-      "important",
-      `Approximately ${homeWords.toLocaleString()} readable words were found outside navigation and footer chrome.`,
+      homeWords >= HOME_WORDS_MIN ? "pass" : "fix",
+      "critical",
+      `Approximately ${homeWords.toLocaleString()} readable words were found outside navigation and footer chrome (practical bar: ${HOME_WORDS_MIN}+).`,
       "Use the homepage to explain what the site offers and guide visitors to substantive pages."
+    ),
+    check(
+      "content-inventory",
+      "content",
+      "Enough public content URLs are discoverable",
+      inventoryUrls.length >= MIN_CONTENT_INVENTORY ? "pass" : "fix",
+      "critical",
+      `${inventoryUrls.length} eligible content URL(s) were found via sitemap and homepage links (practical bar: ${MIN_CONTENT_INVENTORY}+).`,
+      "Build a real inventory of useful articles or pages before applying — not just a homepage and a few stubs."
     ),
     check(
       "sample-size",
       "content",
-      "Multiple content pages are discoverable",
-      sampleCount >= 3 ? "pass" : "fix",
-      "important",
-      `${sampleCount} content page(s) were successfully sampled (maximum ${MAX_SAMPLE_PAGES}).`,
-      "Publish and internally link several complete, useful content pages."
+      "Multiple content pages are sampleable",
+      sampleCount >= MIN_SAMPLE_PAGES ? "pass" : "fix",
+      "critical",
+      `${sampleCount} unique content page(s) were successfully sampled (target ${MIN_SAMPLE_PAGES}+, maximum ${MAX_SAMPLE_PAGES}).`,
+      "Publish and internally link several complete, useful content pages that a crawler can reach."
     ),
     check(
       "content-depth",
       "content",
       "Sample shows meaningful content depth",
-      sampleCount > 0 && sampleMedian >= 250 ? "pass" : "fix",
+      sampleCount > 0 && sampleMedian >= CONTENT_MEDIAN_MIN ? "pass" : "fix",
+      "critical",
+      sampleCount
+        ? `The sampled median is approximately ${sampleMedian.toLocaleString()} words (practical bar: ${CONTENT_MEDIAN_MIN}+).`
+        : "No eligible content pages could be sampled.",
+      `Expand thin topics. The ${CONTENT_MEDIAN_MIN}-word median marker is a readiness heuristic used by publishers in practice — not a published Google minimum.`
+    ),
+    check(
+      "deep-content",
+      "content",
+      "Sample approaches in-depth article length",
+      sampleCount > 0 && sampleMedian >= DEEP_CONTENT_MEDIAN ? "pass" : "fix",
       "important",
       sampleCount
-        ? `The sampled median is approximately ${sampleMedian.toLocaleString()} words.`
+        ? `Median sample depth is about ${sampleMedian.toLocaleString()} words (stretch bar: ${DEEP_CONTENT_MEDIAN}+).`
         : "No eligible content pages could be sampled.",
-      "Expand pages that do not answer their topic fully. The 250-word marker is a review heuristic, not a Google minimum."
+      `Many publishers aim for roughly ${DEEP_CONTENT_MEDIAN}–1,500 words on core articles. This is a competitive signal, not an official AdSense rule.`
     ),
     check(
       "thin-pages",
       "content",
-      "Thin pages are limited",
-      sampleCount > 0 && thinPages.length <= Math.floor(sampleCount / 3)
-        ? "pass"
-        : "fix",
-      "important",
-      `${thinPages.length}/${sampleCount} sampled page(s) contained fewer than approximately 150 readable words.`,
-      "Improve or remove thin public pages before requesting review."
+      "Sampled pages are not thin",
+      sampleCount > 0 && thinPages.length === 0 ? "pass" : "fix",
+      "critical",
+      `${thinPages.length}/${sampleCount} sampled page(s) contained fewer than approximately ${THIN_WORDS} readable words.`,
+      "Improve or remove thin public pages before requesting review. Zero thin pages in the sample is the bar used here."
     ),
     check(
       "placeholders",
@@ -730,7 +846,7 @@ export async function checkAdsenseReadiness(
       "content",
       "Content pages use a primary heading",
       sampleCount > 0 && missingH1.length === 0 ? "pass" : "fix",
-      "advisory",
+      "important",
       `${missingH1.length}/${sampleCount} sampled page(s) were missing an H1.`,
       "Give each substantive page one clear primary heading."
     ),
@@ -739,7 +855,7 @@ export async function checkAdsenseReadiness(
       "content",
       "Sampled pages have distinct titles",
       sampleCount > 0 && uniqueTitles === sampleCount ? "pass" : "fix",
-      "advisory",
+      "important",
       `${uniqueTitles}/${sampleCount} sampled page title(s) were present and unique.`,
       "Use a specific, distinct title for every public content page."
     )
@@ -842,13 +958,25 @@ export async function checkAdsenseReadiness(
 
   const score = scoreChecks(checks);
   const fixes = checks.filter((item) => item.status === "fix").length;
+  const criticalFixes = checks.filter(
+    (item) => item.status === "fix" && item.impact === "critical"
+  ).length;
   const reviews = checks.filter((item) => item.status === "review").length;
   const informational = checks.filter((item) => item.status === "info").length;
   const passed = checks.filter((item) => item.status === "pass").length;
+  const foundationReady =
+    criticalFixes === 0 &&
+    checks.some(
+      (item) => item.id === "content-depth" && item.status === "pass"
+    ) &&
+    checks.some(
+      (item) => item.id === "privacy-disclosure" && item.status === "pass"
+    ) &&
+    checks.some((item) => item.id === "trust-bundle" && item.status === "pass");
   const verdict =
-    score >= 80 && fixes <= 3
+    score >= 85 && foundationReady
       ? "Strong foundation"
-      : score >= 55
+      : score >= 50 && criticalFixes <= 2
         ? "Some work needed"
         : "Not ready yet";
 

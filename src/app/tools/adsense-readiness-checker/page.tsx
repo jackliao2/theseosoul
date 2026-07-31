@@ -58,11 +58,11 @@ const faqs = [
   },
   {
     q: "How many pages does the checker inspect?",
-    a: "It fetches the homepage, public support files, common trust pages, and up to five content pages discovered through the XML sitemap or homepage links. It is a bounded sample, not a full-site crawl.",
+    a: "It fetches the homepage, public support files, common trust pages, and up to eight unique content pages discovered through the XML sitemap or homepage links. Inventory size is counted from discoverable URLs; the body sample stays bounded — not a full-site crawl.",
   },
   {
     q: "Does Google require a minimum article word count?",
-    a: "Google does not publish a universal minimum word count for AdSense approval. The content-depth markers in this report are review heuristics designed to surface unusually thin pages, not official thresholds.",
+    a: "Google does not publish a universal minimum word count for AdSense approval. This report still uses stricter practical bars (roughly 300+ homepage words, 500+ median sample depth, zero thin pages under ~300 words, and a stretch bar near 800+) because thin sites often look “fine” on crawl checks alone. Those markers are readiness heuristics, not official Google thresholds.",
   },
   {
     q: "Does the tool use AI to judge originality or prohibited content?",

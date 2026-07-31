@@ -84,7 +84,8 @@ export const ADSENSE_GROUPS: Array<{
   {
     id: "content",
     label: "Content sample",
-    description: "Does a bounded sample show useful, navigable content?",
+    description:
+      "Is there a real content inventory with enough depth — not just a polished homepage?",
   },
   {
     id: "monetization",

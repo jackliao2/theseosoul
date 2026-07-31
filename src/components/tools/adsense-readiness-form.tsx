@@ -188,7 +188,7 @@ export function AdsenseReadinessForm() {
             </div>
             <p className="mt-2.5 text-sm leading-relaxed text-slate-400">
               We return to the homepage, inspect public trust files and pages,
-              then sample up to five content URLs.
+              then sample up to eight unique content URLs.
             </p>
           </div>
         </div>
