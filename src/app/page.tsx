@@ -25,6 +25,11 @@ const featuredTools = [
     short: "Wayback chapters + WHOIS second-hand check",
   },
   {
+    href: "/tools/seo-ladder",
+    title: "SEO site ladder",
+    short: "10 capability stages — not a dollar chart",
+  },
+  {
     href: "/tools/adsense-readiness-checker",
     title: "AdSense readiness",
     short: "Trust pages, disclosures & content sample",
@@ -43,11 +48,6 @@ const featuredTools = [
     href: "/tools/geo-content-checker",
     title: "GEO content",
     short: "Citation-readiness for drafts",
-  },
-  {
-    href: "/about",
-    title: "About",
-    short: "What we check — and what we won’t invent",
   },
 ] as const;
 

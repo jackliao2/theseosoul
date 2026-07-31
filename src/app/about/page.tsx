@@ -91,6 +91,7 @@ const steps = [
 
 const freeTools = [
   { href: "/tools/domain-history", label: "Domain history" },
+  { href: "/tools/seo-ladder", label: "SEO site ladder" },
   { href: "/tools/adsense-readiness-checker", label: "AdSense readiness" },
   { href: "/tools/robots-txt-checker", label: "Robots.txt" },
   { href: "/tools/meta-tag-checker", label: "Meta tags" },

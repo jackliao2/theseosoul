@@ -9,6 +9,7 @@ export const SITEMAP_STATIC_PATHS = [
   "/tools",
   "/tools/adsense-readiness-checker",
   "/tools/domain-history",
+  "/tools/seo-ladder",
   "/tools/geo-content-checker",
   "/tools/robots-txt-checker",
   "/tools/meta-tag-checker",

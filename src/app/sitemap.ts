@@ -8,6 +8,7 @@ const priorities: Record<string, number> = {
   "/tools": 0.75,
   "/tools/adsense-readiness-checker": 0.75,
   "/tools/domain-history": 0.75,
+  "/tools/seo-ladder": 0.72,
   "/tools/meta-tag-checker": 0.72,
   "/tools/keyword-density-checker": 0.72,
   "/tools/geo-content-checker": 0.7,

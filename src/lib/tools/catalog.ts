@@ -33,6 +33,13 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     group: "growth",
   },
   {
+    href: "/tools/seo-ladder",
+    title: "SEO Site Ladder",
+    nav: "SEO ladder",
+    short: "10 capability stages — not a dollar chart",
+    group: "growth",
+  },
+  {
     href: "/tools/robots-txt-checker",
     title: "Robots.txt Checker",
     nav: "Robots.txt",

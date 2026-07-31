@@ -49,6 +49,14 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/tools/seo-ladder"
+                className="hover:text-teal-700 dark:hover:text-teal-300"
+              >
+                SEO site ladder
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/tools/adsense-readiness-checker"
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
