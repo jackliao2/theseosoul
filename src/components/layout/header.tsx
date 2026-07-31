@@ -19,6 +19,9 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
+const navLinkClass =
+  "hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white md:inline-block";
+
 export function Header({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
 
@@ -47,12 +50,11 @@ export function Header({ compact = false }: { compact?: boolean }) {
           {!compact ? (
             <>
               <ToolsNavMenu />
+              <Link href="/tools/domain-history" className={navLinkClass}>
+                Domain history
+              </Link>
               {NAV.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white md:inline-block"
-                >
+                <Link key={item.href} href={item.href} className={navLinkClass}>
                   {item.label}
                 </Link>
               ))}
@@ -72,6 +74,12 @@ export function Header({ compact = false }: { compact?: boolean }) {
           ) : (
             <>
               <ToolsNavMenu />
+              <Link
+                href="/tools/domain-history"
+                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white lg:inline-block"
+              >
+                Domain history
+              </Link>
               <Link
                 href="/#home-audit-url"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white"
@@ -96,36 +104,43 @@ export function Header({ compact = false }: { compact?: boolean }) {
       {open ? (
         <div className="border-t border-slate-200 bg-[color:var(--surface)] px-4 py-3 dark:border-slate-700 md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1">
+            <Link
+              href="/tools/domain-history"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              Domain history
+            </Link>
             <ToolsMobileNav onNavigate={() => setOpen(false)} />
-            {!compact
-              ? NAV.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
-                  >
-                    {item.label}
-                  </Link>
-                ))
-              : (
-                  <>
-                    <Link
-                      href="/about"
-                      onClick={() => setOpen(false)}
-                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
-                    >
-                      About
-                    </Link>
-                    <Link
-                      href="/#home-audit-url"
-                      onClick={() => setOpen(false)}
-                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
-                    >
-                      New audit
-                    </Link>
-                  </>
-                )}
+            {!compact ? (
+              NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  {item.label}
+                </Link>
+              ))
+            ) : (
+              <>
+                <Link
+                  href="/about"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/#home-audit-url"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  New audit
+                </Link>
+              </>
+            )}
           </div>
         </div>
       ) : null}

@@ -8,8 +8,6 @@ export type ToolCatalogItem = {
   /** One-line scan text for the hub / related tiles */
   short: string;
   group: "featured" | "growth" | "checkers" | "content";
-  /** Elevate under Start here in the Tools dropdown (max ~2). */
-  spotlight?: boolean;
 };
 
 export const TOOL_CATALOG: ToolCatalogItem[] = [
@@ -26,7 +24,6 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     nav: "Domain history",
     short: "Wayback chapters + WHOIS second-hand check",
     group: "growth",
-    spotlight: true,
   },
   {
     href: "/tools/adsense-readiness-checker",
@@ -34,7 +31,6 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     nav: "AdSense readiness",
     short: "Trust pages, content sample & approval prep",
     group: "growth",
-    spotlight: true,
   },
   {
     href: "/tools/seo-ladder",

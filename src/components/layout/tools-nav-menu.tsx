@@ -7,12 +7,15 @@ import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
+/** Domain history lives in the top nav — keep it out of this list. */
+const PINNED_HREF = "/tools/domain-history";
+
 const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;
-const spotlights = TOOL_CATALOG.filter((t) => t.spotlight);
-const moreTools = TOOL_CATALOG.filter(
-  (t) => (t.group === "growth" || t.group === "content") && !t.spotlight
+const dropdownTools = TOOL_CATALOG.filter(
+  (t) =>
+    t.href !== PINNED_HREF &&
+    (t.group === "growth" || t.group === "content")
 );
-const checkers = TOOL_CATALOG.filter((t) => t.group === "checkers");
 
 export function ToolsNavMenu() {
   const [open, setOpen] = useState(false);
@@ -69,100 +72,48 @@ export function ToolsNavMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-1/2 top-full z-50 w-[min(22rem,calc(100vw-1.5rem))] -translate-x-1/2 pt-2 transition-[opacity,transform] duration-200 ease-out",
+          "absolute left-0 top-full z-50 w-56 pt-2 transition-[opacity,transform] duration-150 ease-out",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-1 opacity-0"
         )}
       >
-        <div className="overflow-hidden rounded-xl border border-slate-700/80 bg-[#0b1220] shadow-[0_20px_50px_-24px_rgba(0,0,0,0.65)]">
-          <div className="p-2.5">
-            <p className="px-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-300/75">
-              Start here
-            </p>
-            <AuditCtaLink
-              onNavigate={() => setOpen(false)}
-              className="mt-1 block rounded-lg px-1.5 py-1.5 text-left transition-colors hover:bg-white/5"
+        <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-[color:var(--surface)] py-1.5 shadow-[0_16px_40px_-20px_rgba(15,23,42,0.35)] dark:border-slate-600 dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.6)]">
+          <AuditCtaLink
+            onNavigate={() => setOpen(false)}
+            className="block px-3 py-2 text-left transition-colors hover:bg-teal-800/[0.06] dark:hover:bg-white/[0.05]"
+          >
+            <span className="block text-sm font-semibold text-slate-900 dark:text-slate-50">
+              {featured.nav}
+            </span>
+            <span className="mt-0.5 block text-[11px] leading-snug text-slate-500 dark:text-slate-400">
+              {featured.short}
+            </span>
+          </AuditCtaLink>
+
+          <div className="my-1 border-t border-slate-200/80 dark:border-slate-700" />
+
+          {dropdownTools.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
-              <span className="block font-display text-sm font-bold tracking-tight text-white">
-                {featured.nav}
-              </span>
-              <span className="mt-0.5 block text-[11px] leading-snug text-slate-400">
-                {featured.short}
-              </span>
-            </AuditCtaLink>
+              {item.nav}
+            </Link>
+          ))}
 
-            <p className="mt-2.5 px-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-300/75">
-              Highlights
-            </p>
-            <div className="mt-1 space-y-0.5">
-              {spotlights.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-lg px-1.5 py-1.5 transition-colors hover:bg-white/5"
-                >
-                  <span className="block text-[13px] font-semibold text-slate-100">
-                    {item.nav}
-                  </span>
-                  <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">
-                    {item.short}
-                  </span>
-                </Link>
-              ))}
-            </div>
-
-            {moreTools.length > 0 ? (
-              <div className="mt-1.5 flex flex-wrap gap-1 px-0.5">
-                {moreTools.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    role="menuitem"
-                    onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-1 text-[12px] font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
-                  >
-                    {item.nav}
-                    {item.group === "content" ? (
-                      <span className="ml-1 font-mono text-[8px] uppercase tracking-wider text-slate-500">
-                        GEO
-                      </span>
-                    ) : null}
-                  </Link>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="border-t border-white/10 bg-white/[0.03] px-2.5 py-2">
-            <p className="px-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Page checkers
-            </p>
-            <div className="mt-1.5 grid grid-cols-2 gap-0.5">
-              {checkers.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  role="menuitem"
-                  title={item.short}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-2 py-1.5 text-[12px] font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
-                >
-                  {item.nav}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <div className="my-1 border-t border-slate-200/80 dark:border-slate-700" />
 
           <Link
             href="/tools"
             onClick={() => setOpen(false)}
-            className="flex items-center justify-between border-t border-white/10 px-3.5 py-2 text-xs font-semibold text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-teal-200"
+            className="flex items-center justify-between px-3 py-2 text-sm font-semibold text-teal-800 transition-colors hover:bg-teal-800/[0.06] dark:text-teal-300 dark:hover:bg-teal-400/[0.08]"
           >
             <span>All tools</span>
-            <span className="text-teal-300">→</span>
+            <span aria-hidden>→</span>
           </Link>
         </div>
       </div>
@@ -197,17 +148,7 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
           >
             {featured.nav}
           </AuditCtaLink>
-          {spotlights.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className="block rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
-            >
-              {item.nav}
-            </Link>
-          ))}
-          {moreTools.concat(checkers).map((item) => (
+          {dropdownTools.map((item) => (
             <Link
               key={item.href}
               href={item.href}
