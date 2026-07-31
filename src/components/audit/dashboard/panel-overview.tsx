@@ -115,161 +115,114 @@ export function PanelOverview({
 
   return (
     <div className="space-y-3 pb-3">
-      <div className="flex items-start gap-4">
-        <ScoreRing score={audit.score} size="lg" />
-        <div className="min-w-0 flex-1 pt-1">
-          <div className="flex flex-wrap items-center gap-2">
-            {audit.favicon.href ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={audit.favicon.href}
-                alt=""
-                className="h-5 w-5 rounded border border-slate-200 bg-white object-contain"
-              />
-            ) : null}
-            <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              {audit.domain}
-            </h2>
-            <span
-              className={cn(
-                "inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 font-display text-sm font-bold",
-                gradeTone(audit.grade)
-              )}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+        <div className="flex items-start gap-4">
+          <ScoreRing score={audit.score} size="lg" />
+          <div className="min-w-0 flex-1 pt-1">
+            <div className="flex flex-wrap items-center gap-2">
+              {audit.favicon.href ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={audit.favicon.href}
+                  alt=""
+                  className="h-5 w-5 rounded border border-slate-200 bg-white object-contain"
+                />
+              ) : null}
+              <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {audit.domain}
+              </h2>
+              <span
+                className={cn(
+                  "inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 font-display text-sm font-bold",
+                  gradeTone(audit.grade)
+                )}
+              >
+                {audit.grade}
+              </span>
+            </div>
+            <p className="mt-1 max-w-2xl text-sm leading-snug text-slate-600 dark:text-slate-400">
+              {audit.summary}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              {critical} critical · {warnings} warnings · GEO {audit.geo.score} ·
+              fetched {fmtTimestamp(audit.fetchedAt)}
+            </p>
+            <a
+              href={audit.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs text-teal-700 hover:underline dark:text-teal-400"
             >
-              {audit.grade}
-            </span>
+              <span className="truncate">{audit.url}</span>
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
           </div>
-          <p className="mt-1 max-w-2xl text-sm leading-snug text-slate-600 dark:text-slate-400">
-            {audit.summary}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            {critical} critical · {warnings} warnings · GEO {audit.geo.score} ·
-            fetched {fmtTimestamp(audit.fetchedAt)}
-          </p>
-          <a
-            href={audit.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs text-teal-700 hover:underline dark:text-teal-400"
-          >
-            <span className="truncate">{audit.url}</span>
-            <ExternalLink className="h-3 w-3 shrink-0" />
-          </a>
         </div>
+
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-2 border-slate-200 lg:grid-cols-1 lg:border-l lg:pl-4 dark:border-slate-800">
+          {subs.map((subscore) => (
+            <li key={subscore.id}>
+              <button
+                type="button"
+                onClick={() => onSelectTab(subscore.tab)}
+                className="w-full text-left"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {subscore.label}
+                  </span>
+                  <span className="text-[11px] font-bold tabular-nums text-slate-900 dark:text-white">
+                    {subscore.score}
+                  </span>
+                </div>
+                <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  <span
+                    className={cn(
+                      "block h-full rounded-full",
+                      barColor(subscore.score)
+                    )}
+                    style={{ width: `${subscore.score}%` }}
+                  />
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
-        {subs.map((subscore) => (
-          <li key={subscore.id}>
+      <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 90% 10%, rgba(45,212,191,.22), transparent 38%), radial-gradient(circle at 5% 100%, rgba(45,212,191,.1), transparent 38%)",
+          }}
+        />
+        <div className="relative">
+          <div className="flex items-center justify-between gap-3">
+            <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              Site Soul
+            </p>
             <button
               type="button"
-              onClick={() => onSelectTab(subscore.tab)}
-              className="w-full text-left"
+              onClick={() => onSelectTab("soul")}
+              className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-300/80 hover:text-teal-200"
             >
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  {subscore.label}
-                </span>
-                <span className="text-[11px] font-bold tabular-nums text-slate-900 dark:text-white">
-                  {subscore.score}
-                </span>
-              </div>
-              <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                <span
-                  className={cn(
-                    "block h-full rounded-full",
-                    barColor(subscore.score)
-                  )}
-                  style={{ width: `${subscore.score}%` }}
-                />
-              </span>
+              Explore profile →
             </button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(circle at 90% 10%, rgba(45,212,191,.22), transparent 38%), radial-gradient(circle at 5% 100%, rgba(45,212,191,.1), transparent 38%)",
-            }}
-          />
-          <div className="relative">
-            <div className="flex items-center justify-between gap-3">
-              <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
-                <Sparkles className="h-3.5 w-3.5" />
-                Site Soul
-              </p>
-              <button
-                type="button"
-                onClick={() => onSelectTab("soul")}
-                className="font-mono text-[9px] font-semibold uppercase tracking-wider text-teal-300/80 hover:text-teal-200"
-              >
-                Explore profile →
-              </button>
-            </div>
-            <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
-              {soul.name}
-            </h3>
-            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-300">
-              {soul.message}
-            </p>
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-300/75">
-              {soul.evidence}
-            </p>
           </div>
-        </section>
-
-        <section
-          className={cn(
-            "rounded-xl border p-4",
-            primaryAction.urgent
-              ? "border-amber-300/70 bg-amber-50/55 dark:border-amber-900/60 dark:bg-amber-950/20"
-              : "border-emerald-300/70 bg-emerald-50/55 dark:border-emerald-900/60 dark:bg-emerald-950/20"
-          )}
-        >
-          <div className="flex items-start gap-3">
-            <span
-              className={cn(
-                "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                primaryAction.urgent
-                  ? "bg-amber-500/15 text-amber-800 dark:text-amber-300"
-                  : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-              )}
-            >
-              {primaryAction.urgent ? (
-                <ArrowRight className="h-4 w-4" />
-              ) : (
-                <CheckCircle2 className="h-4 w-4" />
-              )}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                {primaryAction.urgent
-                  ? "If you fix one thing today"
-                  : "Today’s priority"}
-              </p>
-              <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                {primaryAction.title}
-              </h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                {primaryAction.fix}
-              </p>
-              <button
-                type="button"
-                onClick={() => onSelectTab(primaryAction.tab)}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 hover:underline dark:text-teal-300"
-              >
-                {primaryAction.urgent ? "See why it matters" : "Review all checks"}
-                <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+          <h3 className="mt-3 font-display text-2xl font-bold tracking-tight">
+            {soul.name}
+          </h3>
+          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-slate-300">
+            {soul.message}
+          </p>
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-teal-300/75">
+            {soul.evidence}
+          </p>
+        </div>
+      </section>
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,.75fr)]">
         <OverviewCard title="Page essentials">
@@ -474,6 +427,53 @@ export function PanelOverview({
           </ul>
         )}
       </div>
+
+      <section
+        className={cn(
+          "rounded-xl border p-4",
+          primaryAction.urgent
+            ? "border-amber-300/70 bg-amber-50/55 dark:border-amber-900/60 dark:bg-amber-950/20"
+            : "border-emerald-300/70 bg-emerald-50/55 dark:border-emerald-900/60 dark:bg-emerald-950/20"
+        )}
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className={cn(
+              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+              primaryAction.urgent
+                ? "bg-amber-500/15 text-amber-800 dark:text-amber-300"
+                : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+            )}
+          >
+            {primaryAction.urgent ? (
+              <ArrowRight className="h-4 w-4" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              {primaryAction.urgent
+                ? "If you fix one thing today"
+                : "Today’s priority"}
+            </p>
+            <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+              {primaryAction.title}
+            </h3>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              {primaryAction.fix}
+            </p>
+            <button
+              type="button"
+              onClick={() => onSelectTab(primaryAction.tab)}
+              className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              {primaryAction.urgent ? "See why it matters" : "Review all checks"}
+              <ArrowRight className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
