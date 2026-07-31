@@ -380,37 +380,52 @@ export function PanelOverview({
           </button>
         }
       >
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-          <Stat label="Words" value={audit.density.totalWords} />
-          <Stat label="Lang" value={audit.tech.lang ?? "—"} />
-          <Stat label="H1" value={audit.headings.h1Count} />
-          <Stat label="H2" value={audit.headings.h2Count} />
-          <Stat label="H3" value={audit.headings.h3Count} />
-          <Stat
-            label="Read time"
-            value={`~${audit.extras.readingMinutes}m`}
-          />
-        </div>
-
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <MetricGroup
-            title="Images"
+        <div className="divide-y divide-slate-200 dark:divide-slate-800">
+          <SnapshotRow
+            title="Content"
             metrics={[
-              ["Total", audit.images.total],
-              ["Unique", uniqueImages],
-              ["Missing alt", audit.images.missingAlt],
-              ["Missing title", imagesMissingTitle],
+              { label: "Words", value: audit.density.totalWords },
+              { label: "Language", value: audit.tech.lang ?? "—" },
+              {
+                label: "Read time",
+                value: `~${audit.extras.readingMinutes}m`,
+              },
             ]}
           />
-          <MetricGroup
+          <SnapshotRow
+            title="Headings"
+            metrics={[
+              {
+                label: "H1",
+                value: audit.headings.h1Count,
+                tone: audit.headings.h1Status,
+              },
+              { label: "H2", value: audit.headings.h2Count },
+              { label: "H3", value: audit.headings.h3Count },
+            ]}
+          />
+          <SnapshotRow
+            title="Images"
+            metrics={[
+              { label: "Total", value: audit.images.total },
+              { label: "Unique", value: uniqueImages },
+              {
+                label: "Missing alt",
+                value: audit.images.missingAlt,
+                tone: audit.images.missingAlt > 0 ? "fail" : "pass",
+              },
+              { label: "Missing title", value: imagesMissingTitle },
+            ]}
+          />
+          <SnapshotRow
             title="Links"
             metrics={[
-              ["Total", audit.links.total],
-              ["Unique", uniqueLinks],
-              ["Internal", audit.links.internal],
-              ["External", audit.links.external],
-              ["Dofollow", dofollow],
-              ["Nofollow", audit.links.nofollow],
+              { label: "Total", value: audit.links.total },
+              { label: "Unique", value: uniqueLinks },
+              { label: "Internal", value: audit.links.internal },
+              { label: "External", value: audit.links.external },
+              { label: "Dofollow", value: dofollow },
+              { label: "Nofollow", value: audit.links.nofollow },
             ]}
           />
         </div>
@@ -529,39 +544,48 @@ function Fact({
   );
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white/60 px-2 py-2 text-center dark:border-slate-800 dark:bg-slate-950/35">
-      <p className="font-display text-lg font-bold tabular-nums text-slate-900 dark:text-white">
-        {value}
-      </p>
-      <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function MetricGroup({
+function SnapshotRow({
   title,
   metrics,
 }: {
   title: string;
-  metrics: Array<[string, number]>;
+  metrics: Array<{
+    label: string;
+    value: string | number;
+    tone?: CheckStatus;
+  }>;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white/45 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-950/25">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="grid gap-2 py-2.5 first:pt-0 last:pb-0 sm:grid-cols-[6.5rem_minmax(0,1fr)] sm:items-center">
+      <p className="font-display text-sm font-semibold tracking-tight text-slate-700 dark:text-slate-200">
         {title}
       </p>
-      <dl className="mt-2 grid grid-cols-3 gap-x-3 gap-y-2">
-        {metrics.map(([label, value]) => (
-          <div key={label}>
-            <dd className="font-display text-base font-bold tabular-nums text-slate-900 dark:text-white">
-              {value}
+      <dl className="flex flex-wrap items-baseline gap-y-2">
+        {metrics.map((metric, index) => (
+          <div
+            key={metric.label}
+            className={cn(
+              "flex min-w-[4.5rem] items-baseline gap-1.5 px-3",
+              index === 0
+                ? "pl-0"
+                : "border-l border-slate-200 dark:border-slate-700"
+            )}
+          >
+            <dd
+              className={cn(
+                "font-display text-base font-bold tabular-nums text-slate-900 dark:text-white",
+                metric.tone === "fail" &&
+                  "text-rose-700 dark:text-rose-400",
+                metric.tone === "warn" &&
+                  "text-amber-700 dark:text-amber-400",
+                metric.tone === "pass" &&
+                  "text-emerald-700 dark:text-emerald-400"
+              )}
+            >
+              {metric.value}
             </dd>
             <dt className="text-[9px] uppercase tracking-wide text-slate-500">
-              {label}
+              {metric.label}
             </dt>
           </div>
         ))}
