@@ -6,6 +6,7 @@ import { FeaturesSection } from "@/components/home/features-section";
 import { RecentAudits } from "@/components/home/recent-audits";
 import { HeroSearch } from "@/components/home/hero-search";
 import { HeroVisual } from "@/components/home/hero-visual";
+import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 
 const examples = [
@@ -63,6 +64,8 @@ export default function HomePage() {
           <HeroVisual />
         </div>
       </section>
+
+      <SiteSoulSection />
 
       <section
         id="how-it-works"
