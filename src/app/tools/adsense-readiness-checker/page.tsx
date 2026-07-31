@@ -19,6 +19,34 @@ import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 const PAGE_PATH = "/tools/adsense-readiness-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 
+const officialSources = [
+  {
+    label: "Site readiness",
+    detail: "Content quality and navigation",
+    href: "https://support.google.com/adsense/answer/7299563?hl=en",
+  },
+  {
+    label: "Eligibility",
+    detail: "Account and ownership requirements",
+    href: "https://support.google.com/adsense/answer/9724?hl=en",
+  },
+  {
+    label: "Required content",
+    detail: "Privacy and advertising disclosures",
+    href: "https://support.google.com/adsense/answer/1348695?hl=en",
+  },
+  {
+    label: "Publisher policies",
+    detail: "Content, behavior, and privacy rules",
+    href: "https://support.google.com/publisherpolicies/answer/10502938",
+  },
+  {
+    label: "AdSense crawler",
+    detail: "Mediapartners-Google access",
+    href: "https://support.google.com/adsense/answer/10532?hl=en",
+  },
+] as const;
+
 const faqs = [
   {
     q: "Does a passing result guarantee Google AdSense approval?",
@@ -91,7 +119,45 @@ export default function AdsenseReadinessCheckerPage() {
         Google AdSense review. We inspect crawl access, publisher trust pages,
         privacy disclosures, ads.txt, navigation, and a bounded content sample
         — then separate observable fixes from items only the owner can confirm.
+        Every finding links to the relevant Google source.
       </p>
+
+      <section className="mt-6 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+        <div className="border-b border-slate-200 bg-slate-50/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/40">
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-700 dark:text-teal-300">
+            Criteria sourced from Google
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Official AdSense Help and Google Publisher Policy documents — not
+            third-party approval folklore.
+          </p>
+        </div>
+        <ul className="grid sm:grid-cols-2 lg:grid-cols-5">
+          {officialSources.map((source) => (
+            <li
+              key={source.href}
+              className="border-b border-slate-200 last:border-b-0 sm:border-r sm:[&:nth-child(2n)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2n)]:border-r lg:last:border-r-0 dark:border-slate-800"
+            >
+              <a
+                href={source.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block h-full px-3 py-3 hover:bg-teal-800/[0.04] dark:hover:bg-teal-300/[0.05]"
+              >
+                <span className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-900 dark:text-white">
+                  {source.label}
+                  <span className="text-teal-700 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 dark:text-teal-300">
+                    ↗
+                  </span>
+                </span>
+                <span className="mt-1 block text-[10px] leading-snug text-slate-500">
+                  {source.detail}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <div className="mt-8">
         <AdsenseReadinessForm />

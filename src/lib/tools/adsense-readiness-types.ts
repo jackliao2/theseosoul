@@ -8,6 +8,12 @@ export type AdsenseCheckStatus = "pass" | "fix" | "review" | "info";
 
 export type AdsenseCheckImpact = "critical" | "important" | "advisory";
 
+export type AdsenseFindingReference = {
+  label: string;
+  url: string;
+  relation: "Direct requirement" | "Google guidance" | "Supporting signal";
+};
+
 export type AdsenseReadinessCheck = {
   id: string;
   group: AdsenseCheckGroup;
@@ -16,6 +22,7 @@ export type AdsenseReadinessCheck = {
   impact: AdsenseCheckImpact;
   evidence: string;
   recommendation: string;
+  reference: AdsenseFindingReference;
   url?: string;
 };
 

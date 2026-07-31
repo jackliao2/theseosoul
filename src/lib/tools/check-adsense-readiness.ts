@@ -9,6 +9,7 @@ import type {
   AdsenseCheckGroup,
   AdsenseCheckImpact,
   AdsenseCheckStatus,
+  AdsenseFindingReference,
   AdsenseReadinessCheck,
   AdsenseReadinessResult,
   AdsenseSamplePage,
@@ -17,6 +18,132 @@ import type {
 
 const MAX_SAMPLE_PAGES = 5;
 const SAMPLE_TIMEOUT_MS = 8_000;
+
+const GOOGLE_REFERENCES = {
+  siteReady: {
+    label: "Google AdSense — Make sure your site's pages are ready",
+    url: "https://support.google.com/adsense/answer/7299563?hl=en",
+    relation: "Google guidance",
+  },
+  notReady: {
+    label: "Google AdSense — What to do when your site is not ready",
+    url: "https://support.google.com/adsense/answer/12176698?hl=en",
+    relation: "Google guidance",
+  },
+  notApproved: {
+    label: "Google AdSense — Your account wasn't approved",
+    url: "https://support.google.com/adsense/answer/81904?hl=en",
+    relation: "Google guidance",
+  },
+  crawler: {
+    label: "Google AdSense — Give access to the AdSense crawler",
+    url: "https://support.google.com/adsense/answer/10532?hl=en",
+    relation: "Direct requirement",
+  },
+  privacy: {
+    label: "Google AdSense — Required privacy policy content",
+    url: "https://support.google.com/adsense/answer/1348695?hl=en",
+    relation: "Direct requirement",
+  },
+  publisherPolicies: {
+    label: "Google Publisher Policies",
+    url: "https://support.google.com/publisherpolicies/answer/10502938",
+    relation: "Direct requirement",
+  },
+  publisherTransparency: {
+    label: "Google Publisher Policies — Misrepresentation",
+    url: "https://support.google.com/publisherpolicies/answer/10502938",
+    relation: "Supporting signal",
+  },
+  restrictions: {
+    label: "Google Publisher Restrictions",
+    url: "https://support.google.com/publisherpolicies/answer/10437795",
+    relation: "Direct requirement",
+  },
+  programPolicies: {
+    label: "Google AdSense Program policies",
+    url: "https://support.google.com/adsense/answer/48182",
+    relation: "Direct requirement",
+  },
+  programGuidance: {
+    label: "Google AdSense Program policies",
+    url: "https://support.google.com/adsense/answer/48182",
+    relation: "Supporting signal",
+  },
+  eligibility: {
+    label: "Google AdSense — Eligibility requirements",
+    url: "https://support.google.com/adsense/answer/9724?hl=en",
+    relation: "Direct requirement",
+  },
+  invalidTraffic: {
+    label: "Google AdSense — Invalid traffic",
+    url: "https://support.google.com/adsense/answer/16737?hl=en",
+    relation: "Direct requirement",
+  },
+  adsTxt: {
+    label: "Google AdSense — Ads.txt guide",
+    url: "https://support.google.com/adsense/answer/12171612?hl=en",
+    relation: "Google guidance",
+  },
+  robots: {
+    label: "Google Search Central — Introduction to robots.txt",
+    url: "https://developers.google.com/search/docs/crawling-indexing/robots/intro",
+    relation: "Supporting signal",
+  },
+  sitemap: {
+    label: "Google Search Central — Build and submit a sitemap",
+    url: "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+    relation: "Supporting signal",
+  },
+  https: {
+    label: "Google Search Central — Page experience and HTTPS",
+    url: "https://developers.google.com/search/docs/appearance/page-experience",
+    relation: "Supporting signal",
+  },
+} as const satisfies Record<string, AdsenseFindingReference>;
+
+function referenceFor(id: string): AdsenseFindingReference {
+  if (id === "https") return GOOGLE_REFERENCES.https;
+  if (id === "robots-present") return GOOGLE_REFERENCES.robots;
+  if (id === "sitemap") return GOOGLE_REFERENCES.sitemap;
+  if (id === "crawl-access") return GOOGLE_REFERENCES.robots;
+  if (id === "adsense-crawler") return GOOGLE_REFERENCES.crawler;
+  if (id === "privacy-disclosure") return GOOGLE_REFERENCES.privacy;
+  if (id === "trust-privacy") return GOOGLE_REFERENCES.privacy;
+  if (id === "trust-about" || id === "trust-contact") {
+    return GOOGLE_REFERENCES.publisherTransparency;
+  }
+  if (id === "trust-terms") return GOOGLE_REFERENCES.programGuidance;
+  if (id === "ad-experience") return GOOGLE_REFERENCES.programPolicies;
+  if (id === "ads-txt" || id === "publisher-id") {
+    return GOOGLE_REFERENCES.adsTxt;
+  }
+  if (id === "account-eligibility") return GOOGLE_REFERENCES.eligibility;
+  if (id === "content-policy") return GOOGLE_REFERENCES.publisherPolicies;
+  if (id === "traffic-quality") return GOOGLE_REFERENCES.invalidTraffic;
+  if (
+    id === "homepage-content" ||
+    id === "content-depth" ||
+    id === "thin-pages" ||
+    id === "placeholders" ||
+    id === "page-headings" ||
+    id === "unique-titles"
+  ) {
+    return GOOGLE_REFERENCES.notApproved;
+  }
+  if (
+    id === "homepage-reachable" ||
+    id === "redirects" ||
+    id === "homepage-indexable" ||
+    id === "sample-size" ||
+    id === "sample-indexing"
+  ) {
+    return GOOGLE_REFERENCES.notReady;
+  }
+  if (id === "navigation") return GOOGLE_REFERENCES.siteReady;
+  if (id === "adsense-code") return GOOGLE_REFERENCES.notReady;
+  return GOOGLE_REFERENCES.publisherPolicies;
+}
 
 const TRUST_DEFINITIONS: Array<{
   kind: AdsenseTrustPage["kind"];
@@ -70,6 +197,7 @@ function check(
     impact,
     evidence,
     recommendation,
+    reference: referenceFor(id),
     ...(url ? { url } : {}),
   };
 }
@@ -139,9 +267,7 @@ function robotsBlocksAgent(content: string | null, target: string): boolean {
     if (
       disallow &&
       (disallow[1].trim() === "/" || disallow[1].trim() === "/*") &&
-      agents.some(
-        (agent) => agent === "*" || agent === target.toLowerCase()
-      )
+      agents.some((agent) => agent === target.toLowerCase())
     ) {
       return true;
     }
@@ -443,8 +569,8 @@ export async function checkAdsenseReadiness(
       mediaPartnersBlocked ? "fix" : "pass",
       "critical",
       mediaPartnersBlocked
-        ? "Mediapartners-Google, or a wildcard group applying to it, is blocked."
-        : "No full-site block applying to Mediapartners-Google was detected.",
+        ? "An explicit Mediapartners-Google group blocks the whole site."
+        : "No explicit full-site block for Mediapartners-Google was detected.",
       "Allow Mediapartners-Google to crawl pages intended for monetization."
     ),
     check(

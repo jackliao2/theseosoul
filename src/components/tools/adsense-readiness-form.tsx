@@ -109,14 +109,14 @@ export function AdsenseReadinessForm() {
       ...(fixes.length
         ? fixes.map(
             (item, index) =>
-              `${index + 1}. ${item.title}\n   ${item.recommendation}`
+              `${index + 1}. ${item.title}\n   ${item.recommendation}\n   Source: ${item.reference.label} — ${item.reference.url}`
           )
         : ["No automated fixes were flagged."]),
       "",
       "Confirm yourself",
       ...reviews.map(
         (item, index) =>
-          `${index + 1}. ${item.title}\n   ${item.recommendation}`
+          `${index + 1}. ${item.title}\n   ${item.recommendation}\n   Source: ${item.reference.label} — ${item.reference.url}`
       ),
       "",
       data.note,
@@ -292,6 +292,26 @@ function ReadinessReport({
         {result.note}
       </p>
 
+      <section className="rounded-lg border border-slate-200 bg-slate-50/55 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/30">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+            Every finding below links to the Google document used to define or
+            support that check.
+          </p>
+          <div className="flex flex-wrap gap-1.5 font-mono text-[8px] uppercase tracking-wider">
+            <span className="rounded bg-teal-800/10 px-1.5 py-0.5 text-teal-800 dark:bg-teal-300/10 dark:text-teal-300">
+              Direct requirement
+            </span>
+            <span className="rounded bg-blue-800/10 px-1.5 py-0.5 text-blue-800 dark:bg-blue-300/10 dark:text-blue-300">
+              Google guidance
+            </span>
+            <span className="rounded bg-slate-200 px-1.5 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              Supporting signal
+            </span>
+          </div>
+        </div>
+      </section>
+
       <section className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
         <div className="flex items-end justify-between gap-3">
           <div>
@@ -325,6 +345,7 @@ function ReadinessReport({
                   <p className="mt-1 text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-300">
                     {item.recommendation}
                   </p>
+                  <FindingReference check={item} />
                 </div>
               </li>
             ))}
@@ -475,9 +496,25 @@ function CheckRow({ check: item }: { check: AdsenseReadinessCheck }) {
           <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
             {item.evidence}
           </p>
+          <FindingReference check={item} />
         </div>
       </div>
     </li>
+  );
+}
+
+function FindingReference({ check }: { check: AdsenseReadinessCheck }) {
+  return (
+    <a
+      href={check.reference.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-1.5 inline-flex items-center gap-1 font-mono text-[9px] font-semibold text-teal-700 hover:underline dark:text-teal-300"
+    >
+      <span className="text-slate-400">{check.reference.relation} ·</span>
+      {check.reference.label}
+      <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+    </a>
   );
 }
 
