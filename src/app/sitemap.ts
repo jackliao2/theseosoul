@@ -1,111 +1,50 @@
 import type { MetadataRoute } from "next";
 import { getIndexableAuditDomains } from "@/lib/audit/store";
 import { SITE_URL } from "@/lib/audit/types";
+import { SITEMAP_STATIC_PATHS } from "@/lib/site-urls";
+
+const priorities: Record<string, number> = {
+  "": 1,
+  "/tools": 0.75,
+  "/tools/adsense-readiness-checker": 0.75,
+  "/tools/domain-history": 0.75,
+  "/tools/meta-tag-checker": 0.72,
+  "/tools/keyword-density-checker": 0.72,
+  "/tools/geo-content-checker": 0.7,
+  "/tools/robots-txt-checker": 0.7,
+  "/tools/canonical-checker": 0.7,
+  "/tools/open-graph-checker": 0.7,
+  "/tools/noindex-checker": 0.7,
+  "/tools/redirect-checker": 0.65,
+  "/about": 0.6,
+  "/contact": 0.5,
+  "/privacy": 0.3,
+  "/terms": 0.3,
+};
+
+const frequencies: Record<string, MetadataRoute.Sitemap[number]["changeFrequency"]> =
+  {
+    "": "weekly",
+    "/tools": "weekly",
+    "/about": "monthly",
+    "/contact": "monthly",
+    "/privacy": "yearly",
+    "/terms": "yearly",
+  };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const curated = getIndexableAuditDomains();
   const now = new Date();
 
-  const staticEntries: MetadataRoute.Sitemap = [
-    {
-      url: SITE_URL,
+  const staticEntries: MetadataRoute.Sitemap = SITEMAP_STATIC_PATHS.map(
+    (path) => ({
+      url: path ? `${SITE_URL}${path}` : SITE_URL,
       lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${SITE_URL}/about`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/contact`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${SITE_URL}/tools`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.75,
-    },
-    {
-      url: `${SITE_URL}/tools/adsense-readiness-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
-      url: `${SITE_URL}/tools/domain-history`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
-      url: `${SITE_URL}/tools/geo-content-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tools/robots-txt-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tools/meta-tag-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.72,
-    },
-    {
-      url: `${SITE_URL}/tools/canonical-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tools/keyword-density-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.72,
-    },
-    {
-      url: `${SITE_URL}/tools/open-graph-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tools/noindex-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/tools/redirect-checker`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.65,
-    },
-    {
-      url: `${SITE_URL}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${SITE_URL}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-  ];
+      changeFrequency: frequencies[path] ?? "monthly",
+      priority: priorities[path] ?? 0.7,
+    })
+  );
 
-  // Curated example reports only — not every audited domain.
   const auditEntries: MetadataRoute.Sitemap = curated.map((domain) => ({
     url: `${SITE_URL}/audit/${domain}`,
     lastModified: now,
