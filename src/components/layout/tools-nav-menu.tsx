@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
+import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
@@ -83,10 +84,8 @@ export function ToolsNavMenu() {
           <div className="pointer-events-none absolute inset-0 bg-grain opacity-30 dark:opacity-20" />
 
           <div className="relative p-3">
-            <Link
-              href={featured.href}
-              role="menuitem"
-              onClick={() => setOpen(false)}
+            <AuditCtaLink
+              onNavigate={() => setOpen(false)}
               className="group flex items-stretch gap-3 overflow-hidden rounded-xl bg-[#0b1220] px-3.5 py-3 text-left transition-transform duration-200 hover:scale-[1.01] dark:bg-[#0a1018]"
             >
               <span className="flex w-1 shrink-0 rounded-full bg-teal-400/90" />
@@ -104,7 +103,7 @@ export function ToolsNavMenu() {
               <span className="self-center font-display text-lg text-teal-300/80 transition-transform group-hover:translate-x-0.5">
                 ↗
               </span>
-            </Link>
+            </AuditCtaLink>
 
             <div className="mt-3 grid grid-cols-2 gap-1">
               {checkers.map((item, i) => (
@@ -190,18 +189,14 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
       </button>
       {expanded ? (
         <div className="mb-1 ml-1 space-y-0.5 border-l-2 border-teal-800/25 pl-2 dark:border-teal-400/25">
-          <Link
-            href={featured.href}
-            onClick={onNavigate}
-            className="block rounded-lg px-3 py-2"
-          >
+          <AuditCtaLink onNavigate={onNavigate} className="block rounded-lg px-3 py-2">
             <span className="font-mono text-[10px] uppercase tracking-wider text-teal-800 dark:text-teal-300">
               Whole site
             </span>
             <span className="mt-0.5 block text-sm font-semibold text-slate-900 dark:text-slate-50">
               {featured.title}
             </span>
-          </Link>
+          </AuditCtaLink>
           {checkers.concat(content).map((item) => (
             <Link
               key={item.href}

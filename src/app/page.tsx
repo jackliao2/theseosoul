@@ -6,6 +6,7 @@ import { FeaturesSection } from "@/components/home/features-section";
 import { RecentAudits } from "@/components/home/recent-audits";
 import { HeroSearch } from "@/components/home/hero-search";
 import { HeroVisual } from "@/components/home/hero-visual";
+import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 
 const examples = [
   "shopify.com",
@@ -32,7 +33,11 @@ export default function HomePage() {
           </h1>
 
           <div className="animate-fade-up-delay-2 mt-8 w-full">
-            <HeroSearch id="home-audit-url" size="lg" className="mx-auto max-w-2xl" />
+            <HeroSearch
+              anchorTarget
+              size="lg"
+              className="mx-auto max-w-2xl"
+            />
           </div>
 
           <p className="animate-fade-up-delay-2 mt-4 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
@@ -184,13 +189,10 @@ export default function HomePage() {
               third-party data — start with the free technical audit today.
             </p>
           </div>
-          <a
-            href="#home-audit-url"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-teal-400 px-5 text-sm font-semibold text-slate-950 transition-colors hover:bg-teal-300"
-          >
+          <AuditCtaLink className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-teal-400 px-5 text-sm font-semibold text-slate-950 transition-colors hover:bg-teal-300">
             Start free audit
             <ArrowUpRight className="h-4 w-4" />
-          </a>
+          </AuditCtaLink>
         </div>
       </section>
     </div>

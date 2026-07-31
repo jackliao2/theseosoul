@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteBrand } from "@/components/brand/site-mark";
+import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { SITE_EMAIL, SITE_NAME } from "@/lib/audit/types";
 
 export function Footer() {
@@ -26,12 +27,9 @@ export function Footer() {
           </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
             <li>
-              <Link
-                href="/#home-audit-url"
-                className="hover:text-teal-700 dark:hover:text-teal-300"
-              >
+              <AuditCtaLink className="hover:text-teal-700 dark:hover:text-teal-300">
                 Free SEO Audit
-              </Link>
+              </AuditCtaLink>
             </li>
             <li>
               <Link

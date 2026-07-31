@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { SiteBrand } from "@/components/brand/site-mark";
+import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import {
   ToolsMobileNav,
   ToolsNavMenu,
@@ -55,12 +56,9 @@ export function Header({ compact = false }: { compact?: boolean }) {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href="/#home-audit-url"
-                className="rounded-md bg-teal-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700 dark:bg-teal-400 dark:text-slate-950 dark:hover:bg-teal-300"
-              >
+              <AuditCtaLink className="rounded-md bg-teal-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700 dark:bg-teal-400 dark:text-slate-950 dark:hover:bg-teal-300">
                 Free audit
-              </Link>
+              </AuditCtaLink>
               <button
                 type="button"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 md:hidden"
