@@ -76,12 +76,15 @@ export interface HeadingsResult {
 export interface ImageItem {
   src: string;
   alt: string | null;
+  title?: string | null;
   missingAlt: boolean;
 }
 
 export interface ImagesResult {
   total: number;
+  unique?: number;
   missingAlt: number;
+  missingTitle?: number;
   withAlt: number;
   items: ImageItem[];
   status: CheckStatus;
@@ -156,6 +159,7 @@ export interface LinkItem {
 
 export interface LinksResult {
   total: number;
+  unique?: number;
   internal: number;
   external: number;
   nofollow: number;

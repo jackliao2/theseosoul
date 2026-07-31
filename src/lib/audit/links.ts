@@ -57,6 +57,7 @@ export function parseLinks(
   });
 
   const total = items.length;
+  const unique = new Set(items.map((item) => item.href)).size;
   let status: LinksResult["status"] = "pass";
   let message = `Found ${total} links (${internal} internal, ${external} external).`;
 
@@ -67,6 +68,7 @@ export function parseLinks(
 
   return {
     total,
+    unique,
     internal,
     external,
     nofollow,

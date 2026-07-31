@@ -23,6 +23,10 @@ const STACK_RULES: Array<{ id: string; test: (html: string, headers: Record<stri
 
 const TRACKER_RULES: Array<{ id: string; pattern: RegExp }> = [
   { id: "Google Analytics", pattern: /google-analytics\.com|gtag\/js|googletagmanager\.com\/gtag/i },
+  {
+    id: "Google AdSense",
+    pattern: /pagead2\.googlesyndication\.com|adsbygoogle/i,
+  },
   { id: "GTM", pattern: /googletagmanager\.com\/gtm\.js/i },
   { id: "Meta Pixel", pattern: /connect\.facebook\.net|fbevents\.js/i },
   { id: "TikTok Pixel", pattern: /analytics\.tiktok\.com/i },

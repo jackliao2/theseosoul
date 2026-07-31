@@ -156,7 +156,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
         <div
           className={cn(
             "min-h-0 flex-1 px-4 py-3 sm:px-5",
-            active === "overview" ? "overflow-hidden" : "overflow-y-auto"
+            "overflow-y-auto"
           )}
         >
           {renderPanel(active, audit, selectTab)}

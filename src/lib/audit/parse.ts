@@ -261,20 +261,25 @@ export function parseHeadings($: cheerio.CheerioAPI): HeadingsResult {
 export function parseImages($: cheerio.CheerioAPI): ImagesResult {
   const items: ImageItem[] = [];
   let missingAlt = 0;
+  let missingTitle = 0;
 
   $("img").each((_, el) => {
     const src = ($(el).attr("src") || $(el).attr("data-src") || "").trim();
     const altAttr = $(el).attr("alt");
+    const titleAttr = $(el).attr("title");
     const missing = altAttr === undefined || altAttr.trim() === "";
     if (missing) missingAlt += 1;
+    if (titleAttr === undefined || titleAttr.trim() === "") missingTitle += 1;
     items.push({
       src: src.slice(0, 300),
       alt: altAttr?.trim() || null,
+      title: titleAttr?.trim() || null,
       missingAlt: missing,
     });
   });
 
   const total = items.length;
+  const unique = new Set(items.map((item) => item.src).filter(Boolean)).size;
   const withAlt = total - missingAlt;
   let status: CheckStatus = "pass";
   let message = "All images include alt attributes.";
@@ -290,7 +295,9 @@ export function parseImages($: cheerio.CheerioAPI): ImagesResult {
 
   return {
     total,
+    unique,
     missingAlt,
+    missingTitle,
     withAlt,
     items: items.slice(0, 100),
     status,
