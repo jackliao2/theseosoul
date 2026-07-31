@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   CircleHelp,
   Copy,
   ExternalLink,
@@ -136,39 +137,61 @@ export function AdsenseReadinessForm() {
     <div className="space-y-6">
       <form
         onSubmit={onSubmit}
-        className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/35 sm:p-5"
+        className="relative overflow-hidden rounded-2xl bg-[#0b1220] p-5 text-white sm:p-7"
       >
-        <label
-          htmlFor="adsense-readiness-url"
-          className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500"
-        >
-          Website domain
-        </label>
-        <div className="mt-2 flex flex-col gap-2.5 sm:flex-row">
-          <input
-            id="adsense-readiness-url"
-            type="text"
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-            placeholder="example.com or any page on your site"
-            className="h-12 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900 outline-none ring-teal-700/30 focus:ring-2 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-50"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-teal-800 px-5 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-wait disabled:opacity-70 dark:bg-teal-400 dark:text-slate-950 dark:hover:bg-teal-300"
-          >
-            {loading ? (
-              <LoaderCircle className="h-4 w-4 animate-spin" />
-            ) : null}
-            {loading ? "Checking site…" : "Check AdSense readiness"}
-          </button>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 130% at 100% 0%, rgba(45,212,191,.2), transparent 62%)",
+          }}
+        />
+        <div className="relative grid gap-6 lg:grid-cols-[minmax(16rem,.65fr)_minmax(0,1.35fr)] lg:items-end">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+              Live public-site pre-check
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              Is your site ready to request review?
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              One domain. No login. Around 25 evidence-backed checks.
+            </p>
+          </div>
+          <div>
+            <label
+              htmlFor="adsense-readiness-url"
+              className="text-sm font-semibold text-slate-200"
+            >
+              Website domain
+            </label>
+            <div className="mt-2 flex flex-col gap-2.5 sm:flex-row">
+              <input
+                id="adsense-readiness-url"
+                type="text"
+                value={url}
+                onChange={(event) => setUrl(event.target.value)}
+                placeholder="example.com or any page on your site"
+                className="h-13 min-w-0 flex-1 rounded-lg border border-white/15 bg-white px-4 text-base text-slate-900 outline-none ring-teal-300/40 placeholder:text-slate-400 focus:ring-2"
+                required
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex h-13 items-center justify-center gap-2 rounded-lg bg-teal-400 px-6 text-sm font-bold text-slate-950 hover:bg-teal-300 disabled:cursor-wait disabled:opacity-70"
+              >
+                {loading ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : null}
+                {loading ? "Checking site…" : "Run readiness check"}
+              </button>
+            </div>
+            <p className="mt-2.5 text-sm leading-relaxed text-slate-400">
+              We return to the homepage, inspect public trust files and pages,
+              then sample up to five content URLs.
+            </p>
+          </div>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
-          We return to the site homepage, inspect public trust files and pages,
-          then sample up to five content URLs. No account access is requested.
-        </p>
       </form>
 
       {loading ? <ProgressPanel current={progress} /> : null}
@@ -265,13 +288,13 @@ function ReadinessReport({
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-teal-300">
               AdSense readiness · public signals
             </p>
-            <h2 className="mt-2 font-display text-2xl font-bold tracking-tight">
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight">
               {result.verdict}
             </h2>
             <p className="mt-1 truncate text-sm text-slate-400">
               {result.domain} · {result.sampledPages.length} content pages sampled
             </p>
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
               <Metric value={result.summary.passed} label="passed" tone="good" />
               <Metric value={result.summary.fixes} label="fixes" tone="bad" />
               <Metric value={result.summary.reviews} label="owner reviews" />
@@ -288,37 +311,37 @@ function ReadinessReport({
         </div>
       </section>
 
-      <p className="rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/25 dark:text-amber-200">
+      <p className="rounded-xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/25 dark:text-amber-200">
         {result.note}
       </p>
 
       <section className="rounded-lg border border-slate-200 bg-slate-50/55 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/30">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             Every finding below links to the Google document used to define or
             support that check.
           </p>
-          <div className="flex flex-wrap gap-1.5 font-mono text-[8px] uppercase tracking-wider">
-            <span className="rounded bg-teal-800/10 px-1.5 py-0.5 text-teal-800 dark:bg-teal-300/10 dark:text-teal-300">
+          <div className="flex flex-wrap gap-1.5 font-mono text-[10px] uppercase tracking-wider">
+            <span className="rounded bg-teal-800/10 px-2 py-1 text-teal-800 dark:bg-teal-300/10 dark:text-teal-300">
               Direct requirement
             </span>
-            <span className="rounded bg-blue-800/10 px-1.5 py-0.5 text-blue-800 dark:bg-blue-300/10 dark:text-blue-300">
+            <span className="rounded bg-blue-800/10 px-2 py-1 text-blue-800 dark:bg-blue-300/10 dark:text-blue-300">
               Google guidance
             </span>
-            <span className="rounded bg-slate-200 px-1.5 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <span className="rounded bg-slate-200 px-2 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
               Supporting signal
             </span>
           </div>
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+      <section className="rounded-2xl border border-slate-200 p-5 dark:border-slate-800 sm:p-6">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-rose-600 dark:text-rose-300">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-rose-600 dark:text-rose-300">
               Fix before requesting review
             </p>
-            <h3 className="mt-1 font-display text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="mt-1 font-display text-2xl font-bold text-slate-900 dark:text-white">
               {fixes.length
                 ? `${fixes.length} public signal${fixes.length === 1 ? "" : "s"} need work`
                 : "No automated fixes found"}
@@ -330,19 +353,19 @@ function ReadinessReport({
             {fixes.map((item, index) => (
               <li
                 key={item.id}
-                className="grid gap-2 py-3 first:pt-0 last:pb-0 sm:grid-cols-[1.5rem_minmax(0,1fr)]"
+                className="grid gap-2 py-4 first:pt-0 last:pb-0 sm:grid-cols-[2rem_minmax(0,1fr)]"
               >
-                <span className="font-display text-sm font-bold text-rose-600 dark:text-rose-300">
+                <span className="font-display text-lg font-bold text-rose-600 dark:text-rose-300">
                   {index + 1}
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  <p className="text-base font-bold text-slate-900 dark:text-white">
                     {item.title}
                   </p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+                  <p className="mt-1 text-sm leading-relaxed text-slate-500">
                     {item.evidence}
                   </p>
-                  <p className="mt-1 text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                  <p className="mt-1.5 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
                     {item.recommendation}
                   </p>
                   <FindingReference check={item} />
@@ -372,8 +395,8 @@ function ReadinessReport({
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
-        <section className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-          <h3 className="font-display text-base font-bold text-slate-900 dark:text-white">
+        <section className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
             Trust pages found
           </h3>
           <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
@@ -405,8 +428,8 @@ function ReadinessReport({
           </ul>
         </section>
 
-        <section className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-          <h3 className="font-display text-base font-bold text-slate-900 dark:text-white">
+        <section className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
             Content sample
           </h3>
           {result.sampledPages.length ? (
@@ -418,15 +441,15 @@ function ReadinessReport({
                       href={page.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="min-w-0 truncate text-xs font-semibold text-slate-800 hover:text-teal-700 dark:text-slate-200 dark:hover:text-teal-300"
+                      className="min-w-0 truncate text-sm font-semibold text-slate-800 hover:text-teal-700 dark:text-slate-200 dark:hover:text-teal-300"
                     >
                       {page.title}
                     </a>
-                    <span className="shrink-0 font-mono text-[9px] text-slate-500">
+                    <span className="shrink-0 font-mono text-[11px] text-slate-500">
                       ~{page.words} words
                     </span>
                   </div>
-                  <p className="mt-0.5 truncate font-mono text-[9px] text-slate-400">
+                  <p className="mt-1 truncate font-mono text-[10px] text-slate-400">
                     {new URL(page.url).pathname}
                   </p>
                 </li>
@@ -452,25 +475,36 @@ function CheckGroup({
   description: string;
   checks: AdsenseReadinessCheck[];
 }) {
+  const fixes = checks.filter((item) => item.status === "fix").length;
+  const passed = checks.filter((item) => item.status === "pass").length;
   return (
-    <section className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-display text-base font-bold text-slate-900 dark:text-white">
+    <details className="group overflow-hidden rounded-xl border border-slate-200 bg-white/50 dark:border-slate-800 dark:bg-slate-950/20">
+      <summary className="flex cursor-pointer list-none items-center gap-4 p-4 marker:content-none sm:p-5 [&::-webkit-details-marker]:hidden">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
             {title}
           </h3>
-          <p className="mt-0.5 text-[11px] text-slate-500">{description}</p>
+          <p className="mt-1 text-sm text-slate-500">{description}</p>
         </div>
-        <span className="font-mono text-[9px] text-slate-400">
-          {checks.filter((item) => item.status === "pass").length}/{checks.length}
-        </span>
-      </div>
-      <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-800">
+        <div className="flex shrink-0 items-center gap-3">
+          {fixes ? (
+            <span className="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+              {fixes} to fix
+            </span>
+          ) : (
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+              {passed} passed
+            </span>
+          )}
+          <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
+        </div>
+      </summary>
+      <ul className="divide-y divide-slate-200 border-t border-slate-200 px-4 dark:divide-slate-800 dark:border-slate-800 sm:px-5">
         {checks.map((item) => (
           <CheckRow key={item.id} check={item} />
         ))}
       </ul>
-    </section>
+    </details>
   );
 }
 
@@ -478,11 +512,11 @@ function CheckRow({ check: item }: { check: AdsenseReadinessCheck }) {
   const meta = statusMeta[item.status];
   const Icon = meta.icon;
   return (
-    <li className="py-2.5 first:pt-0 last:pb-0">
-      <div className="flex items-start gap-2.5">
+    <li className="py-4">
+      <div className="flex items-start gap-3">
         <span
           className={cn(
-            "mt-0.5 inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-wider",
+            "mt-0.5 inline-flex shrink-0 items-center gap-1 rounded px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wider",
             meta.className
           )}
         >
@@ -490,10 +524,10 @@ function CheckRow({ check: item }: { check: AdsenseReadinessCheck }) {
           {meta.label}
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-slate-900 dark:text-white">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">
             {item.title}
           </p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+          <p className="mt-1 text-sm leading-relaxed text-slate-500">
             {item.evidence}
           </p>
           <FindingReference check={item} />
@@ -509,7 +543,7 @@ function FindingReference({ check }: { check: AdsenseReadinessCheck }) {
       href={check.reference.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="mt-1.5 inline-flex items-center gap-1 font-mono text-[9px] font-semibold text-teal-700 hover:underline dark:text-teal-300"
+      className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 hover:underline dark:text-teal-300"
     >
       <span className="text-slate-400">{check.reference.relation} ·</span>
       {check.reference.label}

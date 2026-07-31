@@ -99,35 +99,46 @@ export const metadata: Metadata = {
 
 export default function AdsenseReadinessCheckerPage() {
   return (
-    <ContentPage>
+    <ContentPage wide className="max-w-6xl py-10 sm:py-12">
       <ToolFaqJsonLd
         faqs={faqs}
         pageUrl={PAGE_URL}
         name="Free AdSense Readiness Checker"
       />
 
-      <ContentEyebrow>
-        <Link href="/tools" className="hover:underline">
-          Free tools
-        </Link>
-        <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
-        Growth & monetization
-      </ContentEyebrow>
-      <ContentTitle>Free AdSense Readiness Checker</ContentTitle>
-      <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
-        Check whether the public parts of a website have a solid foundation for
-        Google AdSense review. We inspect crawl access, publisher trust pages,
-        privacy disclosures, ads.txt, navigation, and a bounded content sample
-        — then separate observable fixes from items only the owner can confirm.
-        Every finding links to the relevant Google source.
-      </p>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
+        <div>
+          <ContentEyebrow>
+            <Link href="/tools" className="hover:underline">
+              Free tools
+            </Link>
+            <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
+            Growth & monetization
+          </ContentEyebrow>
+          <ContentTitle>AdSense readiness, with evidence.</ContentTitle>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+            See the public issues worth fixing before you request Google review.
+            We inspect crawl access, trust pages, privacy disclosures, ads.txt,
+            navigation, and a bounded content sample.
+          </p>
+        </div>
+        <aside className="border-l-2 border-teal-700/25 pl-4 dark:border-teal-300/25">
+          <p className="font-display text-lg font-bold text-slate-900 dark:text-white">
+            No fake approval promise
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+            Findings are separated into direct requirements, Google guidance,
+            supporting signals, and checks only the owner can confirm.
+          </p>
+        </aside>
+      </div>
 
-      <section className="mt-6 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
-        <div className="border-b border-slate-200 bg-slate-50/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/40">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-teal-700 dark:text-teal-300">
+      <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white/55 dark:border-slate-800 dark:bg-slate-950/30">
+        <div className="flex flex-col gap-1 border-b border-slate-200 bg-slate-50/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-900/40">
+          <p className="font-display text-base font-bold text-slate-900 dark:text-white">
             Criteria sourced from Google
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="text-sm text-slate-500">
             Official AdSense Help and Google Publisher Policy documents — not
             third-party approval folklore.
           </p>
@@ -142,15 +153,15 @@ export default function AdsenseReadinessCheckerPage() {
                 href={source.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block h-full px-3 py-3 hover:bg-teal-800/[0.04] dark:hover:bg-teal-300/[0.05]"
+                className="group block h-full px-4 py-4 hover:bg-teal-800/[0.04] dark:hover:bg-teal-300/[0.05]"
               >
-                <span className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-900 dark:text-white">
+                <span className="flex items-center justify-between gap-2 text-sm font-semibold text-slate-900 dark:text-white">
                   {source.label}
                   <span className="text-teal-700 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 dark:text-teal-300">
                     ↗
                   </span>
                 </span>
-                <span className="mt-1 block text-[10px] leading-snug text-slate-500">
+                <span className="mt-1.5 block text-xs leading-snug text-slate-500">
                   {source.detail}
                 </span>
               </a>
@@ -163,6 +174,7 @@ export default function AdsenseReadinessCheckerPage() {
         <AdsenseReadinessForm />
       </div>
 
+      <div className="max-w-4xl">
       <ToolHowItWorks
         steps={[
           {
@@ -259,6 +271,7 @@ export default function AdsenseReadinessCheckerPage() {
           { href: "/#home-audit-url", label: "Full SEO + GEO Audit" },
         ]}
       />
+      </div>
     </ContentPage>
   );
 }
