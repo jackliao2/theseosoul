@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "Which free tool should I start with?",
-    a: "Start with the full technical SEO audit for a shareable report. Use the AdSense readiness checker for monetization preparation, or the focused robots.txt, meta, canonical, density, Open Graph, noindex, and redirect tools for a specific diagnosis.",
+    a: "Start with the full technical SEO audit for a shareable report. Use domain history before buying a name, AdSense readiness for monetization prep, or the focused robots.txt, meta, canonical, density, Open Graph, noindex, and redirect tools for a specific diagnosis.",
   },
   {
     q: "Do you offer a free robots txt checker and keyword density tool?",
@@ -33,7 +33,7 @@ const faqs = [
 export const metadata: Metadata = {
   title: "Free SEO Tools — Audit, AdSense Readiness, Robots & More",
   description:
-    "Free SEO tools with no registration: website SEO audit, AdSense readiness checker, robots.txt, meta tags, canonical, keyword density, Open Graph, noindex, redirects, and GEO.",
+    "Free SEO tools with no registration: website SEO audit, domain history, AdSense readiness checker, robots.txt, meta tags, canonical, keyword density, Open Graph, noindex, redirects, and GEO.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "free seo tools",

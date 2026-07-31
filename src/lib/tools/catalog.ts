@@ -26,6 +26,13 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     group: "growth",
   },
   {
+    href: "/tools/domain-history",
+    title: "Domain History Checker",
+    nav: "Domain history",
+    short: "Wayback chapters + WHOIS second-hand check",
+    group: "growth",
+  },
+  {
     href: "/tools/robots-txt-checker",
     title: "Robots.txt Checker",
     nav: "Robots.txt",
