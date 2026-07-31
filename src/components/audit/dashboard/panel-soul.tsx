@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleHelp, Sparkles } from "lucide-react";
 import {
   getPrimaryAction,
   getSoulProfile,
@@ -56,6 +56,23 @@ export function PanelSoul({
               <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-300">
                 <Sparkles className="h-3.5 w-3.5" />
                 Site Soul
+                <span className="group relative inline-flex">
+                  <button
+                    type="button"
+                    className="rounded text-teal-300/55 outline-none transition-colors hover:text-teal-200 focus-visible:text-teal-200 focus-visible:ring-1 focus-visible:ring-teal-300/50"
+                    aria-label="What is Site Soul?"
+                  >
+                    <CircleHelp className="h-3.5 w-3.5" />
+                  </button>
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-56 -translate-x-1/2 rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-left font-sans text-[11px] font-normal normal-case leading-relaxed tracking-normal text-slate-300 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                  >
+                    Scores measure performance. Site Soul names the kind of
+                    presence this site has — one of 11 rule-based profiles from
+                    Meta, Structure, Technical, and GEO signals.
+                  </span>
+                </span>
               </p>
               <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
                 Rule-based · 11 profiles
