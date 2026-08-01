@@ -295,7 +295,7 @@ export function PanelOverview({
               </button>
             }
           >
-            <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5">
               <Fact
                 label="Robots tag"
                 value={audit.robotsMeta.content ?? "index, follow"}
@@ -541,12 +541,12 @@ function Fact({
 }) {
   return (
     <div className="min-w-0 border-l-2 border-slate-200 pl-2 dark:border-slate-700">
-      <dt className="text-[9px] font-medium uppercase tracking-wide text-slate-500">
+      <dt className="text-[11px] font-medium leading-tight tracking-wide text-slate-500">
         {label}
       </dt>
       <dd
         className={cn(
-          "mt-0.5 truncate text-xs font-semibold text-slate-800 dark:text-slate-200",
+          "mt-0.5 truncate text-sm font-semibold leading-tight text-slate-800 dark:text-slate-200",
           tone === "good" && "text-emerald-700 dark:text-emerald-400",
           tone === "bad" && "text-rose-700 dark:text-rose-400"
         )}
