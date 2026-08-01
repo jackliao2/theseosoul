@@ -220,7 +220,7 @@ export default function HomePage() {
                   <span
                     aria-hidden
                     className={cn(
-                      "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-mono text-[10px] font-bold tracking-wide",
+                      "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md font-mono text-xs font-bold tracking-wide",
                       "bg-[#0b1220] text-teal-300 ring-1 ring-teal-900/30 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/25"
                     )}
                   >
