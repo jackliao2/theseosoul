@@ -1,142 +1,124 @@
 ---
 title: "Technical SEO checklist before you launch (or relaunch)"
-description: "A field-tested pre-launch technical SEO checklist: crawl access, indexation, HTTPS, sitemaps, canonicals, redirects, schema, and GEO — without fake DA scores."
+description: "A pre-launch technical SEO checklist grounded in Google’s own crawl/index docs: robots, noindex, HTTPS, sitemaps, canonicals — plus what to re-check an hour after DNS flips."
 date: "2026-07-28"
 updated: "2026-08-01"
 tags: ["Technical SEO", "Launch", "Checklist"]
-excerpt: "Ship without leaving staging noindex, broken HTTPS, or a silent robots block. Run this the day before you flip DNS — and again an hour after."
+excerpt: "Most launch disasters aren’t ‘the algorithm.’ They’re staging noindex, a dead cert, or Disallow: / that nobody re-read."
 ---
 
-Launch day is when quiet technical mistakes become public. A polished homepage with `noindex`, a certificate that expires in nine days, or a leftover `Disallow: /` will not show up in a brand review — they show up in Search Console three weeks later, after the campaign already spent the budget.
+I’ve lost count of how many “SEO emergencies” were just a staging leftover. Pretty homepage. Press email already sent. Then someone notices `noindex`, or `Disallow: /`, or a certificate that dies mid-campaign.
 
-This is the checklist we use before a site goes live or a redesign cutover. Every item maps to something you can verify with a browser, Search Console, or a free checker. Nothing here depends on invented “Domain Authority,” traffic guesses, or a vendor dashboard turning green.
+This is the list I want in the release PR the day before DNS flips — and again about an hour after. Every step is something you can check without buying a fake “authority” score.
 
-## Who this is for
+## 1. Can crawlers even fetch the site?
 
-- Shipping a new marketing site or docs site
-- Moving hosts, CDNs, or CMS themes
-- Merging www / non-www or HTTP → HTTPS
-- Taking a staging hostname public (or realizing you already did)
+Open the **production** robots file: `https://yourdomain.com/robots.txt`.
 
-If you only have thirty minutes, do sections **1–4**. If you have two hours, finish the list and keep the notes in the release PR.
+Google’s own intro is blunt about what robots.txt is *not*: it’s for managing crawl traffic, not a reliable way to hide pages from Search. From [Google’s robots.txt guide](https://developers.google.com/search/docs/crawling-indexing/robots/intro):
 
-## 1. Crawl access before keywords
+> Don’t use a robots.txt file as a means to hide your web pages… from Google Search results.
 
-Start with whether crawlers can **fetch** what you want indexed.
+So for launch, the question is simpler: did we accidentally ban everyone?
 
-Open `https://yourdomain.com/robots.txt` on the **production** host (not the preview URL). Ask:
+- Is `User-agent: *` still sitting on `Disallow: /` from preview?
+- Any path rules that made sense on staging and make no sense now?
+- If you’ve got a WAF, has “bot fighting” started soft-403’ing Googlebot while Chrome still looks fine?
 
-- Can `User-agent: *` reach `/`?
-- Are there leftover staging rules: `Disallow: /`, environment paths, or “block everything until launch”?
-- Did a WAF / bot fight start returning soft 403s to Googlebot while browsers still work?
+Blocking one AI trainer on purpose is a product call. Shipping production with a full-site disallow is usually copy-paste.
 
-Blocking a specific AI trainer (for example GPTBot) can be a deliberate product choice. Blocking `User-agent: *` with `Disallow: /` on production is almost always an accident copied from preview.
+Quick pass: [Robots.txt Checker](/tools/robots-txt-checker).
 
-**Verify:** [Robots.txt Checker](/tools/robots-txt-checker) — read Sitemap lines and AI-crawler blocks in one pass.
+## 2. Indexation matches what you meant
 
-**Release note to leave yourself:** paste the live robots.txt into the PR so someone notices if CI redeploys the staging file.
+Crawlable ≠ indexable. People mash these together constantly.
 
-## 2. Indexation signals must match intent
+Google’s [noindex docs](https://developers.google.com/search/docs/crawling-indexing/block-indexing) say they have to **crawl** the page to see the rule:
 
-Crawlable is not the same as indexable. Teams blur three different instructions and then blame “the algorithm.”
+> We have to crawl your page in order to see `<meta>` tags and HTTP headers.
 
-| Signal | Question it answers | Typical intent |
-| --- | --- | --- |
-| robots.txt `Disallow` | May I **fetch** this URL? | Save crawl budget / keep bots out of infinite spaces |
-| `noindex` (meta or `X-Robots-Tag`) | May I **show** this URL in results? | Thank-you, thin, private-ish templates |
-| Canonical | Which URL is the **preferred** duplicate? | Consolidate variants |
-| Soft 404 / empty template | Does this look like a real page? | Avoid wasting discovery on junk |
+And if robots.txt blocks the URL, they can’t see the tag — same doc, same trap.
 
-Before launch, spot-check templates — not just the homepage:
+Before launch, don’t only check the homepage. Hit:
 
-1. Home, a category/hub, a money page (product, pricing, or flagship article)
-2. Thank-you / confirmation
-3. Account, cart, or search results if they exist on the public host
-4. One parameterized URL you know marketing will share
+1. Home + one money page (pricing, product, flagship article)
+2. A thank-you / confirmation URL
+3. Account, cart, or on-site search if those are public
+4. One ugly parameterized URL marketing will share anyway
 
-Production money pages must **not** be noindex. Staging, cart, and thank-you pages usually **should** be noindex (or blocked on purpose — pick one story).
+Money pages: not noindex. Thank-you / cart junk: usually noindex on purpose.
 
-The classic relaunch failure: the CMS keeps preview `noindex` after DNS flips. Catch it before the press release.
+The relaunch classic: CMS keeps preview `noindex` after go-live. I’ve seen it survive two “final” QA passes because everyone tested logged-in preview URLs.
 
-**Verify:** [Noindex Checker](/tools/noindex-checker) (reads meta robots **and** `X-Robots-Tag`). Deeper context: [robots vs noindex vs canonical](/blog/robots-txt-vs-noindex-vs-canonical).
+Check both meta and `X-Robots-Tag`: [Noindex Checker](/tools/noindex-checker). Longer write-up: [robots vs noindex vs canonical](/blog/robots-txt-vs-noindex-vs-canonical).
 
-## 3. One host story: HTTPS, redirects, certificate days
+## 3. One host, HTTPS, certificate days
 
-Pick a single preferred host and enforce it:
+Pick `www` or apex. Not both as equals. HTTP should land on HTTPS in one hop if you can help it.
 
-- `https://example.com` **or** `https://www.example.com` — not both as equals
-- HTTP → HTTPS
-- Prefer **one** redirect hop to the final URL (long chains break analytics and patience)
+Google prefers HTTPS when signals aren’t a mess — see their notes on [canonicalization and HTTPS](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) (invalid certs and HTTPS→HTTP redirects are called out as ways to screw that up). HTTPS as a ranking signal goes back to their [2014 announcement](https://developers.google.com/search/blog/2014/08/https-as-ranking-signal); the operational point in 2026 is still: don’t ship a flaky cert.
 
-Do not trust “Chrome shows a padlock today.” Check **days remaining** on the certificate. Let’s Encrypt and ACME renewals fail quietly when DNS challenges break after a provider change. CDN edges sometimes keep serving an old cert after the origin renewed.
+Don’t trust “padlock in my browser.” Check **days remaining**. Let’s Encrypt renewals die quietly when DNS challenges break after a provider swap. CDNs sometimes keep serving the old leaf after origin renewed.
 
-Add HSTS only after HTTPS is boringly stable — not on day one of a flaky cutover.
+HSTS comes *after* HTTPS is boring. Not during the cutover chaos.
 
-**Verify:** [SSL Days Checker](/tools/ssl-checker), [Redirect Checker](/tools/redirect-checker), then [Security Headers Checker](/tools/security-headers-checker). More nuance: [SSL and security headers](/blog/ssl-and-security-headers-for-seo).
+Tools: [SSL Days Checker](/tools/ssl-checker), [Redirect Checker](/tools/redirect-checker), [Security Headers Checker](/tools/security-headers-checker).
 
-## 4. Sitemaps that match reality
+## 4. Sitemap that isn’t lying
 
-A sitemap is a discovery hint, not a ranking lever.
+Google’s [sitemap overview](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) is refreshingly modest:
 
-- Serve real XML (`urlset` or `sitemapindex`) — not an HTML soft-404 at `/sitemap.xml`
-- Declare it in robots.txt: `Sitemap: https://example.com/sitemap.xml`
-- Include only canonical, indexable, **200** URLs on the preferred host
-- Exclude staging hosts, thank-you pages, facet explosions, and noindex templates
+> If your site’s pages are properly linked, Google can usually discover most of your site… Even so, a sitemap can improve the crawling of larger or more complex sites…
 
-Submit in Google Search Console and Bing Webmaster Tools after the file is honest. If Search Console reports “Couldn’t fetch,” fix auth, content-type, or XML shape — do not “fix” it by stuffing more URLs into a broken file.
+So: discovery helper, not a ranking lever.
 
-**Verify:** [Sitemap Checker](/tools/sitemap-checker). Long-form: [XML sitemaps that actually help](/blog/xml-sitemaps-that-actually-help).
+Also from that page — you might *not* need one if the site is small (~500 pages) and well linked. Plenty of brochure launches still benefit from a clean `/sitemap.xml` plus a robots `Sitemap:` line, especially when the site is new and barely linked.
 
-## 5. Titles, descriptions, and canonicals on primary templates
+Rules of thumb I actually use:
 
-You do not need perfect marketing copy for every URL on day one. You do need non-broken defaults:
+- Real XML, not an HTML soft-404 wearing a sitemap URL
+- Only preferred-host, 200, indexable URLs
+- No thank-you pages, staging hosts, or facet explosions
+- Declare it in robots.txt
 
-- Unique `<title>` patterns per template type (home ≠ category ≠ article)
-- Meta descriptions that are not empty and not identical sitewide
-- Self-referencing canonicals on preferred URLs — or deliberate cross-URL canonicals when a variant should consolidate
-- No absolute canonicals still pointing at the old domain, staging host, or HTTP
+Validate: [Sitemap Checker](/tools/sitemap-checker). Deeper notes: [XML sitemaps that actually help](/blog/xml-sitemaps-that-actually-help).
 
-Also open one shared URL in a private window and glance at the [Open Graph Checker](/tools/open-graph-checker) if social launch posts matter on day one. Broken `og:image` will not tank rankings; it will make the launch look unfinished in Slack and LinkedIn.
+## 5. Titles, descriptions, canonicals on the templates that matter
 
-**Verify:** [Meta Tag Checker](/tools/meta-tag-checker), [Canonical Checker](/tools/canonical-checker) on home, one money page, one content URL.
+Day-one copy doesn’t need to win awards. It does need to not be broken.
 
-## 6. Status codes and “looks live” traps
+- Titles that aren’t identical on every template
+- Descriptions that aren’t empty sitewide
+- Canonicals that don’t still point at staging or the old domain
+- Absolute canonical URLs (Google [recommends against relying on relative ones](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) long-term)
 
-Before you announce:
+Spot-check home, one money URL, one article with [Meta Tag Checker](/tools/meta-tag-checker) and [Canonical Checker](/tools/canonical-checker). If social posts go out launch morning, glance at [Open Graph](/tools/open-graph-checker) so you don’t share a blank card.
 
-- Spot-check critical URLs for **200**, not soft 404 HTML with a 200 status
-- Confirm custom 404 pages return **404** (or 410 for deliberate removals)
-- After migrations, sample old URLs for **301/308** to the new equivalents — not chains of 302s forever
-- Pagination / filtered views: either noindex, canonical to a clean view, or blocked from crawl if they explode
+## 6. Status codes that match reality
 
-If a redesign reused URLs with totally different intent, treat it as a content change, not only a CSS change. Redirect maps belong in the same release as the theme.
+Soft 404s with a 200 status are launch goblins. Custom error pages should return real 404/410. Old URLs after a redesign should 301/308 to the new ones — not a decorative chain of temporary redirects.
 
-## 7. Structured data and GEO without cargo cult
+If the redesign reused URLs for totally different intent, that’s a content migration, not a CSS deploy. Put the redirect map in the same PR as the theme.
 
-Ship schema that matches **visible** content: `Organization`, `WebSite`, `Article` or `Product` where real. Skip FAQ blocks invented only to chase rich results with keyword-stuffed Q&A nobody asked.
+## 7. Schema and GEO without the cosplay
 
-For AI-assisted discovery, a short honest [`llms.txt`](https://theseosoul.com/llms.txt) beats a wall of slogans. GEO is mostly citability and clarity — not a new density game. See [GEO and llms.txt](/blog/geo-llms-txt-practical-guide).
+Ship `Organization` / `WebSite` / real `Article` or `Product` markup when the page content matches. Skip FAQ blocks invented only to chase rich results.
 
-**Verify:** [GEO Content Checker](/tools/geo-content-checker) for drafts; a [full technical audit](/#home-audit-url) for crawl + citability together (including Site Soul archetypes as a readable pattern summary — not a vanity grade).
+For AI-ish discovery, a short honest [`llms.txt`](https://llmstxt.org/) beats a slogan dump. More on that in [GEO and llms.txt](/blog/geo-llms-txt-practical-guide).
 
-## 8. Cutover sequence (keep it boring)
+Draft check: [GEO Content Checker](/tools/geo-content-checker). Whole-site pass: [free audit](/#home-audit-url).
 
-1. Freeze changes that alter URL structure for the freeze window.
-2. Flip DNS / release with alerts on 5xx and TLS.
-3. Immediately re-run: robots, noindex on money templates, SSL days, sitemap, three meta/canonical spot checks.
-4. In Search Console, request indexing for a **handful** of priority URLs — not every loc in the sitemap.
-5. Watch Pages / indexing reports and crawl stats for a week before you declare victory.
-6. Only then enable HSTS preload considerations, aggressive caching, or large IndexNow bursts.
+## Cutover day (boring on purpose)
 
-Print this as a release checklist. The team that documents the boring steps is the team that sleeps after launch.
+1. Freeze URL-structure changes for the window.
+2. Ship with 5xx + TLS alerts on.
+3. Re-run robots, noindex on money templates, SSL days, sitemap, three meta/canonical spot checks.
+4. In Search Console, request indexing for a *handful* of priority URLs — not the whole sitemap.
+5. Watch indexing reports for a week before you declare victory.
+6. *Then* get cute with HSTS preload, aggressive cache, bulk pings, etc.
 
-## What we deliberately skip
+## What I’m not promising
 
-- Invented Domain Authority, “traffic value,” or backlink theater
-- Guaranteeing rankings from a green checklist
-- Mass-indexing every audited URL as a growth hack
-- Core Web Vitals as a launch blocker for a brochure site (measure them, yes — delay launch for a perfect LCP chase, usually no)
+A green checklist does not buy rankings. It stops you from donating the first month to avoidable crawl/index accidents. When those are clean, content and distribution can do their jobs.
 
-Technical SEO before launch is about **not shooting yourself in the foot**. When crawl, indexation, HTTPS, and discovery are honest, content and distribution can actually compound.
-
-For one shareable pass across meta, structure, technical, and GEO, run a [free TheSeoSoul audit](/#home-audit-url) and keep the `/audit/[domain]` link in the launch channel.
+If the team wants one shareable pass, run a [TheSeoSoul audit](/#home-audit-url) and drop the `/audit/[domain]` link in the launch channel.

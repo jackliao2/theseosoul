@@ -1,118 +1,105 @@
 ---
 title: "Check domain history before you buy (Wayback + WHOIS)"
-description: "How to evaluate a second-hand or aged domain with Wayback Machine chapters and WHOIS/RDAP — spam eras, brand risk, archive gaps, and a buy/walk-away framework."
+description: "How to vet an aged or second-hand domain with the Wayback Machine and WHOIS/RDAP — spam eras, brand risk, archive gaps, and when to walk away."
 date: "2026-07-30"
 updated: "2026-08-01"
 tags: ["Domains", "Wayback", "WHOIS"]
-excerpt: "A cheap aged domain can be a gift or a liability. Read the archive story before you transfer money — age alone proves nothing."
+excerpt: "Domain age isn’t a strategy. Open the archive for the weird years before you wire the money."
 ---
 
-Aged domains are marketed like wine. Some are fine. Some spent years as doorway spam, pharma redirects, or brand impersonation. Buying on “domain age” alone is how teams inherit toxic inbound anchors, confusing Search Console history, trademark headaches, and customer-support nightmares that no on-page tweak will fix.
+Aged domains get sold like bottles of wine. Some are fine. Some spent half a decade as doorway spam, fake support pages, or pharmaceutical merry-go-rounds. Paying for “age” alone is how you inherit someone else’s inbound junk and a brand string you can’t defend.
 
-You do not need a private investigator. You need **history**, **ownership clues**, and a sober bias for walking away when the story smells.
+You don’t need a PI license. You need curiosity and a bias for walking away.
 
-## What “domain history” means (for buyers)
+## What I actually look at
 
-Two public lenses matter most before money moves:
+Two public lenses before money moves:
 
-1. **Wayback Machine / web archives** — what the site *looked like* and claimed to be over time  
-2. **WHOIS / RDAP registration data** — creation date, registrar, and registrant changes when not redacted  
+1. **[Wayback Machine](https://web.archive.org/)** (and similar archives) — what the site *looked like* and claimed to be  
+2. **WHOIS / RDAP** — created date, registrar, churn when not privacy-redacted  
 
-Neither proves Google’s current trust. Both catch obvious disasters cheaply.
+Neither proves Google’s current trust. Both catch obvious disasters for free.
 
-Use our free [Domain History Checker](/tools/domain-history) for a chapter-style Wayback summary plus WHOIS second-hand signals. For any domain that costs real money, open raw archive captures yourself for the weirdest years — tools summarize; your eyes catch impersonation.
+Our [Domain History Checker](/tools/domain-history) gives a chapter-style Wayback summary plus registration clues. For anything expensive, still open raw captures yourself. Tools summarize; your eyes catch the impersonation screenshots.
 
-## Myths that still sell domains
+Internet Archive’s own about page is the right mental model: it’s a library of what was published, not a reputation API — start at [web.archive.org](https://web.archive.org/).
 
-**“Aged domains rank faster.”** Sometimes prior relevance and clean inbound links help. Often you are buying someone else’s mess. Age without a coherent topical history is not a strategy.
+## Myths sellers love
 
-**“No archive captures means clean.”** Gaps happen for many reasons (see below). Absence of evidence is not evidence of purity.
+**“Aged domains rank faster.”** Sometimes prior relevance helps. Often you’re buying mess. Age without a coherent topical story is not a plan.
 
-**“A high spam score tool said OK.”** Single-gauge scores are marketed harder than they are understood. Qualitative archive review still wins for pre-purchase diligence.
+**“No archive captures = clean.”** Gaps happen. More below.
 
-**“We will just 301 it to our main site for juice.”** Redirecting a spammy aged domain into a clean brand is a classic way to import problems. If you would not put that domain’s past on your About page, do not point it at your homepage.
+**“The spam-score tool said 2/100.”** Single gauges are marketing-friendly. Qualitative archive review still wins for diligence.
 
-## Red flags in archive history
+**“We’ll 301 it to the main site for juice.”** If you wouldn’t put that domain’s past on your About page, don’t point it at your homepage.
 
-Treat these as stop-or-deep-discount signals:
+## Archive red flags
 
-- **Topic whiplash** — casino → crypto → “AI essays” → local plumber every few months  
-- **Doorway / scraped layouts** — thin pages, spun text, dense outbound junk, cloned templates  
-- **Brand hijack patterns** — logos, product names, or support pages that clearly impersonate a known company  
-- **Malware / phishing eras** — security interstitial language in captures, fake login themes  
-- **Pure redirect shells** — years of parked pages or single-hop affiliate bounce with no real site  
-- **Adult / regulated bait-and-switch** into a “new wholesome brand” story from the seller  
+- Niche whiplash every few months (casino → crypto → “AI essays” → plumber)
+- Doorway layouts, spun text, outbound junk forests
+- Brand hijacks — fake login themes, trademark lookalikes
+- Long malware / phishing eras
+- Years of parked or pure redirect shells with no real site
+- Adult or regulated bait-and-switch into a “new wholesome brand” sales pitch
 
-A clean personal blog that went dark is usually fine. A domain that spent years as multilingual pill spam is a different animal — even if it is “available,” “aged,” and on sale this weekend.
+A quiet personal blog that went dark? Usually fine. Multilingual pill spam from 2019–2022 with a fresh coat of paint? Different animal.
 
-### How to sample Wayback efficiently
+### How I sample Wayback without boiling the ocean
 
-1. Open the calendar / timeline view for the hostname.  
-2. Sample **early**, **mid**, and **late** captures — not only the prettiest year.  
-3. Open at least one capture from any dense cluster of changes.  
-4. Note language, niche, and outbound link behavior.  
-5. Compare the seller’s narrative to what you actually see.
+1. Open the timeline for the hostname.  
+2. Grab early / middle / late — not only the prettiest year.  
+3. Click into any dense cluster of changes.  
+4. Note language, niche, outbound behavior.  
+5. Compare that to the seller’s email story.
 
-If the seller’s story and the archive disagree, believe the archive.
+If the story and the archive disagree, believe the archive.
 
-## What archive gaps mean (and do not)
+## Gaps aren’t innocence
 
-Gaps happen because:
+Archives miss stuff when:
 
 - The site blocked crawlers or returned errors  
-- robots.txt excluded archive bots  
-- The project was private, tiny, or rarely linked  
-- Archive coverage simply missed stretches of time  
+- robots excluded archive bots  
+- The project was tiny / rarely linked  
+- Coverage just… skipped years  
 
-A gap is **not** proof of innocence or guilt. Combine gaps with:
+So combine gaps with WHOIS churn, whether *any* meaningful content appears later, and whether the string itself is a trademark grenade.
 
-- WHOIS / RDAP creation and churn  
-- Whether meaningful content ever appears later  
-- Qualitative backlink sampling if you have access (look for patterns, not a vanity score)  
-- Trademark / brand confusion risk on the string itself  
+## WHOIS / RDAP questions worth asking
 
-## WHOIS / RDAP clues worth asking
+- Created when vs. first real archive content when?  
+- Ownership flip-flop in a short window?  
+- Does anything visible match the seller?  
 
-- When was the domain created versus when did meaningful archive content start?  
-- Did ownership churn repeatedly in a short window (drop → catch → flip)?  
-- Is the registrar ecosystem associated with high-churn speculation? (Not proof — context.)  
-- Does any visible registrant data match the seller’s identity?  
+Privacy redaction is normal now. Missing public name ≠ guilt. Rapid create → spam → drop → catch cycles are the smell.
 
-Privacy redaction is normal. Missing public name is not a red flag by itself. Rapid create → spam → drop → recreate cycles are.
+ICANN’s RDAP direction is why many lookups feel different than “old WHOIS” — if a registrar UI looks empty, try an RDAP client before you assume the domain is a ghost.
 
-## Brand and legal risk (SEO is secondary)
+## Legal risk beats SEO cosplay
 
 Before you buy a “great keyword domain”:
 
-- Search the trademark databases relevant to your markets  
-- Check whether the string impersonates a living brand (typosquatting vibes)  
-- Skim social and news for scam reports tied to the domain  
-- If the deal is large, get a human legal review — tools will not do this for you  
+- Trademark search in your markets  
+- Typosquat / impersonation smell test  
+- Quick news/social scan for scam reports on that string  
+- Real legal review if the check is large  
 
-A domain that is SEO-perfect and legally toxic is still a bad purchase.
+A domain can be SEO-cute and still legally stupid.
 
-## Decision framework
+## Buy / don’t-buy gut check
 
 | Situation | Bias |
 | --- | --- |
-| Clean niche history aligning with your future brand | Reasonable to buy at a fair price |
-| Empty / young with no spam evidence | Fine if the **name** is strategically worth it |
-| Spam, scam, or malware eras in archive | Walk away or pay scrap value only |
-| Famous brand confusingly similar | Legal review first — SEO second |
-| Seller refuses to discuss archive history | Assume they know something |
-| Plan is “301 to main site for authority” after a dirty past | Default to no |
+| Clean niche history matching your future site | Reasonable at a fair price |
+| Empty/young, no spam evidence | Fine if the *name* is worth it |
+| Spam/scam/malware eras | Walk or scrap value only |
+| Confusingly similar to a living brand | Lawyers first |
+| Seller won’t discuss archive history | Assume they know why |
+| Plan is “301 dirty age into clean brand” | Default no |
 
-## After you buy (if you still do)
+## After purchase
 
-1. Point DNS only when you control the content that will answer.  
-2. Publish a clear site with honest About and Contact — ambiguity invites user distrust.  
-3. Set robots, HTTPS, and sitemap correctly ([technical SEO checklist](/blog/technical-seo-checklist-before-launch)).  
-4. Run a [full audit](/#home-audit-url) on the live host.  
-5. Watch Search Console for weeks if you feared prior issues. There is no honest “trust reset” button.  
-6. Do not cloak. Do not paste spun “aged domain SEO” articles and hope history washes out.
+Point DNS when you control the answer. Ship honest About/Contact. Fix robots/HTTPS/sitemap ([launch checklist](/blog/technical-seo-checklist-before-launch)). Run a [full audit](/#home-audit-url). Watch Search Console if you were nervous. There is no honest “trust reset” button.
 
-## Honesty boundary
-
-We will not sell you a fake spam score or invented backlink valuation. Archive chapters plus registration context already prevent most disasters. For high-ticket acquisitions, add legal review and a human look at referring domains — still without pretending a single gauge decides the future.
-
-Start with the [Domain History Checker](/tools/domain-history), then read two or three captures from the weirdest years. Ten minutes of curiosity beats six months of cleanup.
+We won’t sell you a fake spam score. Open [Domain History](/tools/domain-history), then click two captures from the weird years. Ten minutes of curiosity beats six months of cleanup.
