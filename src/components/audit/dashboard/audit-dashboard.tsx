@@ -121,12 +121,19 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
             </div>
 
             <div className="hidden min-w-0 flex-1 justify-center sm:flex md:max-w-xs lg:max-w-md no-print">
-              <DashboardSearch currentDomain={audit.domain} />
+              <DashboardSearch
+                currentDomain={audit.domain}
+                fallbackUrl={audit.url}
+              />
             </div>
 
             <div className="flex shrink-0 items-center gap-0.5">
               <div className="sm:hidden no-print">
-                <DashboardSearch currentDomain={audit.domain} compact />
+                <DashboardSearch
+                  currentDomain={audit.domain}
+                  fallbackUrl={audit.url}
+                  compact
+                />
               </div>
               <ReportActions audit={audit} />
               <Button

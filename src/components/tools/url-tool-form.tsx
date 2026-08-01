@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export function UrlToolForm({
   defaultUrl,
@@ -17,6 +17,16 @@ export function UrlToolForm({
 }) {
   const [url, setUrl] = useState(defaultUrl);
   const [loading, setLoading] = useState(false);
+
+  // Prefill from ?url= when linked from an audit Next Step or share.
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("url");
+      if (q?.trim()) setUrl(q.trim());
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

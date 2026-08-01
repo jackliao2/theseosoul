@@ -6,10 +6,16 @@ import Link from "next/link";
 const KEY = "theseosoul-recent-audits";
 
 /** Remember a share slug like "stripe.com" or "stripe.com/docs". */
+function readRecentList(raw: string | null): string[] {
+  if (!raw) return [];
+  const parsed = JSON.parse(raw) as unknown;
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter((item): item is string => typeof item === "string");
+}
+
 export function rememberRecentAudit(slug: string) {
   try {
-    const raw = localStorage.getItem(KEY);
-    const list: string[] = raw ? (JSON.parse(raw) as string[]) : [];
+    const list = readRecentList(localStorage.getItem(KEY));
     const next = [slug, ...list.filter((d) => d !== slug)].slice(0, 8);
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
@@ -27,8 +33,7 @@ export function RecentAudits() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw) as string[]);
+      setItems(readRecentList(localStorage.getItem(KEY)));
     } catch {
       // ignore
     }

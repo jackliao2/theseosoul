@@ -9,10 +9,13 @@ import { cn } from "@/lib/utils";
 
 export function DashboardSearch({
   currentDomain,
+  /** Prefer full audited URL so empty re-search keeps path pages. */
+  fallbackUrl,
   className,
   compact,
 }: {
   currentDomain: string;
+  fallbackUrl?: string;
   className?: string;
   /** Icon-only trigger on very small screens when used in a row */
   compact?: boolean;
@@ -27,7 +30,9 @@ export function DashboardSearch({
     event.preventDefault();
     setError(null);
     try {
-      const normalized = normalizeUrl(value || currentDomain);
+      const normalized = normalizeUrl(
+        value || fallbackUrl || currentDomain
+      );
       startTransition(() => router.push(auditHref(normalized)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid URL");

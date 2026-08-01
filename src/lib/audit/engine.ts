@@ -142,6 +142,10 @@ export async function runAudit(input: string): Promise<AuditResponse> {
       faqSchemaPresent: extras.faqSchema.present,
     });
 
+    const xRobotsBlocked = /noindex|\bnone\b/i.test(tech.xRobotsTag ?? "");
+    const robotsMetaStatus: typeof robotsMeta.status =
+      robotsMeta.status === "fail" || xRobotsBlocked ? "fail" : robotsMeta.status;
+
     const { score, grade } = computeScore({
       title: title.status,
       description: description.status,
@@ -150,6 +154,7 @@ export async function runAudit(input: string): Promise<AuditResponse> {
       images: images.status,
       openGraph: openGraph.status,
       robots: robots.status,
+      robotsMeta: robotsMetaStatus,
       aiBlockedCount: robots.aiCrawlers.filter((c) => c.blocked).length,
     });
 

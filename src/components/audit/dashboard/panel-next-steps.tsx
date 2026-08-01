@@ -71,7 +71,7 @@ export function PanelNextSteps({
                   <div className="mt-2 flex flex-wrap gap-2">
                     {step.tool ? (
                       <Link
-                        href={step.tool.href}
+                        href={`${step.tool.href}?url=${encodeURIComponent(audit.url)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-700 hover:border-teal-300 hover:text-teal-800 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-teal-700 dark:hover:text-teal-300"

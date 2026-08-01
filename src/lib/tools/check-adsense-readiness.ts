@@ -369,8 +369,21 @@ async function discoverSitemapPages(
   origin: string,
   directives: string[]
 ): Promise<{ present: boolean; url: string; pages: string[] }> {
+  const resolvedDirectives = directives
+    .map((directive) => {
+      try {
+        return new URL(directive, origin).toString();
+      } catch {
+        return null;
+      }
+    })
+    .filter((value): value is string => Boolean(value));
+
   const candidates = Array.from(
-    new Set([...directives, new URL("/sitemap.xml", origin).toString()])
+    new Set([
+      ...resolvedDirectives,
+      new URL("/sitemap.xml", origin).toString(),
+    ])
   ).slice(0, 3);
 
   for (const candidate of candidates) {

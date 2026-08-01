@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink, LoaderCircle } from "lucide-react";
 import { ToolError } from "@/components/tools/url-tool-form";
 import type {
@@ -37,6 +37,15 @@ export function DomainHistoryForm() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DomainHistoryResponse | null>(null);
+
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("url");
+      if (q?.trim()) setUrl(q.trim());
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();

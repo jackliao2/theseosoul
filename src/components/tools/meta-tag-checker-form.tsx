@@ -8,6 +8,7 @@ import {
   ToolStat,
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
+import { auditReportHref } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 type FieldResult = {
@@ -227,7 +228,7 @@ export function MetaTagCheckerForm() {
           </Link>
           {" · "}
           <Link
-            href={`/audit/${fetchResult.domain}`}
+            href={auditReportHref(fetchResult.domain, fetchResult.finalUrl)}
             className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
           >
             Full audit →

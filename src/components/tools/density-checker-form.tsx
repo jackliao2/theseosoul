@@ -7,6 +7,7 @@ import {
   ToolStat,
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
+import { auditReportHref } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 type Kw = { keyword: string; count: number; density: number };
@@ -239,7 +240,7 @@ export function DensityCheckerForm() {
             <p className="text-sm text-slate-600 dark:text-slate-300">
               Full technical report:{" "}
               <Link
-                href={`/audit/${result.domain}`}
+                href={auditReportHref(result.domain, result.finalUrl)}
                 className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
               >
                 Open audit →

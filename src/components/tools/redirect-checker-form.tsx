@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { auditReportHref } from "@/lib/url";
 
 type Hop = { url: string; status: number };
 
@@ -22,6 +23,15 @@ export function RedirectCheckerForm() {
   const [url, setUrl] = useState("https://www.github.com");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("url");
+      if (q?.trim()) setUrl(q.trim());
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,7 +118,7 @@ export function RedirectCheckerForm() {
             Want the full technical report for{" "}
             <span className="font-medium">{result.domain}</span>?{" "}
             <Link
-              href={`/audit/${result.domain}`}
+              href={auditReportHref(result.domain, result.finalUrl)}
               className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
             >
               Open audit →

@@ -7,6 +7,7 @@ import {
   ToolStat,
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
+import { auditReportHref } from "@/lib/url";
 
 type Probe = {
   url: string;
@@ -177,7 +178,7 @@ export function SitemapCheckerForm() {
             </Link>
             {" · "}
             <Link
-              href={`/audit/${result.domain}`}
+              href={auditReportHref(result.domain, result.origin)}
               className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
             >
               Full audit →

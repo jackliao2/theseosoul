@@ -45,6 +45,7 @@ export function computeScore(parts: {
   images: CheckStatus;
   openGraph: CheckStatus;
   robots: CheckStatus;
+  robotsMeta?: CheckStatus;
   aiBlockedCount: number;
 }): { score: number; grade: SeoGrade } {
   let score = 0;
@@ -55,6 +56,11 @@ export function computeScore(parts: {
   score += pointsFor(parts.images, 12);
   score += pointsFor(parts.openGraph, 12);
   score += pointsFor(parts.robots, 12);
+
+  // Accidental noindex is a hard indexing blocker — heavy penalty.
+  if (parts.robotsMeta === "fail") {
+    score -= 25;
+  }
 
   score -= Math.min(10, parts.aiBlockedCount * 2);
 
@@ -72,6 +78,7 @@ export function buildIssueChecks(
     | "images"
     | "openGraph"
     | "robots"
+    | "robotsMeta"
     | "tech"
     | "structured"
     | "density"
@@ -146,6 +153,30 @@ export function buildIssueChecks(
       title: "robots.txt Check",
       description: result.robots.message,
       status: result.robots.status,
+    }),
+    withGuidance({
+      id: "robots-meta",
+      title: "Robots Meta / X-Robots-Tag",
+      description: (() => {
+        const x = result.tech.xRobotsTag;
+        if (result.robotsMeta.status === "fail" || /noindex|\bnone\b/i.test(x ?? "")) {
+          const bits = [
+            result.robotsMeta.content
+              ? `meta: ${result.robotsMeta.content}`
+              : null,
+            x ? `header: ${x}` : null,
+          ].filter(Boolean);
+          return bits.length
+            ? `Indexing restricted (${bits.join("; ")}).`
+            : "Indexing directives block this URL.";
+        }
+        return result.robotsMeta.message;
+      })(),
+      status:
+        result.robotsMeta.status === "fail" ||
+        /noindex|\bnone\b/i.test(result.tech.xRobotsTag ?? "")
+          ? "fail"
+          : result.robotsMeta.status,
     }),
     withGuidance({
       id: "viewport",
@@ -349,6 +380,29 @@ export function buildIssues(
       severity: result.robots.status === "fail" ? "critical" : "warning",
       title: "robots.txt issue",
       description: result.robots.message,
+    });
+  }
+
+  const xRobots = result.tech.xRobotsTag ?? "";
+  const robotsMetaBlocked =
+    result.robotsMeta.status === "fail" ||
+    /noindex|\bnone\b/i.test(result.robotsMeta.content ?? "");
+  const xRobotsBlocked = /noindex|\bnone\b/i.test(xRobots);
+  if (robotsMetaBlocked || xRobotsBlocked) {
+    const bits = [
+      result.robotsMeta.content
+        ? `meta robots: ${result.robotsMeta.content}`
+        : null,
+      xRobots ? `X-Robots-Tag: ${xRobots}` : null,
+    ].filter(Boolean);
+    issues.push({
+      id: "noindex",
+      category: "technical",
+      severity: "critical",
+      title: "Page is marked noindex",
+      description: bits.length
+        ? `Indexing is restricted (${bits.join("; ")}).`
+        : "Indexing directives block this URL from search results.",
     });
   }
 

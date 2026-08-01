@@ -7,6 +7,7 @@ import {
   ToolStat,
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
+import { auditReportHref } from "@/lib/url";
 
 type Directive = {
   source: string;
@@ -164,7 +165,7 @@ export function NoindexCheckerForm() {
             </Link>
             {" · "}
             <Link
-              href={`/audit/${result.domain}`}
+              href={auditReportHref(result.domain, result.finalUrl)}
               className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
             >
               Full audit →

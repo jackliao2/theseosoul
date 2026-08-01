@@ -20,33 +20,26 @@ export type AuditNextStep = {
   guide?: NextStepLink;
 };
 
+/** Keys must match AuditIssue.id values from buildIssues(). */
 const ISSUE_LINKS: Record<
   string,
   { tab: AuditTabId; tool?: NextStepLink; guide?: NextStepLink }
 > = {
-  "meta-title": {
-    tab: "issues",
-    tool: { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
-    guide: {
-      href: "/blog/technical-seo-checklist-before-launch",
-      label: "Launch checklist",
-    },
-  },
-  "meta-description": {
-    tab: "issues",
-    tool: { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
-    guide: {
-      href: "/blog/technical-seo-checklist-before-launch",
-      label: "Launch checklist",
-    },
-  },
   title: {
     tab: "issues",
     tool: { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
+    guide: {
+      href: "/blog/technical-seo-checklist-before-launch",
+      label: "Launch checklist",
+    },
   },
   description: {
     tab: "issues",
     tool: { href: "/tools/meta-tag-checker", label: "Meta Tag Checker" },
+    guide: {
+      href: "/blog/technical-seo-checklist-before-launch",
+      label: "Launch checklist",
+    },
   },
   canonical: {
     tab: "issues",
@@ -56,17 +49,15 @@ const ISSUE_LINKS: Record<
       label: "robots vs noindex vs canonical",
     },
   },
-  "robots-txt": {
+  headings: { tab: "structure" },
+  images: { tab: "structure" },
+  og: {
+    tab: "signals",
+    tool: { href: "/tools/open-graph-checker", label: "Open Graph Checker" },
+  },
+  robots: {
     tab: "issues",
     tool: { href: "/tools/robots-txt-checker", label: "Robots.txt Checker" },
-    guide: {
-      href: "/blog/robots-txt-vs-noindex-vs-canonical",
-      label: "robots vs noindex vs canonical",
-    },
-  },
-  "robots-meta": {
-    tab: "issues",
-    tool: { href: "/tools/noindex-checker", label: "Noindex Checker" },
     guide: {
       href: "/blog/robots-txt-vs-noindex-vs-canonical",
       label: "robots vs noindex vs canonical",
@@ -80,15 +71,7 @@ const ISSUE_LINKS: Record<
       label: "robots vs noindex vs canonical",
     },
   },
-  sitemap: {
-    tab: "issues",
-    tool: { href: "/tools/sitemap-checker", label: "Sitemap Checker" },
-    guide: {
-      href: "/blog/xml-sitemaps-that-actually-help",
-      label: "XML sitemaps guide",
-    },
-  },
-  https: {
+  "mixed-content": {
     tab: "domain",
     tool: { href: "/tools/ssl-checker", label: "SSL Days Checker" },
     guide: {
@@ -104,24 +87,12 @@ const ISSUE_LINKS: Record<
       label: "SSL & headers",
     },
   },
-  "security-headers": {
-    tab: "domain",
-    tool: {
-      href: "/tools/security-headers-checker",
-      label: "Security Headers",
-    },
-    guide: {
-      href: "/blog/ssl-and-security-headers-for-seo",
-      label: "SSL & headers",
-    },
-  },
+  "dns-spf": { tab: "domain" },
+  "text-html-ratio": { tab: "structure" },
+  "title-h1": { tab: "structure" },
   "redirect-chain": {
     tab: "domain",
     tool: { href: "/tools/redirect-checker", label: "Redirect Checker" },
-  },
-  "open-graph": {
-    tab: "signals",
-    tool: { href: "/tools/open-graph-checker", label: "Open Graph Checker" },
   },
   "llms-txt": {
     tab: "geo",
@@ -129,31 +100,6 @@ const ISSUE_LINKS: Record<
     guide: {
       href: "/blog/geo-llms-txt-practical-guide",
       label: "GEO & llms.txt",
-    },
-  },
-  structured: {
-    tab: "geo",
-    tool: { href: "/tools/geo-content-checker", label: "GEO Content Checker" },
-    guide: {
-      href: "/blog/geo-llms-txt-practical-guide",
-      label: "GEO & llms.txt",
-    },
-  },
-  "faq-schema": {
-    tab: "geo",
-    guide: {
-      href: "/blog/geo-llms-txt-practical-guide",
-      label: "GEO & llms.txt",
-    },
-  },
-  h1: { tab: "structure" },
-  h2: { tab: "structure" },
-  "images-alt": { tab: "structure" },
-  "content-length": {
-    tab: "keywords",
-    tool: {
-      href: "/tools/keyword-density-checker",
-      label: "Density Checker",
     },
   },
 };
@@ -165,6 +111,22 @@ function fallbackTab(issue: AuditIssue): AuditTabId {
   return "issues";
 }
 
+function linksFor(issue: AuditIssue) {
+  if (ISSUE_LINKS[issue.id]) return ISSUE_LINKS[issue.id];
+  // AI crawler blocks: ai-GPTBot, etc.
+  if (issue.id.startsWith("ai-")) {
+    return {
+      tab: "geo" as const,
+      tool: { href: "/tools/robots-txt-checker", label: "Robots.txt Checker" },
+      guide: {
+        href: "/blog/geo-llms-txt-practical-guide",
+        label: "GEO & llms.txt",
+      },
+    };
+  }
+  return undefined;
+}
+
 /** Top actionable next steps for the Overview “Next 15 minutes” block. */
 export function getAuditNextSteps(
   audit: AuditResult,
@@ -172,20 +134,17 @@ export function getAuditNextSteps(
 ): AuditNextStep[] {
   const ranked = [...audit.issues]
     .filter((i) => i.severity !== "info")
-    .sort(
-      (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]
-    );
+    .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
 
   const steps: AuditNextStep[] = [];
   const seen = new Set<string>();
 
   for (const issue of ranked) {
     if (steps.length >= limit) break;
-    const key = issue.id;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    if (seen.has(issue.id)) continue;
+    seen.add(issue.id);
 
-    const links = ISSUE_LINKS[issue.id];
+    const links = linksFor(issue);
     steps.push({
       id: issue.id,
       title: issue.title,

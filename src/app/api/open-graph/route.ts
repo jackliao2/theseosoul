@@ -35,6 +35,25 @@ export async function GET(request: NextRequest) {
     const twitter = parseTwitterCards($);
     const title = $("title").first().text().trim() || null;
 
+    const absolutize = (value: string | null | undefined) => {
+      if (!value) return value ?? null;
+      try {
+        return new URL(value, finalUrl).toString();
+      } catch {
+        return value;
+      }
+    };
+
+    if (openGraph.tags["og:image"]) {
+      openGraph.tags["og:image"] = absolutize(openGraph.tags["og:image"])!;
+    }
+    if (openGraph.tags["og:url"]) {
+      openGraph.tags["og:url"] = absolutize(openGraph.tags["og:url"])!;
+    }
+    if (twitter.tags["twitter:image"]) {
+      twitter.tags["twitter:image"] = absolutize(twitter.tags["twitter:image"])!;
+    }
+
     const checklist = OG_KEYS.map((key) => ({
       key,
       present: Boolean(openGraph.tags[key]),

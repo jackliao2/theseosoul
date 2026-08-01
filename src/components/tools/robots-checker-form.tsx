@@ -7,6 +7,7 @@ import {
   ToolStat,
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
+import { auditReportHref } from "@/lib/url";
 
 type Crawler = {
   name: string;
@@ -155,7 +156,7 @@ export function RobotsCheckerForm() {
             Full technical + GEO report for{" "}
             <span className="font-medium">{result.domain}</span>:{" "}
             <Link
-              href={`/audit/${result.domain}`}
+              href={auditReportHref(result.domain, result.origin)}
               className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
             >
               Open audit →

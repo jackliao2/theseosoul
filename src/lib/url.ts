@@ -107,14 +107,30 @@ export function auditHref(input: {
 /**
  * Convert a route param like "shopify.com" into audit inputs.
  * Prefer {@link targetFromSegments} for catch-all routes.
+ * Does not lowercase path segments (host casing is normalized in normalizeUrl).
  */
 export function domainFromParam(param: string): {
   url: string;
   domain: string;
   hostname: string;
 } {
-  const decoded = decodeURIComponent(param).trim().toLowerCase();
+  const decoded = decodeURIComponent(param).trim();
   return normalizeUrl(decoded);
+}
+
+/** Build /audit/... href from a tool result domain + preferred live URL. */
+export function auditReportHref(
+  domain: string,
+  preferredUrl?: string | null
+): string {
+  if (preferredUrl) {
+    try {
+      return auditHref(normalizeUrl(preferredUrl));
+    } catch {
+      /* fall through */
+    }
+  }
+  return `/audit/${domain.replace(/^www\./, "")}`;
 }
 
 /** Join catch-all [...target] segments into a normalizable host[/path]. */

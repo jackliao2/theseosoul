@@ -39,6 +39,10 @@ export const ISSUE_GUIDANCE: Record<
     why: "robots.txt governs crawl access for search and AI bots.",
     fix: "Publish a valid robots.txt; avoid Disallow: / unless intentional; allow important bots.",
   },
+  "robots-meta": {
+    why: "Meta robots and X-Robots-Tag can block indexing even when the page looks fine.",
+    fix: "Remove noindex/none unless the page should stay out of Google; check both HTML meta and response headers.",
+  },
   viewport: {
     why: "Viewport is required for mobile-friendly rendering — a ranking baseline.",
     fix: "Add <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">.",

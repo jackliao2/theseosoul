@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -66,6 +66,15 @@ export function AdsenseReadinessForm() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AdsenseReadinessResponse | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get("url");
+      if (q?.trim()) setUrl(q.trim());
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
