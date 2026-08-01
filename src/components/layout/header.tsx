@@ -73,9 +73,11 @@ export function Header({ compact = false }: { compact?: boolean }) {
             </>
           ) : (
             <>
-              <ToolsNavMenu />
+              <ToolsNavMenu openInNewTab />
               <Link
                 href="/tools/domain-history"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white lg:inline-block"
               >
                 Domain History
@@ -106,12 +108,18 @@ export function Header({ compact = false }: { compact?: boolean }) {
           <div className="mx-auto flex max-w-6xl flex-col gap-1">
             <Link
               href="/tools/domain-history"
+              {...(compact
+                ? { target: "_blank" as const, rel: "noopener noreferrer" }
+                : {})}
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
             >
               Domain History
             </Link>
-            <ToolsMobileNav onNavigate={() => setOpen(false)} />
+            <ToolsMobileNav
+              onNavigate={() => setOpen(false)}
+              openInNewTab={compact}
+            />
             {!compact ? (
               NAV.map((item) => (
                 <Link

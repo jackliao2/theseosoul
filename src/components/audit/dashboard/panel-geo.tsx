@@ -57,6 +57,8 @@ export function PanelGeo({ audit }: { audit: AuditResult }) {
           </p>
           <Link
             href="/tools/geo-content-checker"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-1 inline-block text-xs font-semibold text-teal-700 hover:underline dark:text-teal-400"
           >
             GEO content checker →

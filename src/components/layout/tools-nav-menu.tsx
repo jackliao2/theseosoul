@@ -10,10 +10,20 @@ const dropdownTools = TOOL_CATALOG.filter(
   (t) => t.group === "growth" || t.group === "content"
 );
 
-export function ToolsNavMenu() {
+const newTabProps = {
+  target: "_blank" as const,
+  rel: "noopener noreferrer",
+};
+
+export function ToolsNavMenu({
+  openInNewTab = false,
+}: {
+  openInNewTab?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const tabProps = openInNewTab ? newTabProps : {};
 
   useEffect(() => {
     if (!open) return;
@@ -77,6 +87,7 @@ export function ToolsNavMenu() {
               key={item.href}
               href={item.href}
               role="menuitem"
+              {...tabProps}
               onClick={() => setOpen(false)}
               className="block px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
@@ -88,6 +99,7 @@ export function ToolsNavMenu() {
 
           <Link
             href="/tools"
+            {...tabProps}
             onClick={() => setOpen(false)}
             className="flex items-center justify-between px-3 py-2 text-sm font-semibold text-teal-800 transition-colors hover:bg-teal-800/[0.06] dark:text-teal-300 dark:hover:bg-teal-400/[0.08]"
           >
@@ -100,8 +112,15 @@ export function ToolsNavMenu() {
   );
 }
 
-export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
+export function ToolsMobileNav({
+  onNavigate,
+  openInNewTab = false,
+}: {
+  onNavigate: () => void;
+  openInNewTab?: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const tabProps = openInNewTab ? newTabProps : {};
 
   return (
     <div>
@@ -125,6 +144,7 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
             <Link
               key={item.href}
               href={item.href}
+              {...tabProps}
               onClick={onNavigate}
               className="block rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             >
@@ -133,6 +153,7 @@ export function ToolsMobileNav({ onNavigate }: { onNavigate: () => void }) {
           ))}
           <Link
             href="/tools"
+            {...tabProps}
             onClick={onNavigate}
             className="block rounded-lg px-3 py-1.5 text-sm font-semibold text-teal-800 dark:text-teal-300"
           >

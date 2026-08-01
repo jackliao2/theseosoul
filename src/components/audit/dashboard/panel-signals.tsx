@@ -58,6 +58,8 @@ export function PanelSignals({ audit }: { audit: AuditResult }) {
             Tweak a draft snippet in the{" "}
             <Link
               href="/tools/meta-tag-checker"
+              target="_blank"
+              rel="noopener noreferrer"
               className="font-semibold text-teal-700 hover:underline dark:text-teal-400"
             >
               Meta Tag Checker
