@@ -6,13 +6,8 @@ import { ChevronDown } from "lucide-react";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
-/** Pinned in the top nav — keep out of the Tools list. */
-const PINNED_HREF = "/tools/domain-history";
-
 const dropdownTools = TOOL_CATALOG.filter(
-  (t) =>
-    t.href !== PINNED_HREF &&
-    (t.group === "growth" || t.group === "content")
+  (t) => t.group === "growth" || t.group === "content"
 );
 
 export function ToolsNavMenu() {
@@ -70,7 +65,7 @@ export function ToolsNavMenu() {
         role="menu"
         aria-hidden={!open}
         className={cn(
-          "absolute left-0 top-full z-50 w-52 pt-2 transition-[opacity,transform] duration-150 ease-out",
+          "absolute left-0 top-full z-50 w-56 pt-2 transition-[opacity,transform] duration-150 ease-out",
           open
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-1 opacity-0"

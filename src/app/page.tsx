@@ -9,45 +9,53 @@ import { HeroVisual } from "@/components/home/hero-visual";
 import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { HOME_FAQS } from "@/lib/home-faqs";
+import { cn } from "@/lib/utils";
 
+/** Public demo chips — skip first-party so the hero doesn’t look like self-promo. */
 const examples = [
-  "theseosoul.com",
   "stripe.com",
   "vercel.com",
   "github.com",
   "notion.so",
+  "cloudflare.com",
 ];
 
 const featuredTools = [
   {
     href: "/tools/domain-history",
-    title: "Domain history",
+    title: "Domain History",
     short: "Wayback chapters + WHOIS second-hand check",
+    mark: "DH",
   },
   {
     href: "/tools/seo-ladder",
-    title: "SEO site ladder",
+    title: "SEO ladder",
     short: "10 capability stages — not a dollar chart",
+    mark: "10",
   },
   {
     href: "/tools/adsense-readiness-checker",
     title: "AdSense readiness",
     short: "Trust pages, disclosures & content sample",
+    mark: "AD",
   },
   {
     href: "/tools/robots-txt-checker",
     title: "Robots.txt",
     short: "Crawl rules, sitemaps, AI bot blocks",
+    mark: "RB",
   },
   {
     href: "/tools/meta-tag-checker",
     title: "Meta tags",
     short: "Title, description & SERP preview",
+    mark: "MT",
   },
   {
     href: "/tools/geo-content-checker",
     title: "GEO content",
     short: "Citation-readiness for drafts",
+    mark: "GEO",
   },
 ] as const;
 
@@ -80,8 +88,10 @@ export default function HomePage() {
           <p className="animate-fade-up text-center">
             <SiteWordmark size="hero" withDomain className="justify-center" />
           </p>
-          <h1 className="animate-fade-up-delay mx-auto mt-4 max-w-xl text-center text-base text-slate-600 dark:text-slate-300 sm:text-lg">
-            Free website SEO checker — paste a URL, get a shareable audit report.
+          <h1 className="animate-fade-up-delay mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
+            Free website SEO checker — paste a URL for a shareable audit, scores
+            and fixes, plus a Site Soul profile that reads what kind of presence
+            the site has.
           </h1>
 
           <div className="animate-fade-up-delay-2 mt-8 w-full">
@@ -200,18 +210,29 @@ export default function HomePage() {
               All tools →
             </Link>
           </div>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {featuredTools.map((tool) => (
               <li key={tool.href}>
                 <Link
                   href={tool.href}
-                  className="group flex h-full flex-col rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/50 px-4 py-3.5 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:hover:border-teal-400/35"
+                  className="group flex h-full items-start gap-3 rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/50 px-3.5 py-3 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:hover:border-teal-400/35"
                 >
-                  <span className="font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
-                    {tool.title}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-mono text-[10px] font-bold tracking-wide",
+                      "bg-[#0b1220] text-teal-300 ring-1 ring-teal-900/30 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/25"
+                    )}
+                  >
+                    {tool.mark}
                   </span>
-                  <span className="mt-1 text-xs leading-snug text-slate-500">
-                    {tool.short}
+                  <span className="min-w-0">
+                    <span className="block font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
+                      {tool.title}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-snug text-slate-500">
+                      {tool.short}
+                    </span>
                   </span>
                 </Link>
               </li>
