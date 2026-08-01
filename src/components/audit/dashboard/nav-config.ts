@@ -22,11 +22,11 @@ export const AUDIT_NAV: NavItem[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "soul", label: "Site Soul", icon: Sparkles },
   { id: "issues", label: "Issues", icon: AlertTriangle },
+  { id: "domain", label: "Domain", icon: CalendarClock },
   { id: "structure", label: "Structure", icon: Layers3 },
   { id: "keywords", label: "Keywords", icon: Type },
   { id: "signals", label: "Signals", icon: FileSearch },
   { id: "geo", label: "GEO", icon: Globe2 },
-  { id: "domain", label: "Domain", icon: CalendarClock },
   { id: "insights", label: "Insights", icon: Globe2, locked: true },
 ];
 
