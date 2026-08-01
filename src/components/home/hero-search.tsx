@@ -10,7 +10,7 @@ import {
   HOME_AUDIT_HASH,
   HOME_AUDIT_INPUT_ID,
 } from "@/lib/focus-home-audit";
-import { normalizeUrl } from "@/lib/url";
+import { auditHref, normalizeUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 export function HeroSearch({
@@ -61,9 +61,9 @@ export function HeroSearch({
     setError(null);
 
     try {
-      const { domain } = normalizeUrl(value);
+      const normalized = normalizeUrl(value);
       startTransition(() => {
-        router.push(`/audit/${domain}`);
+        router.push(auditHref(normalized));
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Please enter a valid URL");
@@ -87,7 +87,7 @@ export function HeroSearch({
               name="url"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="shopify.com or https://example.com"
+              placeholder="example.com or https://example.com/blog"
               className={cn("pl-11", size === "lg" && "h-14 text-base")}
               autoComplete="url"
               inputMode="url"
@@ -120,7 +120,11 @@ export function HeroSearch({
           >
             {error}
           </p>
-        ) : null}
+        ) : (
+          <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-left">
+            Audits the exact URL you paste — homepage or a specific path.
+          </p>
+        )}
       </form>
     </div>
   );

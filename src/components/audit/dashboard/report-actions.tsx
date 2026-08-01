@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Download, Link2, Share2 } from "lucide-react";
+import { Check, Copy, Download, Link2, Printer, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   getPrimaryAction,
   getSoulProfile,
 } from "@/lib/audit/soul";
 import type { AuditResult } from "@/lib/audit/types";
-import { auditCanonicalUrl } from "@/lib/url";
+import { auditCanonicalUrl, auditShareSlug } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 type FlashKind = "link" | "json" | "summary";
@@ -38,6 +38,8 @@ async function writeClipboard(text: string): Promise<boolean> {
 export function ReportActions({ audit }: { audit: AuditResult }) {
   const [copied, setCopied] = useState<FlashKind | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const shareUrl = auditCanonicalUrl(audit);
+  const slug = auditShareSlug(audit);
 
   function flash(kind: FlashKind) {
     setCopied(kind);
@@ -51,7 +53,7 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
   }
 
   async function copyLink() {
-    const ok = await writeClipboard(auditCanonicalUrl(audit.domain));
+    const ok = await writeClipboard(shareUrl);
     if (ok) flash("link");
     else fail("Couldn’t copy link — select the URL bar instead.");
   }
@@ -60,7 +62,7 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
     const soul = getSoulProfile(audit);
     const priority = getPrimaryAction(audit);
     const lines = [
-      `TheSeoSoul SEO Audit — ${audit.domain}`,
+      `TheSeoSoul SEO Audit — ${slug}`,
       `Score: ${audit.score}/100 (Grade ${audit.grade})`,
       `Site Soul: ${soul.name}`,
       soul.message,
@@ -73,6 +75,7 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
       `GEO: ${audit.geo.score}/100`,
       `Issues: ${audit.issues.length}`,
       `Fetched: ${audit.fetchedAt}`,
+      `Report: ${shareUrl}`,
     ];
     const ok = await writeClipboard(lines.join("\n"));
     if (ok) flash("summary");
@@ -80,18 +83,16 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
   }
 
   async function share() {
-    const url = auditCanonicalUrl(audit.domain);
     const soul = getSoulProfile(audit);
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${audit.domain} SEO Audit`,
-          text: `${audit.domain} scored ${audit.score}/100 (${audit.grade}). Site Soul: ${soul.name} — ${soul.message}`,
-          url,
+          title: `${slug} SEO Audit`,
+          text: `${slug} scored ${audit.score}/100 (${audit.grade}). Site Soul: ${soul.name} — ${soul.message}`,
+          url: shareUrl,
         });
         return;
       } catch (err) {
-        // User dismissed the sheet — don't treat as failure.
         if (err instanceof DOMException && err.name === "AbortError") return;
       }
     }
@@ -105,14 +106,18 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
     const href = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = href;
-    a.download = `${audit.domain}-seo-audit.json`;
+    a.download = `${slug.replace(/\//g, "-")}-seo-audit.json`;
     a.click();
     URL.revokeObjectURL(href);
     flash("json");
   }
 
+  function printReport() {
+    window.print();
+  }
+
   return (
-    <div className="relative flex items-center gap-0.5">
+    <div className="relative flex items-center gap-0.5 no-print">
       <Button
         variant="ghost"
         size="icon"
@@ -154,6 +159,16 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
         ) : (
           <Copy className="h-4 w-4" />
         )}
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={printReport}
+        aria-label="Print or save as PDF"
+        title="Print / PDF"
+        className="h-9 w-9 sm:h-8 sm:w-8"
+      >
+        <Printer className="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"

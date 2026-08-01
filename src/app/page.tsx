@@ -84,7 +84,7 @@ export default function HomePage() {
           </div>
 
           <p className="animate-fade-up-delay-2 mt-4 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
-            Free · No signup · Shareable /audit/[domain] reports
+            Free · No signup · Shareable /audit/… reports · homepage or path
           </p>
 
           <div className="animate-fade-up-delay-2 mt-5 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">

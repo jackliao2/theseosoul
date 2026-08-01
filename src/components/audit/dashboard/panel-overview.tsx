@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { ArrowRight, CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
 import { CharBadge } from "@/components/audit/dashboard/char-badge";
 import { ScoreRing } from "@/components/ui/score-ring";
+import { PanelNextSteps } from "@/components/audit/dashboard/panel-next-steps";
 import {
   getPrimaryAction,
   getSoulProfile,
@@ -85,9 +86,13 @@ function attentionItems(audit: AuditResult): Array<{
 export function PanelOverview({
   audit,
   onSelectTab,
+  onReaudit,
+  isRefreshing,
 }: {
   audit: AuditResult;
   onSelectTab: (id: AuditTabId) => void;
+  onReaudit: () => void;
+  isRefreshing?: boolean;
 }) {
   const critical = audit.issues.filter((i) => i.severity === "critical").length;
   const warnings = audit.issues.filter((i) => i.severity === "warning").length;
@@ -189,6 +194,13 @@ export function PanelOverview({
           ))}
         </ul>
       </div>
+
+      <PanelNextSteps
+        audit={audit}
+        onSelectTab={onSelectTab}
+        onReaudit={onReaudit}
+        isRefreshing={isRefreshing}
+      />
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,.92fr)] lg:items-start">
         <div className="space-y-3">

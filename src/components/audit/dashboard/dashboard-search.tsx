@@ -4,7 +4,7 @@ import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { normalizeUrl } from "@/lib/url";
+import { auditHref, normalizeUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 export function DashboardSearch({
@@ -27,8 +27,8 @@ export function DashboardSearch({
     event.preventDefault();
     setError(null);
     try {
-      const { domain } = normalizeUrl(value || currentDomain);
-      startTransition(() => router.push(`/audit/${domain}`));
+      const normalized = normalizeUrl(value || currentDomain);
+      startTransition(() => router.push(auditHref(normalized)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid URL");
     }
@@ -59,7 +59,7 @@ export function DashboardSearch({
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Audit another site…"
+        placeholder="Domain or full URL…"
         className="h-8 pl-9 text-sm sm:h-9"
         disabled={isPending}
         aria-label="Audit another website"

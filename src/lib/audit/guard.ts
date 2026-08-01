@@ -6,13 +6,15 @@ import {
 } from "@/lib/audit/cache";
 import { checkAuditRateLimit } from "@/lib/audit/limit";
 import type { AuditResponse, AuditResult } from "@/lib/audit/types";
-import { domainFromParam, normalizeUrl } from "@/lib/url";
+import { auditCacheKey, domainFromParam, normalizeUrl } from "@/lib/url";
 
 function resolveDomain(input: string): { domain: string; url: string | null } {
   try {
-    const normalized = input.includes("/")
-      ? normalizeUrl(input)
-      : domainFromParam(input);
+    // Bare host ("example.com") has no slash; full URLs and host/path do.
+    const normalized =
+      input.includes("/") || /^https?:\/\//i.test(input)
+        ? normalizeUrl(input)
+        : domainFromParam(input);
     return { domain: normalized.domain, url: normalized.url };
   } catch {
     return { domain: input.trim() || "unknown", url: null };
@@ -32,7 +34,7 @@ export async function runGuardedAudit(
 
   // Only rate-limit when the input looks like a domain we would actually audit.
   if (domain.includes(".")) {
-    const cacheKey = `audit:${domain.toLowerCase().replace(/^www\./, "")}`;
+    const cacheKey = auditCacheKey(url ?? `https://${domain}/`, domain);
     if (!opts?.fresh) {
       const cached = cacheGet<AuditResult>(cacheKey);
       if (cached) return cached;
@@ -53,7 +55,8 @@ export async function runGuardedAudit(
       };
     }
 
-    const result = await runAudit(input);
+    // Prefer the normalized URL so path audits fetch the requested page.
+    const result = await runAudit(url ?? input);
     if (result.success) {
       cacheSet(cacheKey, result, AUDIT_CACHE_TTL_MS);
     }

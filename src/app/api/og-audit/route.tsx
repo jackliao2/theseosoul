@@ -1,23 +1,17 @@
 import { ImageResponse } from "next/og";
-import { domainFromParam } from "@/lib/url";
+import { NextRequest } from "next/server";
 
 export const runtime = "edge";
-export const alt = "TheSeoSoul SEO Audit";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
 
-type Props = {
-  params: Promise<{ domain: string }>;
-};
-
-export default async function AuditTwitterImage({ params }: Props) {
-  const { domain: raw } = await params;
-  let domain = raw;
+export async function GET(request: NextRequest) {
+  const raw = request.nextUrl.searchParams.get("target") ?? "site";
+  let label = raw;
   try {
-    domain = domainFromParam(raw).domain;
+    label = decodeURIComponent(raw);
   } catch {
-    domain = decodeURIComponent(raw);
+    /* keep raw */
   }
+  const display = label.length > 48 ? `${label.slice(0, 45)}…` : label;
 
   return new ImageResponse(
     (
@@ -65,13 +59,13 @@ export default async function AuditTwitterImage({ params }: Props) {
           <div
             style={{
               display: "flex",
-              fontSize: 56,
+              fontSize: display.length > 28 ? 40 : 56,
               fontWeight: 800,
               letterSpacing: -1,
               maxWidth: 1000,
             }}
           >
-            {domain}
+            {display}
           </div>
           <div
             style={{
@@ -91,10 +85,10 @@ export default async function AuditTwitterImage({ params }: Props) {
             color: "#94a3b8",
           }}
         >
-          Discover what helps this site get found · theseosoul.com/audit/{domain}
+          theseosoul.com/audit/{display}
         </div>
       </div>
     ),
-    { ...size }
+    { width: 1200, height: 630 }
   );
 }

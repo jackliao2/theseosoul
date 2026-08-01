@@ -18,9 +18,10 @@ import { DashboardSearch } from "@/components/audit/dashboard/dashboard-search";
 import { ReportActions } from "@/components/audit/dashboard/report-actions";
 import { PanelRelatedTools } from "@/components/audit/dashboard/panel-related-tools";
 import { resolveAuditTabId } from "@/components/audit/dashboard/nav-config";
-import { rememberRecentDomain } from "@/components/home/recent-audits";
+import { rememberRecentAudit } from "@/components/home/recent-audits";
 import { Button } from "@/components/ui/button";
 import type { AuditResult, AuditTabId } from "@/lib/audit/types";
+import { auditShareSlug } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 export function AuditDashboard({ audit }: { audit: AuditResult }) {
@@ -39,8 +40,8 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
   }, [tabParam]);
 
   useEffect(() => {
-    rememberRecentDomain(audit.domain);
-  }, [audit.domain]);
+    rememberRecentAudit(auditShareSlug(audit));
+  }, [audit]);
 
   const selectTab = useCallback(
     (id: AuditTabId) => {
@@ -64,8 +65,8 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-white dark:bg-slate-950">
-      <div className="hidden md:block">
+    <div className="audit-report flex h-[calc(100vh-3.5rem)] overflow-hidden bg-white dark:bg-slate-950 print:h-auto print:overflow-visible">
+      <div className="hidden md:block no-print">
         <SidebarNav active={active} onSelect={selectTab} />
       </div>
 
@@ -84,12 +85,12 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-slate-200 dark:border-slate-800">
+        <header className="shrink-0 border-b border-slate-200 dark:border-slate-800 print:border-b-0">
           <div className="flex items-center gap-2 px-2.5 py-2 sm:px-3">
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 md:hidden"
+              className="h-8 w-8 shrink-0 md:hidden no-print"
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open menu"
             >
@@ -98,7 +99,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
 
             <div className="min-w-0 flex-1">
               <h1 className="truncate font-display text-sm font-bold text-slate-900 dark:text-white">
-                {audit.domain}
+                {auditShareSlug(audit)}
               </h1>
               <p className="text-[11px] tabular-nums text-slate-500">
                 <span
@@ -119,19 +120,19 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
               </p>
             </div>
 
-            <div className="hidden min-w-0 flex-1 justify-center sm:flex md:max-w-xs lg:max-w-md">
+            <div className="hidden min-w-0 flex-1 justify-center sm:flex md:max-w-xs lg:max-w-md no-print">
               <DashboardSearch currentDomain={audit.domain} />
             </div>
 
             <div className="flex shrink-0 items-center gap-0.5">
-              <div className="sm:hidden">
+              <div className="sm:hidden no-print">
                 <DashboardSearch currentDomain={audit.domain} compact />
               </div>
               <ReportActions audit={audit} />
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 no-print"
                 aria-label="Refresh audit"
                 onClick={onRefresh}
                 disabled={isRefreshing}
@@ -144,7 +145,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
                 asChild
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 no-print"
                 aria-label="Close"
               >
                 <Link href="/">
@@ -158,11 +159,13 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
         <div
           className={cn(
             "min-h-0 flex-1 px-4 py-3 sm:px-5",
-            "overflow-y-auto"
+            "overflow-y-auto print:overflow-visible print:h-auto"
           )}
         >
-          {renderPanel(active, audit, selectTab)}
-          <PanelRelatedTools tab={active} />
+          {renderPanel(active, audit, selectTab, onRefresh, isRefreshing)}
+          <div className="no-print">
+            <PanelRelatedTools tab={active} />
+          </div>
         </div>
       </div>
     </div>
@@ -172,11 +175,20 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
 function renderPanel(
   active: AuditTabId,
   audit: AuditResult,
-  onSelectTab: (id: AuditTabId) => void
+  onSelectTab: (id: AuditTabId) => void,
+  onReaudit: () => void,
+  isRefreshing: boolean
 ) {
   switch (active) {
     case "overview":
-      return <PanelOverview audit={audit} onSelectTab={onSelectTab} />;
+      return (
+        <PanelOverview
+          audit={audit}
+          onSelectTab={onSelectTab}
+          onReaudit={onReaudit}
+          isRefreshing={isRefreshing}
+        />
+      );
     case "soul":
       return <PanelSoul audit={audit} onSelectTab={onSelectTab} />;
     case "issues":
@@ -199,6 +211,13 @@ function renderPanel(
         />
       );
     default:
-      return <PanelOverview audit={audit} onSelectTab={onSelectTab} />;
+      return (
+        <PanelOverview
+          audit={audit}
+          onSelectTab={onSelectTab}
+          onReaudit={onReaudit}
+          isRefreshing={isRefreshing}
+        />
+      );
   }
 }

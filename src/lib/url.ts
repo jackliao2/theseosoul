@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/audit/types";
 /**
  * Normalize a user-provided URL or bare domain into a canonical https URL.
  * Handles missing protocol, trailing slashes, and lowercase hostnames.
+ * Preserves path and query (hash stripped).
  */
 export function normalizeUrl(input: string): {
   url: string;
@@ -65,7 +66,47 @@ export function normalizeUrl(input: string): {
 }
 
 /**
- * Convert a route param like "shopify.com" or "www.shopify.com" into audit inputs.
+ * Shareable audit path segment(s) after /audit/
+ * e.g. "stripe.com" or "stripe.com/docs"
+ * Query strings are omitted from the pretty share URL (path is enough for SEO tests).
+ */
+export function auditShareSlug(input: {
+  domain: string;
+  url: string;
+}): string {
+  try {
+    const parsed = new URL(input.url);
+    const pathname =
+      parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/+$/, "");
+    const domain = input.domain.replace(/^www\./, "");
+    return pathname ? `${domain}${pathname}` : domain;
+  } catch {
+    return input.domain.replace(/^www\./, "");
+  }
+}
+
+/** Absolute canonical report URL for sharing / metadata. */
+export function auditCanonicalUrl(
+  input: string | { domain: string; url: string }
+): string {
+  if (typeof input === "string") {
+    const domain = input.replace(/^www\./, "");
+    return `${SITE_URL}/audit/${domain}`;
+  }
+  return `${SITE_URL}/audit/${auditShareSlug(input)}`;
+}
+
+/** Client/router path: /audit/example.com or /audit/example.com/blog */
+export function auditHref(input: {
+  domain: string;
+  url: string;
+}): string {
+  return `/audit/${auditShareSlug(input)}`;
+}
+
+/**
+ * Convert a route param like "shopify.com" into audit inputs.
+ * Prefer {@link targetFromSegments} for catch-all routes.
  */
 export function domainFromParam(param: string): {
   url: string;
@@ -76,8 +117,20 @@ export function domainFromParam(param: string): {
   return normalizeUrl(decoded);
 }
 
-export function auditCanonicalUrl(domain: string): string {
-  return `${SITE_URL}/audit/${domain.replace(/^www\./, "")}`;
+/** Join catch-all [...target] segments into a normalizable host[/path]. */
+export function targetFromSegments(segments: string[]): {
+  url: string;
+  domain: string;
+  hostname: string;
+} {
+  if (!segments.length) {
+    throw new Error("URL is required");
+  }
+  const joined = segments
+    .map((s) => decodeURIComponent(s).trim())
+    .filter(Boolean)
+    .join("/");
+  return normalizeUrl(joined);
 }
 
 export function isValidDomainParam(param: string): boolean {
@@ -86,5 +139,27 @@ export function isValidDomainParam(param: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+export function isValidAuditTarget(segments: string[]): boolean {
+  try {
+    targetFromSegments(segments);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Cache key must distinguish path audits on the same host. */
+export function auditCacheKey(url: string, domain: string): string {
+  try {
+    const parsed = new URL(url);
+    const path =
+      parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/+$/, "");
+    const search = parsed.search;
+    return `audit:${domain.toLowerCase()}${path}${search}`;
+  } catch {
+    return `audit:${domain.toLowerCase()}`;
   }
 }

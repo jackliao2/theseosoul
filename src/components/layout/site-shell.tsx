@@ -11,10 +11,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <Header compact={isAudit} />
+      <div className="no-print">
+        <Header compact={isAudit} />
+      </div>
       <main className="flex-1">{children}</main>
       {/* Keep footer on audit reports so curated examples still pass PageRank to About/Tools/Contact. */}
-      <Footer />
+      <div className="no-print">
+        <Footer />
+      </div>
     </>
   );
 }

@@ -182,3 +182,31 @@
     animation: audit-loading-bar 1.35s ease-in-out infinite;
   }
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .audit-report {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .audit-report a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* Prefer a compact Overview print: hide sticky chrome */
+  header.sticky,
+  footer {
+    display: none !important;
+  }
+}
+

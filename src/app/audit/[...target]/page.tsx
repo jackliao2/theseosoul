@@ -9,12 +9,13 @@ import { isIndexableAuditDomain } from "@/lib/audit/store";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import {
   auditCanonicalUrl,
-  domainFromParam,
-  isValidDomainParam,
+  auditShareSlug,
+  isValidAuditTarget,
+  targetFromSegments,
 } from "@/lib/url";
 
 type PageProps = {
-  params: Promise<{ domain: string }>;
+  params: Promise<{ target: string[] }>;
   searchParams: Promise<{ t?: string; tab?: string }>;
 };
 
@@ -27,19 +28,25 @@ export const maxDuration = 60;
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { domain: raw } = await params;
-  let domain = raw;
+  const { target } = await params;
+  let domain = target[0] ?? "site";
+  let label = domain;
+  let canonical = `${SITE_URL}/audit/${domain}`;
 
   try {
-    domain = domainFromParam(raw).domain;
+    const normalized = targetFromSegments(target);
+    domain = normalized.domain;
+    const slug = auditShareSlug(normalized);
+    label = slug;
+    canonical = auditCanonicalUrl(normalized);
   } catch {
-    domain = decodeURIComponent(raw);
+    label = target.map((s) => decodeURIComponent(s)).join("/");
   }
 
-  const title = `${domain} SEO Audit & Technical Analysis | ${SITE_NAME}`;
-  const description = `Free technical SEO audit for ${domain}: on-page SEO, structure, GEO, TLS, DNS, and shareable /audit report.`;
-  const canonical = auditCanonicalUrl(domain);
-  const indexable = isIndexableAuditDomain(domain);
+  const title = `${label} SEO Audit & Technical Analysis | ${SITE_NAME}`;
+  const description = `Free technical SEO audit for ${label}: on-page SEO, structure, GEO, TLS, DNS, and shareable /audit report.`;
+  const indexable = isIndexableAuditDomain(domain) && !label.includes("/");
+  const ogImage = `${SITE_URL}/api/og-audit?target=${encodeURIComponent(label)}`;
 
   return {
     title: { absolute: title },
@@ -54,31 +61,35 @@ export async function generateMetadata({
       url: canonical,
       siteName: SITE_NAME,
       type: "article",
+      images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [ogImage],
     },
   };
 }
 
-export default async function AuditDomainPage({
+export default async function AuditTargetPage({
   params,
   searchParams,
 }: PageProps) {
-  const { domain: raw } = await params;
+  const { target } = await params;
   const sp = await searchParams;
+  const rawLabel = target.map((s) => decodeURIComponent(s)).join("/");
 
-  if (!isValidDomainParam(raw)) {
+  if (!isValidAuditTarget(target)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <AuditError
           error={{
             success: false,
-            domain: decodeURIComponent(raw),
+            domain: rawLabel,
             url: null,
-            error: "Please provide a valid public domain (e.g. shopify.com).",
+            error:
+              "Please provide a valid public URL (e.g. shopify.com or example.com/blog).",
             code: "INVALID_URL",
           }}
         />
@@ -86,22 +97,26 @@ export default async function AuditDomainPage({
     );
   }
 
-  const { domain } = domainFromParam(raw);
+  const normalized = targetFromSegments(target);
   const h = await headers();
-  const audit = await runGuardedAudit(domain, clientIpFromHeaders(h), {
-    fresh: Boolean(sp.t),
-  });
+  const audit = await runGuardedAudit(
+    normalized.url,
+    clientIpFromHeaders(h),
+    { fresh: Boolean(sp.t) }
+  );
 
   if (!audit.success) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <AuditError error={audit} />
         <p className="mt-4 text-center text-xs text-slate-500">
-          Canonical: {SITE_URL}/audit/{domain}
+          Canonical: {auditCanonicalUrl(normalized)}
         </p>
       </div>
     );
   }
+
+  const share = auditCanonicalUrl(audit);
 
   return (
     <>
@@ -111,12 +126,16 @@ export default async function AuditDomainPage({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: `${audit.domain} SEO Audit & Technical Analysis`,
+            headline: `${auditShareSlug(audit)} SEO Audit & Technical Analysis`,
             description: audit.summary,
             dateModified: audit.fetchedAt,
             author: { "@type": "Organization", name: SITE_NAME },
-            publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-            mainEntityOfPage: auditCanonicalUrl(audit.domain),
+            publisher: {
+              "@type": "Organization",
+              name: SITE_NAME,
+              url: SITE_URL,
+            },
+            mainEntityOfPage: share,
             about: audit.url,
           }),
         }}
