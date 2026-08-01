@@ -69,28 +69,36 @@ function ToolTile({
   href,
   title,
   short,
+  mark,
 }: {
   href: string;
   title: string;
   short: string;
+  mark: string;
 }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col justify-between rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/60 px-4 py-3.5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/40 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/35 dark:hover:bg-teal-400/[0.06]"
+      className="group flex h-full items-start gap-3 rounded-lg border border-slate-300/70 bg-[color:var(--surface)]/60 px-3.5 py-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/40 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/35 dark:hover:bg-teal-400/[0.06]"
     >
-      <div>
+      <span
+        aria-hidden
+        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#0b1220] font-mono text-xs font-bold tracking-wide text-teal-300 ring-1 ring-teal-900/30 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/25"
+      >
+        {mark}
+      </span>
+      <div className="min-w-0 flex-1">
         <h3 className="font-display text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
           {title}
         </h3>
-        <p className="mt-1 text-xs leading-snug text-slate-500 dark:text-slate-400">
+        <p className="mt-0.5 text-xs leading-snug text-slate-500 dark:text-slate-400">
           {short}
         </p>
+        <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 opacity-80 transition-opacity group-hover:opacity-100 dark:text-teal-300">
+          Open
+          <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
       </div>
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 opacity-80 transition-opacity group-hover:opacity-100 dark:text-teal-300">
-        Open
-        <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-      </span>
     </Link>
   );
 }

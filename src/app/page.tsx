@@ -9,6 +9,7 @@ import { HeroVisual } from "@/components/home/hero-visual";
 import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { HOME_FAQS } from "@/lib/home-faqs";
+import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
 /** Public demo chips — skip first-party so the hero doesn’t look like self-promo. */
@@ -20,44 +21,24 @@ const examples = [
   "cloudflare.com",
 ];
 
-const featuredTools = [
-  {
-    href: "/tools/domain-history",
-    title: "Domain History",
-    short: "Wayback chapters + WHOIS second-hand check",
-    mark: "DH",
-  },
-  {
-    href: "/tools/seo-ladder",
-    title: "SEO ladder",
-    short: "10 capability stages — not a dollar chart",
-    mark: "10",
-  },
-  {
-    href: "/tools/adsense-readiness-checker",
-    title: "AdSense readiness",
-    short: "Trust pages, disclosures & content sample",
-    mark: "AD",
-  },
-  {
-    href: "/tools/robots-txt-checker",
-    title: "Robots.txt",
-    short: "Crawl rules, sitemaps, AI bot blocks",
-    mark: "RB",
-  },
-  {
-    href: "/tools/meta-tag-checker",
-    title: "Meta tags",
-    short: "Title, description & SERP preview",
-    mark: "MT",
-  },
-  {
-    href: "/tools/geo-content-checker",
-    title: "GEO content",
-    short: "Citation-readiness for drafts",
-    mark: "GEO",
-  },
+const featuredToolHrefs = [
+  "/tools/domain-history",
+  "/tools/seo-ladder",
+  "/tools/adsense-readiness-checker",
+  "/tools/robots-txt-checker",
+  "/tools/meta-tag-checker",
+  "/tools/geo-content-checker",
 ] as const;
+
+const featuredTools = featuredToolHrefs.map((href) => {
+  const tool = TOOL_CATALOG.find((t) => t.href === href)!;
+  return {
+    href: tool.href,
+    title: tool.nav,
+    short: tool.short,
+    mark: tool.mark,
+  };
+});
 
 export default function HomePage() {
   const faqJsonLd = {
