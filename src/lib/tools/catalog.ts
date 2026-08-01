@@ -24,7 +24,7 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
   {
     href: "/tools/domain-history",
     title: "Domain History Checker",
-    nav: "Domain History",
+    nav: "Domain History Checker",
     short: "Wayback chapters + WHOIS second-hand check",
     group: "growth",
     mark: "DH",
