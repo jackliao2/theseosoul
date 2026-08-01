@@ -301,8 +301,19 @@ export function PanelOverview({
                 value={audit.robotsMeta.content ?? "index, follow"}
               />
               <Fact
-                label="X-Robots-Tag"
-                value={audit.tech.xRobotsTag ?? "Not set"}
+                label="Redirects"
+                value={
+                  audit.extras.redirectChain.length > 1
+                    ? `${audit.extras.redirectChain.length} hops`
+                    : "None"
+                }
+                tone={
+                  audit.extras.redirectChain.length > 3
+                    ? "bad"
+                    : audit.extras.redirectChain.length > 1
+                      ? undefined
+                      : "good"
+                }
               />
               <Fact
                 label="robots.txt"
