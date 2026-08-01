@@ -41,6 +41,14 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/blog"
+                className="hover:text-teal-700 dark:hover:text-teal-300"
+              >
+                Guides & blog
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/tools/domain-history"
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
@@ -61,6 +69,22 @@ export function Footer() {
                 className="hover:text-teal-700 dark:hover:text-teal-300"
               >
                 AdSense readiness
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/tools/sitemap-checker"
+                className="hover:text-teal-700 dark:hover:text-teal-300"
+              >
+                Sitemap checker
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/tools/ssl-checker"
+                className="hover:text-teal-700 dark:hover:text-teal-300"
+              >
+                SSL days checker
               </Link>
             </li>
             <li>

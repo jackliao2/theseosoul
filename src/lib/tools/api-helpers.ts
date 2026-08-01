@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAuditRateLimit, clientIpFromHeaders } from "@/lib/audit/limit";
+import { captureException } from "@/lib/monitoring";
 import { normalizeUrl } from "@/lib/url";
+
+/** Report tool failures (timeouts / fetch errors) when monitoring is configured. */
+export async function reportToolFailure(
+  tool: string,
+  error: unknown,
+  context?: Record<string, unknown>
+): Promise<void> {
+  await captureException(error, { tool, ...context });
+}
 
 export function parseToolUrl(request: NextRequest):
   | { ok: true; url: string; domain: string; hostname: string }

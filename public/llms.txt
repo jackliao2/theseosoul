@@ -4,6 +4,7 @@
 ## Site
 - Homepage: https://theseosoul.com/
 - Free tools: https://theseosoul.com/tools
+- Guides & blog: https://theseosoul.com/blog
 - About (incl. Site Soul): https://theseosoul.com/about
 - About · Site Soul archetypes: https://theseosoul.com/about#site-soul
 - Contact: https://theseosoul.com/contact
@@ -20,6 +21,9 @@
 - AdSense readiness: https://theseosoul.com/tools/adsense-readiness-checker
 - Domain history (Wayback + WHOIS): https://theseosoul.com/tools/domain-history
 - SEO site ladder (10 capability stages): https://theseosoul.com/tools/seo-ladder
+- Sitemap checker: https://theseosoul.com/tools/sitemap-checker
+- Security headers checker: https://theseosoul.com/tools/security-headers-checker
+- SSL days checker: https://theseosoul.com/tools/ssl-checker
 - Robots.txt checker: https://theseosoul.com/tools/robots-txt-checker
 - Meta tag checker: https://theseosoul.com/tools/meta-tag-checker
 - Canonical checker: https://theseosoul.com/tools/canonical-checker
@@ -28,6 +32,15 @@
 - Noindex checker: https://theseosoul.com/tools/noindex-checker
 - Redirect checker: https://theseosoul.com/tools/redirect-checker
 - GEO content checker: https://theseosoul.com/tools/geo-content-checker
+
+## Guides (high-signal)
+- Technical SEO checklist before launch: https://theseosoul.com/blog/technical-seo-checklist-before-launch
+- robots.txt vs noindex vs canonical: https://theseosoul.com/blog/robots-txt-vs-noindex-vs-canonical
+- GEO and llms.txt: https://theseosoul.com/blog/geo-llms-txt-practical-guide
+- Domain history before you buy: https://theseosoul.com/blog/domain-history-before-you-buy
+- XML sitemaps that help: https://theseosoul.com/blog/xml-sitemaps-that-actually-help
+- SSL & security headers: https://theseosoul.com/blog/ssl-and-security-headers-for-seo
+- AdSense readiness checklist: https://theseosoul.com/blog/adsense-readiness-honest-checklist
 
 ## Contact
 - Email: hello@theseosoul.com

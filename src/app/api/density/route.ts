@@ -8,6 +8,7 @@ import { FetchTimeoutError, fetchHtml } from "@/lib/audit/fetch";
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 
 export const runtime = "nodejs";
@@ -53,6 +54,10 @@ export async function GET(request: NextRequest) {
       trigrams: topNgrams(density.byNgram, 3),
     });
   } catch (error) {
+    await reportToolFailure("density", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {

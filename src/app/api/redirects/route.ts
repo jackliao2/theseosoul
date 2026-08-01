@@ -4,6 +4,7 @@ import {
   traceRedirects,
 } from "@/lib/audit/fetch";
 import { clientIpFromHeaders, checkAuditRateLimit } from "@/lib/audit/limit";
+import { reportToolFailure } from "@/lib/tools/api-helpers";
 import { normalizeUrl } from "@/lib/url";
 
 export const runtime = "nodejs";
@@ -62,6 +63,10 @@ export async function GET(request: NextRequest) {
             : "No redirect hops — request landed on the start URL.",
     });
   } catch (error) {
+    await reportToolFailure("redirects", error, {
+      domain: normalized.domain,
+      url: normalized.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {

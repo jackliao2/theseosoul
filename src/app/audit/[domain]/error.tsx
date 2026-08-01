@@ -13,7 +13,12 @@ export default function AuditErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    void import("@/lib/monitoring").then(({ captureException }) =>
+      captureException(error, {
+        digest: error.digest,
+        boundary: "audit/error",
+      })
+    );
   }, [error]);
 
   return (

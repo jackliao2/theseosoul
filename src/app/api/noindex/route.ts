@@ -6,6 +6,7 @@ import {
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 
 export const runtime = "nodejs";
@@ -23,6 +24,10 @@ export async function GET(request: NextRequest) {
     const result = await checkNoindex(parsed.url, parsed.domain);
     return NextResponse.json(result);
   } catch (error) {
+    await reportToolFailure("noindex", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runGuardedAudit } from "@/lib/audit/guard";
 import { clientIpFromHeaders } from "@/lib/audit/limit";
+import { captureException, captureMessage } from "@/lib/monitoring";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +14,25 @@ function statusFor(result: Awaited<ReturnType<typeof runGuardedAudit>>): number 
   if (result.code === "RATE_LIMITED") return 429;
   if (result.code === "TIMEOUT") return 504;
   return 502;
+}
+
+async function reportAuditFailure(
+  result: Awaited<ReturnType<typeof runGuardedAudit>>,
+  url: string
+): Promise<void> {
+  if (result.success) return;
+  if (result.code === "INVALID_URL" || result.code === "RATE_LIMITED") return;
+  const extra = {
+    code: result.code,
+    domain: result.domain,
+    url,
+    error: result.error,
+  };
+  if (result.code === "TIMEOUT") {
+    await captureMessage(`Audit timeout: ${result.domain || url}`, extra);
+    return;
+  }
+  await captureException(new Error(result.error || "Audit failed"), extra);
 }
 
 export async function GET(request: NextRequest) {
@@ -35,6 +55,7 @@ export async function GET(request: NextRequest) {
     url,
     clientIpFromHeaders(request.headers)
   );
+  await reportAuditFailure(result, url);
   const response = NextResponse.json(result, { status: statusFor(result) });
   if (!result.success && result.code === "RATE_LIMITED") {
     response.headers.set("Retry-After", "60");
@@ -85,6 +106,7 @@ export async function POST(request: NextRequest) {
     url,
     clientIpFromHeaders(request.headers)
   );
+  await reportAuditFailure(result, url);
   const response = NextResponse.json(result, { status: statusFor(result) });
   if (!result.success && result.code === "RATE_LIMITED") {
     response.headers.set("Retry-After", "60");

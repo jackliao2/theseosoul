@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 import { checkDomainHistory } from "@/lib/tools/check-domain-history";
 
@@ -20,6 +21,10 @@ export async function GET(request: NextRequest) {
     const result = await checkDomainHistory(parsed.domain);
     return NextResponse.json(result);
   } catch (error) {
+    await reportToolFailure("domain-history", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     return NextResponse.json(
       {
         success: false,

@@ -5,6 +5,7 @@ import { parseCanonical } from "@/lib/audit/parse";
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 
 export const runtime = "nodejs";
@@ -68,6 +69,10 @@ export async function GET(request: NextRequest) {
             : "Canonical differs from the final URL — common for www/HTTPS or pagination.",
     });
   } catch (error) {
+    await reportToolFailure("canonical", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {

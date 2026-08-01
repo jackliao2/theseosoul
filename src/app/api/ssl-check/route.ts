@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeRobots } from "@/lib/audit/robots";
+import { checkSsl, FetchTimeoutError } from "@/lib/tools/check-ssl";
 import {
   enforceToolRateLimit,
   parseToolUrl,
@@ -18,27 +18,25 @@ export async function GET(request: NextRequest) {
   if (limited) return limited;
 
   try {
-    const origin = new URL(parsed.url).origin;
-    const robots = await analyzeRobots(origin);
-
-    return NextResponse.json({
-      success: true,
-      domain: parsed.domain,
-      origin,
-      ...robots,
-    });
+    const result = await checkSsl(
+      parsed.url,
+      parsed.domain,
+      parsed.hostname
+    );
+    return NextResponse.json(result);
   } catch (error) {
-    await reportToolFailure("robots", error, {
+    await reportToolFailure("ssl-check", error, {
       domain: parsed.domain,
       url: parsed.url,
     });
+    const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {
         success: false,
         error:
-          error instanceof Error ? error.message : "Failed to fetch robots.txt",
+          error instanceof Error ? error.message : "Failed to check SSL/TLS",
       },
-      { status: 502 }
+      { status: timedOut ? 504 : 502 }
     );
   }
 }

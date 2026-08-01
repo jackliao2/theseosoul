@@ -22,11 +22,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Push to GitHub → Vercel imports the repo (Next.js defaults). No required env vars.
 
-Optional later:
+Optional:
 
 | Env | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical site URL after custom domain, e.g. `https://theseosoul.com` |
+| `SENTRY_DSN` or `NEXT_PUBLIC_SENTRY_DSN` | Optional Sentry DSN — reports audit timeouts/failures and tool API errors. No-op when unset. |
 
 ## API
 

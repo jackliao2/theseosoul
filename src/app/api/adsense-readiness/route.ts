@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 import { checkAdsenseReadiness } from "@/lib/tools/check-adsense-readiness";
 
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
     const result = await checkAdsenseReadiness(origin, parsed.domain);
     return NextResponse.json(result);
   } catch (error) {
+    await reportToolFailure("adsense-readiness", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     return NextResponse.json(
       {
         success: false,

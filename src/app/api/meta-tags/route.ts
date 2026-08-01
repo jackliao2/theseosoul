@@ -9,6 +9,7 @@ import {
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 
 export const runtime = "nodejs";
@@ -60,6 +61,10 @@ export async function GET(request: NextRequest) {
           : `${issues.length} issue(s) to review on title/description.`,
     });
   } catch (error) {
+    await reportToolFailure("meta-tags", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {

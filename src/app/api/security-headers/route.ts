@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeRobots } from "@/lib/audit/robots";
+import {
+  checkSecurityHeaders,
+  FetchTimeoutError,
+} from "@/lib/tools/check-security-headers";
 import {
   enforceToolRateLimit,
   parseToolUrl,
@@ -18,27 +21,23 @@ export async function GET(request: NextRequest) {
   if (limited) return limited;
 
   try {
-    const origin = new URL(parsed.url).origin;
-    const robots = await analyzeRobots(origin);
-
-    return NextResponse.json({
-      success: true,
-      domain: parsed.domain,
-      origin,
-      ...robots,
-    });
+    const result = await checkSecurityHeaders(parsed.url, parsed.domain);
+    return NextResponse.json(result);
   } catch (error) {
-    await reportToolFailure("robots", error, {
+    await reportToolFailure("security-headers", error, {
       domain: parsed.domain,
       url: parsed.url,
     });
+    const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {
         success: false,
         error:
-          error instanceof Error ? error.message : "Failed to fetch robots.txt",
+          error instanceof Error
+            ? error.message
+            : "Failed to check security headers",
       },
-      { status: 502 }
+      { status: timedOut ? 504 : 502 }
     );
   }
 }

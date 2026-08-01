@@ -5,6 +5,7 @@ import { parseOpenGraph, parseTwitterCards } from "@/lib/audit/parse";
 import {
   enforceToolRateLimit,
   parseToolUrl,
+  reportToolFailure,
 } from "@/lib/tools/api-helpers";
 
 export const runtime = "nodejs";
@@ -68,6 +69,10 @@ export async function GET(request: NextRequest) {
       summary: openGraph.message,
     });
   } catch (error) {
+    await reportToolFailure("open-graph", error, {
+      domain: parsed.domain,
+      url: parsed.url,
+    });
     const timedOut = error instanceof FetchTimeoutError;
     return NextResponse.json(
       {
