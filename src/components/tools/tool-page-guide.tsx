@@ -177,28 +177,31 @@ export function ToolRelated({
           const catalog = getToolByHref(t.href);
           const title = catalog?.nav ?? t.label.replace(/ Checker$/, "");
           const short = catalog?.short;
+          const mark = catalog?.mark;
           return (
             <li key={t.href}>
               <Link
                 href={t.href}
-                className="group flex h-full flex-col justify-between rounded-xl border border-slate-300/60 px-3.5 py-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/35 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/30 dark:hover:bg-teal-400/[0.05]"
+                className="group flex h-full items-start gap-3 rounded-xl border border-slate-300/60 px-3.5 py-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-teal-700/35 hover:bg-teal-800/[0.04] dark:border-slate-700 dark:hover:border-teal-400/30 dark:hover:bg-teal-400/[0.05]"
               >
-                <span className="flex items-start justify-between gap-2">
-                  <span className="font-display text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                    {title}
-                  </span>
+                {mark ? (
                   <span
                     aria-hidden
-                    className="mt-0.5 text-sm text-teal-800/50 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-teal-800 dark:text-teal-300/40 dark:group-hover:text-teal-300"
+                    className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#0b1220] font-mono text-xs font-bold tracking-wide text-teal-300 ring-1 ring-teal-900/30 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/25"
                   >
-                    ↗
-                  </span>
-                </span>
-                {short ? (
-                  <span className="mt-1 text-xs leading-snug text-slate-500 dark:text-slate-400">
-                    {short}
+                    {mark}
                   </span>
                 ) : null}
+                <span className="min-w-0">
+                  <span className="block font-display text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    {title}
+                  </span>
+                  {short ? (
+                    <span className="mt-0.5 block text-xs leading-snug text-slate-500 dark:text-slate-400">
+                      {short}
+                    </span>
+                  ) : null}
+                </span>
               </Link>
             </li>
           );

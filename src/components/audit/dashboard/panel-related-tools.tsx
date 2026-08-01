@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { AuditTabId } from "@/lib/audit/types";
+import { getToolByHref } from "@/lib/tools/catalog";
 
 type Related = { href: string; label: string };
 
@@ -75,17 +76,28 @@ export function PanelRelatedTools({ tab }: { tab: AuditTabId }) {
         </Link>
       </div>
       <ul className="mt-2.5 flex flex-wrap gap-1.5">
-        {tools.map((tool) => (
-          <li key={tool.href}>
-            <Link
-              href={tool.href}
-              {...NEW_TAB}
-              className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-700/35 hover:bg-teal-800/[0.06] hover:text-teal-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-teal-400/35 dark:hover:bg-teal-400/[0.08] dark:hover:text-teal-200"
-            >
-              {tool.label}
-            </Link>
-          </li>
-        ))}
+        {tools.map((tool) => {
+          const mark = getToolByHref(tool.href)?.mark;
+          return (
+            <li key={tool.href}>
+              <Link
+                href={tool.href}
+                {...NEW_TAB}
+                className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-700/35 hover:bg-teal-800/[0.06] hover:text-teal-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-teal-400/35 dark:hover:bg-teal-400/[0.08] dark:hover:text-teal-200"
+              >
+                {mark ? (
+                  <span
+                    aria-hidden
+                    className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[#0b1220] px-1 font-mono text-[9px] font-bold tracking-wide text-teal-300 dark:bg-teal-400/15 dark:text-teal-300"
+                  >
+                    {mark}
+                  </span>
+                ) : null}
+                {tool.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </aside>
   );

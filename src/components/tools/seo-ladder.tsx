@@ -12,6 +12,7 @@ import {
   type LadderArcId,
   type LadderStage,
 } from "@/lib/tools/seo-ladder";
+import { getToolByHref } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
 const ARC_ORDER: LadderArcId[] = [
@@ -146,15 +147,26 @@ function StageCard({
           </p>
         ) : null}
         <div className="mt-3 flex flex-wrap gap-2">
-          {stage.tools.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="inline-flex items-center rounded-md border border-slate-300/80 bg-[color:var(--surface)] px-2.5 py-1 text-xs font-semibold text-teal-900 transition-colors hover:border-teal-700/40 hover:bg-teal-800/[0.06] dark:border-slate-600 dark:text-teal-200 dark:hover:border-teal-400/40 dark:hover:bg-teal-400/[0.08]"
-            >
-              {tool.label}
-            </Link>
-          ))}
+          {stage.tools.map((tool) => {
+            const mark = getToolByHref(tool.href)?.mark;
+            return (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="inline-flex items-center gap-1.5 rounded-md border border-slate-300/80 bg-[color:var(--surface)] px-2 py-1 text-xs font-semibold text-teal-900 transition-colors hover:border-teal-700/40 hover:bg-teal-800/[0.06] dark:border-slate-600 dark:text-teal-200 dark:hover:border-teal-400/40 dark:hover:bg-teal-400/[0.08]"
+              >
+                {mark ? (
+                  <span
+                    aria-hidden
+                    className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-[#0b1220] px-1 font-mono text-[9px] font-bold tracking-wide text-teal-300 dark:bg-teal-400/15 dark:text-teal-300"
+                  >
+                    {mark}
+                  </span>
+                ) : null}
+                {tool.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </article>
