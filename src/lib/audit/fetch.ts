@@ -1,17 +1,21 @@
 import { Agent, fetch as undiciFetch } from "undici";
 import type { RedirectHop } from "@/lib/audit/types";
 
-/** Per-attempt budget for HTML audits (enterprise CDNs / WAF often need headroom on Vercel). */
-export const FETCH_TIMEOUT_MS = 22_000;
-const BODY_TIMEOUT_MS = 25_000;
+/**
+ * Primary HTML fetch budget. Keep this snappy for normal sites;
+ * alternate-host fallback uses a shorter budget (see fetchHtml).
+ */
+export const FETCH_TIMEOUT_MS = 14_000;
+const FALLBACK_TIMEOUT_MS = 10_000;
+const BODY_TIMEOUT_MS = 16_000;
 
 /** Force HTTP/1.1 — many enterprise CDNs break Node's default HTTP/2 streams. */
 const http1Agent = new Agent({
   allowH2: false,
-  connectTimeout: 12_000,
-  headersTimeout: 22_000,
-  bodyTimeout: 30_000,
-  keepAliveTimeout: 10_000,
+  connectTimeout: 8_000,
+  headersTimeout: 14_000,
+  bodyTimeout: 20_000,
+  keepAliveTimeout: 8_000,
 });
 
 const BROWSER_HEADERS = {
@@ -23,7 +27,6 @@ const BROWSER_HEADERS = {
   "Cache-Control": "no-cache",
   Pragma: "no-cache",
   "Upgrade-Insecure-Requests": "1",
-  // Helps some bot/WAF scores treat us closer to a real browser navigation.
   "Sec-Fetch-Dest": "document",
   "Sec-Fetch-Mode": "navigate",
   "Sec-Fetch-Site": "none",
@@ -54,27 +57,21 @@ function formatFetchError(error: unknown): string {
   return `${error.message}${cause}`;
 }
 
-/**
- * Apex + www variants. Prefer www first — many enterprise sites (HPE, etc.)
- * park a slow/WAF-heavy apex that only 301s to www.
- */
+/** Exact host first, then www/apex alternate. */
 function buildUrlCandidates(url: string): string[] {
   const parsed = new URL(url);
-  const hosts = new Set<string>();
   const host = parsed.hostname.toLowerCase();
-  if (host.startsWith("www.")) {
-    hosts.add(host);
-    hosts.add(host.replace(/^www\./, ""));
-  } else {
-    hosts.add(`www.${host}`);
-    hosts.add(host);
-  }
+  const alternate = host.startsWith("www.")
+    ? host.replace(/^www\./, "")
+    : `www.${host}`;
 
-  return Array.from(hosts).map((hostname) => {
-    const next = new URL(parsed.toString());
-    next.hostname = hostname;
-    return next.toString();
-  });
+  const primary = new URL(parsed.toString());
+  primary.hostname = host;
+
+  const secondary = new URL(parsed.toString());
+  secondary.hostname = alternate;
+
+  return [primary.toString(), secondary.toString()];
 }
 
 function collectHeaders(responseHeaders: Headers): Record<string, string> {
@@ -159,7 +156,6 @@ async function requestWithRedirects(
 
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get("location");
-        // Drain/cancel body for redirect responses
         try {
           await response.body?.cancel();
         } catch {
@@ -227,21 +223,12 @@ async function fetchHtmlCandidate(
   };
 }
 
-function rethrowAggregate(
+function toFetchFailure(
   error: unknown,
   timeoutMs: number,
   url: string,
   action: "fetching" | "tracing"
 ): never {
-  if (error instanceof AggregateError) {
-    const errors = error.errors;
-    if (errors.length && errors.every((e) => isTimeoutError(e))) {
-      throw new FetchTimeoutError(
-        `Timed out after ${timeoutMs / 1000}s while ${action} ${url}`
-      );
-    }
-    throw new Error(formatFetchError(errors[0] ?? error));
-  }
   if (isTimeoutError(error)) {
     throw new FetchTimeoutError(
       `Timed out after ${timeoutMs / 1000}s while ${action} ${url}`
@@ -250,6 +237,11 @@ function rethrowAggregate(
   throw error instanceof Error ? error : new Error(formatFetchError(error));
 }
 
+/**
+ * Fast path: hit the exact host the user asked for.
+ * Only if that fails, try www/apex alternate with a shorter budget.
+ * (Avoids parallel dual-fetch that can stall serverless on the losing request.)
+ */
 export async function fetchHtml(
   url: string,
   timeoutMs: number = FETCH_TIMEOUT_MS
@@ -261,23 +253,18 @@ export async function fetchHtml(
   redirectChain: RedirectHop[];
 }> {
   const candidates = buildUrlCandidates(url);
+  let lastError: unknown;
 
-  if (candidates.length === 1) {
+  for (let i = 0; i < candidates.length; i += 1) {
+    const budget = i === 0 ? timeoutMs : FALLBACK_TIMEOUT_MS;
     try {
-      return await fetchHtmlCandidate(candidates[0], timeoutMs);
+      return await fetchHtmlCandidate(candidates[i], budget);
     } catch (error) {
-      rethrowAggregate(error, timeoutMs, url, "fetching");
+      lastError = error;
     }
   }
 
-  // Race apex/www — don't burn the full budget on a sticky apex WAF.
-  try {
-    return await Promise.any(
-      candidates.map((candidate) => fetchHtmlCandidate(candidate, timeoutMs))
-    );
-  } catch (error) {
-    rethrowAggregate(error, timeoutMs, url, "fetching");
-  }
+  toFetchFailure(lastError, timeoutMs, url, "fetching");
 }
 
 export async function fetchText(
@@ -308,33 +295,28 @@ export async function traceRedirects(
   redirectChain: RedirectHop[];
 }> {
   const candidates = buildUrlCandidates(url);
+  let lastError: unknown;
 
-  const attempt = async (candidate: string) => {
-    const response = await requestWithRedirects(
-      candidate,
-      timeoutMs,
-      BROWSER_HEADERS.Accept
-    );
-    await response.text().catch(() => null);
-    return {
-      startUrl: candidate,
-      finalUrl: response.finalUrl,
-      status: response.status,
-      redirectChain: response.redirectChain,
-    };
-  };
-
-  if (candidates.length === 1) {
+  for (let i = 0; i < candidates.length; i += 1) {
+    const candidate = candidates[i];
+    const budget = i === 0 ? timeoutMs : FALLBACK_TIMEOUT_MS;
     try {
-      return await attempt(candidates[0]);
+      const response = await requestWithRedirects(
+        candidate,
+        budget,
+        BROWSER_HEADERS.Accept
+      );
+      await response.text().catch(() => null);
+      return {
+        startUrl: candidate,
+        finalUrl: response.finalUrl,
+        status: response.status,
+        redirectChain: response.redirectChain,
+      };
     } catch (error) {
-      rethrowAggregate(error, timeoutMs, url, "tracing");
+      lastError = error;
     }
   }
 
-  try {
-    return await Promise.any(candidates.map((c) => attempt(c)));
-  } catch (error) {
-    rethrowAggregate(error, timeoutMs, url, "tracing");
-  }
+  toFetchFailure(lastError, timeoutMs, url, "tracing");
 }

@@ -17,9 +17,10 @@ export function AuditLoadingSteps() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
+    // Keep the step UI snappy — it is cosmetic only; the server audit is the real wait.
     const id = window.setInterval(() => {
       setActive((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
-    }, 2200);
+    }, 900);
     return () => window.clearInterval(id);
   }, []);
 
@@ -38,8 +39,7 @@ export function AuditLoadingSteps() {
         Running technical audit…
       </h1>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-        Checking the live URL from our servers. Homepage or a specific path —
-        whichever you pasted.
+        Checking the live URL you pasted. Most sites finish in a few seconds.
       </p>
 
       <div className="relative mt-6 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
