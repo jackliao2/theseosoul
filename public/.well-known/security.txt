@@ -1,5 +1,5 @@
 Contact: mailto:hello@theseosoul.com
-Preferred-Languages: en, zh
+Preferred-Languages: en
 Canonical: https://theseosoul.com/.well-known/security.txt
 Policy: https://theseosoul.com/privacy
 Expires: 2027-07-31T00:00:00.000Z
