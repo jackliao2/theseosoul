@@ -195,13 +195,6 @@ export function PanelOverview({
         </ul>
       </div>
 
-      <PanelNextSteps
-        audit={audit}
-        onSelectTab={onSelectTab}
-        onReaudit={onReaudit}
-        isRefreshing={isRefreshing}
-      />
-
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,.92fr)] lg:items-start">
         <div className="space-y-3">
           <section className="relative overflow-hidden rounded-xl bg-[#0b1220] p-4 text-white">
@@ -507,6 +500,13 @@ export function PanelOverview({
           </div>
         </div>
       </section>
+
+      <PanelNextSteps
+        audit={audit}
+        onSelectTab={onSelectTab}
+        onReaudit={onReaudit}
+        isRefreshing={isRefreshing}
+      />
     </div>
   );
 }
