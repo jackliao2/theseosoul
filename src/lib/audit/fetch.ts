@@ -1,14 +1,16 @@
 import { Agent, fetch as undiciFetch } from "undici";
 import type { RedirectHop } from "@/lib/audit/types";
 
-export const FETCH_TIMEOUT_MS = 12_000;
+/** Per-attempt budget for HTML audits (enterprise CDNs / WAF often need headroom on Vercel). */
+export const FETCH_TIMEOUT_MS = 22_000;
+const BODY_TIMEOUT_MS = 25_000;
 
 /** Force HTTP/1.1 — many enterprise CDNs break Node's default HTTP/2 streams. */
 const http1Agent = new Agent({
   allowH2: false,
-  connectTimeout: 10_000,
-  headersTimeout: 12_000,
-  bodyTimeout: 20_000,
+  connectTimeout: 12_000,
+  headersTimeout: 22_000,
+  bodyTimeout: 30_000,
   keepAliveTimeout: 10_000,
 });
 
@@ -21,6 +23,11 @@ const BROWSER_HEADERS = {
   "Cache-Control": "no-cache",
   Pragma: "no-cache",
   "Upgrade-Insecure-Requests": "1",
+  // Helps some bot/WAF scores treat us closer to a real browser navigation.
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Sec-Fetch-User": "?1",
 } as const;
 
 export class FetchTimeoutError extends Error {
@@ -47,13 +54,20 @@ function formatFetchError(error: unknown): string {
   return `${error.message}${cause}`;
 }
 
+/**
+ * Apex + www variants. Prefer www first — many enterprise sites (HPE, etc.)
+ * park a slow/WAF-heavy apex that only 301s to www.
+ */
 function buildUrlCandidates(url: string): string[] {
   const parsed = new URL(url);
-  const hosts = new Set<string>([parsed.hostname]);
-  if (parsed.hostname.startsWith("www.")) {
-    hosts.add(parsed.hostname.replace(/^www\./, ""));
+  const hosts = new Set<string>();
+  const host = parsed.hostname.toLowerCase();
+  if (host.startsWith("www.")) {
+    hosts.add(host);
+    hosts.add(host.replace(/^www\./, ""));
   } else {
-    hosts.add(`www.${parsed.hostname}`);
+    hosts.add(`www.${host}`);
+    hosts.add(host);
   }
 
   return Array.from(hosts).map((hostname) => {
@@ -84,6 +98,29 @@ function collectHeaders(responseHeaders: Headers): Record<string, string> {
     if (value) headers[key] = value;
   }
   return headers;
+}
+
+async function readTextWithTimeout(
+  read: () => Promise<string>,
+  timeoutMs: number
+): Promise<string> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      read(),
+      new Promise<string>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(
+            new FetchTimeoutError(
+              `Timed out after ${timeoutMs / 1000}s reading response body`
+            )
+          );
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 /**
@@ -151,6 +188,68 @@ async function requestWithRedirects(
   }
 }
 
+async function fetchHtmlCandidate(
+  candidate: string,
+  timeoutMs: number
+): Promise<{
+  html: string;
+  finalUrl: string;
+  status: number;
+  headers: Record<string, string>;
+  redirectChain: RedirectHop[];
+}> {
+  const response = await requestWithRedirects(
+    candidate,
+    timeoutMs,
+    BROWSER_HEADERS.Accept
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: Unable to fetch page`);
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (
+    contentType &&
+    !contentType.includes("text/html") &&
+    !contentType.includes("application/xhtml")
+  ) {
+    throw new Error("Target URL did not return HTML content");
+  }
+
+  const html = await readTextWithTimeout(response.text, BODY_TIMEOUT_MS);
+  return {
+    html,
+    finalUrl: response.finalUrl,
+    status: response.status,
+    headers: collectHeaders(response.headers),
+    redirectChain: response.redirectChain,
+  };
+}
+
+function rethrowAggregate(
+  error: unknown,
+  timeoutMs: number,
+  url: string,
+  action: "fetching" | "tracing"
+): never {
+  if (error instanceof AggregateError) {
+    const errors = error.errors;
+    if (errors.length && errors.every((e) => isTimeoutError(e))) {
+      throw new FetchTimeoutError(
+        `Timed out after ${timeoutMs / 1000}s while ${action} ${url}`
+      );
+    }
+    throw new Error(formatFetchError(errors[0] ?? error));
+  }
+  if (isTimeoutError(error)) {
+    throw new FetchTimeoutError(
+      `Timed out after ${timeoutMs / 1000}s while ${action} ${url}`
+    );
+  }
+  throw error instanceof Error ? error : new Error(formatFetchError(error));
+}
+
 export async function fetchHtml(
   url: string,
   timeoutMs: number = FETCH_TIMEOUT_MS
@@ -162,59 +261,23 @@ export async function fetchHtml(
   redirectChain: RedirectHop[];
 }> {
   const candidates = buildUrlCandidates(url);
-  let lastError: unknown;
 
-  for (const candidate of candidates) {
+  if (candidates.length === 1) {
     try {
-      const response = await requestWithRedirects(
-        candidate,
-        timeoutMs,
-        BROWSER_HEADERS.Accept
-      );
-
-      if (!response.ok) {
-        lastError = new Error(`HTTP ${response.status}: Unable to fetch page`);
-        continue;
-      }
-
-      const contentType = response.headers.get("content-type") ?? "";
-      if (
-        contentType &&
-        !contentType.includes("text/html") &&
-        !contentType.includes("application/xhtml")
-      ) {
-        lastError = new Error("Target URL did not return HTML content");
-        continue;
-      }
-
-      const html = await response.text();
-      return {
-        html,
-        finalUrl: response.finalUrl,
-        status: response.status,
-        headers: collectHeaders(response.headers),
-        redirectChain: response.redirectChain,
-      };
+      return await fetchHtmlCandidate(candidates[0], timeoutMs);
     } catch (error) {
-      lastError = error;
-      if (
-        isTimeoutError(error) &&
-        candidates.indexOf(candidate) === candidates.length - 1
-      ) {
-        throw new FetchTimeoutError(
-          `Timed out after ${timeoutMs / 1000}s while fetching ${url}`
-        );
-      }
+      rethrowAggregate(error, timeoutMs, url, "fetching");
     }
   }
 
-  if (isTimeoutError(lastError)) {
-    throw new FetchTimeoutError(
-      `Timed out after ${timeoutMs / 1000}s while fetching ${url}`
+  // Race apex/www — don't burn the full budget on a sticky apex WAF.
+  try {
+    return await Promise.any(
+      candidates.map((candidate) => fetchHtmlCandidate(candidate, timeoutMs))
     );
+  } catch (error) {
+    rethrowAggregate(error, timeoutMs, url, "fetching");
   }
-
-  throw new Error(formatFetchError(lastError));
 }
 
 export async function fetchText(
@@ -228,7 +291,7 @@ export async function fetchText(
       "text/plain,*/*;q=0.8"
     );
     if (!response.ok) return null;
-    return await response.text();
+    return await readTextWithTimeout(response.text, BODY_TIMEOUT_MS);
   } catch {
     return null;
   }
@@ -245,41 +308,33 @@ export async function traceRedirects(
   redirectChain: RedirectHop[];
 }> {
   const candidates = buildUrlCandidates(url);
-  let lastError: unknown;
 
-  for (const candidate of candidates) {
+  const attempt = async (candidate: string) => {
+    const response = await requestWithRedirects(
+      candidate,
+      timeoutMs,
+      BROWSER_HEADERS.Accept
+    );
+    await response.text().catch(() => null);
+    return {
+      startUrl: candidate,
+      finalUrl: response.finalUrl,
+      status: response.status,
+      redirectChain: response.redirectChain,
+    };
+  };
+
+  if (candidates.length === 1) {
     try {
-      const response = await requestWithRedirects(
-        candidate,
-        timeoutMs,
-        BROWSER_HEADERS.Accept
-      );
-      // Drain body so the socket can close; hop data is already recorded
-      await response.text().catch(() => null);
-      return {
-        startUrl: candidate,
-        finalUrl: response.finalUrl,
-        status: response.status,
-        redirectChain: response.redirectChain,
-      };
+      return await attempt(candidates[0]);
     } catch (error) {
-      lastError = error;
-      if (
-        isTimeoutError(error) &&
-        candidates.indexOf(candidate) === candidates.length - 1
-      ) {
-        throw new FetchTimeoutError(
-          `Timed out after ${timeoutMs / 1000}s while tracing ${url}`
-        );
-      }
+      rethrowAggregate(error, timeoutMs, url, "tracing");
     }
   }
 
-  if (isTimeoutError(lastError)) {
-    throw new FetchTimeoutError(
-      `Timed out after ${timeoutMs / 1000}s while tracing ${url}`
-    );
+  try {
+    return await Promise.any(candidates.map((c) => attempt(c)));
+  } catch (error) {
+    rethrowAggregate(error, timeoutMs, url, "tracing");
   }
-
-  throw new Error(formatFetchError(lastError));
 }

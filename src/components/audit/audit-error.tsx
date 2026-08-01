@@ -3,15 +3,28 @@ import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AuditErrorResult } from "@/lib/audit/types";
+import { auditHref, normalizeUrl } from "@/lib/url";
 
 const friendly: Record<AuditErrorResult["code"], string> = {
   INVALID_URL: "That doesn’t look like a valid website URL.",
-  TIMEOUT: "The site took too long to respond.",
+  TIMEOUT:
+    "The site took too long to respond. Enterprise sites with a WAF sometimes need a second try.",
   UNREACHABLE: "We couldn’t reach this website right now.",
   PARSE_ERROR: "We fetched the page but couldn’t parse its HTML.",
   RATE_LIMITED: "You’re auditing a bit too fast — wait a minute and try again.",
   UNKNOWN: "Something unexpected went wrong during the audit.",
 };
+
+function retryHref(error: AuditErrorResult): string {
+  if (error.url) {
+    try {
+      return auditHref(normalizeUrl(error.url));
+    } catch {
+      /* fall through */
+    }
+  }
+  return `/audit/${error.domain}`;
+}
 
 export function AuditError({ error }: { error: AuditErrorResult }) {
   return (
@@ -45,7 +58,7 @@ export function AuditError({ error }: { error: AuditErrorResult }) {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link href={`/audit/${error.domain}`}>
+            <Link href={`${retryHref(error)}?t=${Date.now()}`}>
               <RefreshCw className="h-4 w-4" />
               Try again
             </Link>
