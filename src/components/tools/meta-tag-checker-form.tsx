@@ -19,15 +19,30 @@ type FieldResult = {
   message: string;
 };
 
+type Signal = {
+  value?: string | null;
+  count?: number;
+  texts?: string[];
+  status: string;
+  message: string;
+};
+
 type FetchResult =
   | {
       success: true;
       domain: string;
       hostname: string;
+      requestedUrl: string;
       finalUrl: string;
+      status: number;
+      redirected: boolean;
       title: FieldResult;
       description: FieldResult;
-      robotsMeta: { content: string | null; message: string };
+      robotsMeta: { content: string | null; message: string; status?: string };
+      h1: Signal;
+      lang: Signal;
+      viewport: Signal;
+      charset: Signal;
       summary: string;
       issues: string[];
     }
@@ -160,7 +175,7 @@ export function MetaTagCheckerForm() {
 
       {mode === "url" && fetchResult && fetchResult.success ? (
         <div className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-4">
             <ToolStat
               label="Title"
               value={`${fetchResult.title.length}/${fetchResult.title.idealMax}`}
@@ -170,13 +185,46 @@ export function MetaTagCheckerForm() {
               value={`${fetchResult.description.length}/${fetchResult.description.idealMax}`}
             />
             <ToolStat
+              label="H1"
+              value={String(fetchResult.h1.count ?? 0)}
+            />
+            <ToolStat
               label="Issues"
               value={String(fetchResult.issues.length)}
             />
           </div>
+
+          <div className="rounded-md border border-slate-300/80 px-3 py-2.5 text-xs dark:border-slate-700">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+              Request vs final · HTTP {fetchResult.status}
+              {fetchResult.redirected ? " · redirected" : ""}
+            </p>
+            <p className="mt-1 break-all font-mono text-slate-600 dark:text-slate-300">
+              {fetchResult.requestedUrl}
+            </p>
+            {fetchResult.redirected ? (
+              <p className="mt-1 break-all font-mono text-teal-800 dark:text-teal-300">
+                → {fetchResult.finalUrl}
+              </p>
+            ) : (
+              <p className="mt-1 break-all font-mono text-slate-500">
+                {fetchResult.finalUrl}
+              </p>
+            )}
+          </div>
+
           <p className="text-sm text-slate-600 dark:text-slate-300">
             {fetchResult.summary}
           </p>
+
+          {fetchResult.issues.length > 0 ? (
+            <ul className="list-inside list-disc space-y-1 text-sm text-amber-800 dark:text-amber-200">
+              {fetchResult.issues.map((issue) => (
+                <li key={issue}>{issue}</li>
+              ))}
+            </ul>
+          ) : null}
+
           <ul className="space-y-2 text-sm">
             <li>
               <span className="font-semibold text-slate-900 dark:text-slate-50">
@@ -200,11 +248,56 @@ export function MetaTagCheckerForm() {
                 {fetchResult.description.content ?? "—"}
               </p>
             </li>
+            <li>
+              <span className="font-semibold text-slate-900 dark:text-slate-50">
+                H1 ·{" "}
+              </span>
+              <span className={statusTone(fetchResult.h1.status)}>
+                {fetchResult.h1.message}
+              </span>
+              {(fetchResult.h1.texts ?? []).length > 0 ? (
+                <ul className="mt-0.5 space-y-0.5 text-slate-700 dark:text-slate-200">
+                  {fetchResult.h1.texts!.map((text, i) => (
+                    <li key={`${text}-${i}`}>{text}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-0.5 text-slate-500">—</p>
+              )}
+            </li>
+            <li className="text-slate-600 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-50">
+                Lang ·{" "}
+              </span>
+              <span className={statusTone(fetchResult.lang.status)}>
+                {fetchResult.lang.message}
+              </span>
+            </li>
+            <li className="text-slate-600 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-50">
+                Viewport ·{" "}
+              </span>
+              <span className={statusTone(fetchResult.viewport.status)}>
+                {fetchResult.viewport.message}
+              </span>
+            </li>
+            <li className="text-slate-600 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-50">
+                Charset ·{" "}
+              </span>
+              <span className={statusTone(fetchResult.charset.status)}>
+                {fetchResult.charset.message}
+              </span>
+            </li>
             <li className="text-slate-600 dark:text-slate-300">
               <span className="font-semibold text-slate-900 dark:text-slate-50">
                 Robots meta ·{" "}
               </span>
-              {fetchResult.robotsMeta.message}
+              <span
+                className={statusTone(fetchResult.robotsMeta.status ?? "pass")}
+              >
+                {fetchResult.robotsMeta.message}
+              </span>
             </li>
           </ul>
         </div>

@@ -8,6 +8,7 @@ import {
   UrlToolForm,
 } from "@/components/tools/url-tool-form";
 import { auditReportHref } from "@/lib/url";
+import { cn } from "@/lib/utils";
 
 type Row = {
   id: string;
@@ -16,6 +17,8 @@ type Row = {
   present: boolean;
   value: string | null;
   weight: "core" | "extra";
+  status: "pass" | "warn" | "fail" | "info";
+  why: string;
 };
 
 type Result =
@@ -31,6 +34,14 @@ type Result =
       rows: Row[];
     }
   | { success: false; error: string };
+
+function statusTone(status: Row["status"]) {
+  if (status === "pass")
+    return "text-emerald-700 dark:text-emerald-300";
+  if (status === "warn") return "text-amber-700 dark:text-amber-300";
+  if (status === "fail") return "text-rose-700 dark:text-rose-300";
+  return "text-slate-500 dark:text-slate-400";
+}
 
 export function SecurityHeadersForm() {
   const [result, setResult] = useState<Result | null>(null);
@@ -82,12 +93,18 @@ export function SecurityHeadersForm() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-4">
             <ToolStat label="HTTP" value={String(result.status)} />
             <ToolStat label="HTTPS" value={result.https ? "Yes" : "No"} />
             <ToolStat
-              label="Present"
-              value={`${result.rows.filter((r) => r.present).length}/${result.rows.length}`}
+              label="Pass"
+              value={String(
+                result.rows.filter((r) => r.status === "pass").length
+              )}
+            />
+            <ToolStat
+              label="Fail / warn"
+              value={`${result.rows.filter((r) => r.status === "fail").length}/${result.rows.filter((r) => r.status === "warn").length}`}
             />
           </div>
 
@@ -113,17 +130,19 @@ export function SecurityHeadersForm() {
                     ) : null}
                   </span>
                   <span
-                    className={
-                      row.present
-                        ? "font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300"
-                        : "font-mono text-[10px] font-semibold uppercase tracking-wide text-rose-700 dark:text-rose-300"
-                    }
+                    className={cn(
+                      "font-mono text-[10px] font-semibold uppercase tracking-wide",
+                      statusTone(row.status)
+                    )}
                   >
-                    {row.present ? "present" : "missing"}
+                    {row.status}
                   </span>
                 </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  {row.why}
+                </p>
                 {row.value ? (
-                  <p className="break-all font-mono text-[11px] text-slate-600 dark:text-slate-300">
+                  <p className="break-all font-mono text-[11px] text-slate-500 dark:text-slate-400">
                     {row.value}
                   </p>
                 ) : null}

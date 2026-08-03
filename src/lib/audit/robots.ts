@@ -156,7 +156,8 @@ export async function analyzeRobots(origin: string): Promise<RobotsResult> {
   return {
     present: true,
     url,
-    content: content.slice(0, 4000),
+    // Cap for response size; large enough for path/UA matching on typical files.
+    content: content.slice(0, 100_000),
     allowsIndexing,
     sitemapDirectives,
     aiCrawlers,
