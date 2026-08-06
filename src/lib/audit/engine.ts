@@ -1,6 +1,11 @@
 import { domainFromParam, normalizeUrl } from "@/lib/url";
 import { analyzeDensity } from "@/lib/audit/density";
-import { fetchHtml, FetchTimeoutError } from "@/lib/audit/fetch";
+import {
+  describeFetchError,
+  fetchHtml,
+  FetchTimeoutError,
+  humanizeFetchFailure,
+} from "@/lib/audit/fetch";
 import { computeGeoScore } from "@/lib/audit/geo-score";
 import { parseLinks } from "@/lib/audit/links";
 import {
@@ -209,12 +214,18 @@ export async function runAudit(input: string): Promise<AuditResponse> {
       };
     }
 
+    // Prefer already-humanized errors from fetchHtml; otherwise rewrite.
+    const raw = describeFetchError(error);
     const message =
-      error instanceof Error ? error.message : "Unknown audit failure";
+      error instanceof Error &&
+      !/^fetch failed$/i.test(error.message.trim()) &&
+      error.message.length > 20
+        ? error.message
+        : humanizeFetchFailure(error, url);
 
     const unreachable =
-      /fetch failed|ENOTFOUND|ECONNREFUSED|ECONNRESET|certificate|HTTP\s[45]/i.test(
-        message
+      /couldn’t reach|doesn’t resolve|refused the connection|connection was dropped|tls\/certificate|http\s*[45]|enotfound|econnrefused|econnreset|fetch failed|certificate/i.test(
+        `${message} ${raw}`
       );
 
     return {

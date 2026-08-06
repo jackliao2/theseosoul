@@ -57,6 +57,63 @@ function formatFetchError(error: unknown): string {
   return `${error.message}${cause}`;
 }
 
+/** Flatten Error + nested cause into one string for classification. */
+export function describeFetchError(error: unknown): string {
+  if (!(error instanceof Error)) return String(error ?? "Unknown error");
+  const parts = [error.message];
+  let current: unknown = error.cause;
+  let depth = 0;
+  while (current instanceof Error && depth < 4) {
+    parts.push(current.message);
+    current = current.cause;
+    depth += 1;
+  }
+  return parts.join(" | ");
+}
+
+/**
+ * Turn low-level fetch/DNS/TLS failures into a short user-facing explanation.
+ * Avoids dumping Undici’s bare “fetch failed” in the UI.
+ */
+export function humanizeFetchFailure(error: unknown, url: string): string {
+  const detail = describeFetchError(error).toLowerCase();
+
+  if (
+    /enotfound|getaddrinfo|nxdomain|err_name_not_resolved|name not resolved/i.test(
+      detail
+    )
+  ) {
+    return "This domain doesn’t resolve in DNS — it may be unregistered, expired, or have no website configured.";
+  }
+  if (/econnrefused/i.test(detail)) {
+    return "The host refused the connection — nothing appears to be listening on HTTPS for this site.";
+  }
+  if (/econnreset|econnaborted|epipe|socket hang up/i.test(detail)) {
+    return "The connection was dropped before we could load the page. The site may be down or filtering bots.";
+  }
+  if (/cert|ssl|tls|unable to verify/i.test(detail)) {
+    return "We couldn’t establish a trusted HTTPS connection (TLS/certificate problem).";
+  }
+  if (/http\s*404/i.test(detail)) {
+    return "The server responded with 404 Not Found for this URL.";
+  }
+  if (/http\s*403/i.test(detail)) {
+    return "The server blocked our request (HTTP 403). A WAF or bot filter may be in the way.";
+  }
+  if (/http\s*5\d\d/i.test(detail)) {
+    return "The server returned an error response. Try again in a moment.";
+  }
+  if (/fetch failed/i.test(detail)) {
+    return `We couldn’t reach ${url}. The site may be offline, have no public page, or be blocking automated requests.`;
+  }
+
+  const raw = error instanceof Error ? error.message.trim() : "";
+  if (raw && !/^fetch failed$/i.test(raw)) {
+    return raw;
+  }
+  return `We couldn’t reach ${url}. The site may be offline or unreachable.`;
+}
+
 /** Exact host first, then www/apex alternate. */
 function buildUrlCandidates(url: string): string[] {
   const parsed = new URL(url);
@@ -237,7 +294,7 @@ function toFetchFailure(
       `Timed out after ${timeoutMs / 1000}s while ${action} ${url}`
     );
   }
-  throw error instanceof Error ? error : new Error(formatFetchError(error));
+  throw new Error(humanizeFetchFailure(error, url));
 }
 
 /**

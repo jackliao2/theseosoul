@@ -5,15 +5,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AuditErrorResult } from "@/lib/audit/types";
 import { auditHref, normalizeUrl } from "@/lib/url";
 
+const titles: Record<AuditErrorResult["code"], string> = {
+  INVALID_URL: "Invalid URL",
+  TIMEOUT: "Site timed out",
+  UNREACHABLE: "Website unreachable",
+  PARSE_ERROR: "Couldn’t parse page",
+  RATE_LIMITED: "Slow down",
+  UNKNOWN: "Audit unavailable",
+};
+
 const friendly: Record<AuditErrorResult["code"], string> = {
   INVALID_URL: "That doesn’t look like a valid website URL.",
   TIMEOUT:
     "The site took too long to respond. Enterprise sites with a WAF sometimes need a second try.",
-  UNREACHABLE: "We couldn’t reach this website right now.",
+  UNREACHABLE:
+    "We couldn’t load a page from this domain. It may be offline, not set up for the web, or blocking automated checks.",
   PARSE_ERROR: "We fetched the page but couldn’t parse its HTML.",
   RATE_LIMITED: "You’re auditing a bit too fast — wait a minute and try again.",
   UNKNOWN: "Something unexpected went wrong during the audit.",
 };
+
+/** Hide Undici noise / duplicates of the friendly headline. */
+function detailForDisplay(error: AuditErrorResult): string | null {
+  const detail = error.error?.trim();
+  if (!detail) return null;
+  if (/^fetch failed$/i.test(detail)) return null;
+
+  const headline = friendly[error.code].toLowerCase();
+  if (detail.toLowerCase() === headline) return null;
+
+  // Prefer the humanized detail as the main body when it's richer than the headline.
+  return detail;
+}
 
 function retryHref(error: AuditErrorResult): string {
   if (error.url) {
@@ -27,6 +50,8 @@ function retryHref(error: AuditErrorResult): string {
 }
 
 export function AuditError({ error }: { error: AuditErrorResult }) {
+  const detail = detailForDisplay(error);
+
   return (
     <Card className="border-rose-200 dark:border-rose-900/50">
       <CardHeader>
@@ -35,9 +60,9 @@ export function AuditError({ error }: { error: AuditErrorResult }) {
             <AlertTriangle className="h-5 w-5" />
           </span>
           <div>
-            <CardTitle>Audit unavailable</CardTitle>
+            <CardTitle>{titles[error.code]}</CardTitle>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-              {friendly[error.code]}
+              {detail ?? friendly[error.code]}
             </p>
           </div>
         </div>
@@ -54,7 +79,6 @@ export function AuditError({ error }: { error: AuditErrorResult }) {
               <span className="text-slate-900 dark:text-white">{error.url}</span>
             </p>
           ) : null}
-          <p className="mt-2 text-slate-600 dark:text-slate-400">{error.error}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
