@@ -48,15 +48,6 @@ function isTimeoutError(error: unknown): boolean {
   return msg.includes("timeout") || msg.includes("aborted");
 }
 
-function formatFetchError(error: unknown): string {
-  if (!(error instanceof Error)) return "Unknown fetch error";
-  const cause =
-    "cause" in error && error.cause instanceof Error
-      ? `: ${error.cause.message}`
-      : "";
-  return `${error.message}${cause}`;
-}
-
 /** Flatten Error + nested cause into one string for classification. */
 export function describeFetchError(error: unknown): string {
   if (!(error instanceof Error)) return String(error ?? "Unknown error");
