@@ -36,6 +36,9 @@
 ## Guides (high-signal)
 - Technical SEO checklist before launch: https://theseosoul.com/blog/technical-seo-checklist-before-launch
 - robots.txt vs noindex vs canonical: https://theseosoul.com/blog/robots-txt-vs-noindex-vs-canonical
+- What a free robots.txt checker should tell you: https://theseosoul.com/blog/free-robots-txt-checker-what-matters
+- Find and fix accidental noindex: https://theseosoul.com/blog/find-and-fix-accidental-noindex
+- Free meta tag checker (titles & descriptions): https://theseosoul.com/blog/free-meta-tag-checker-titles-descriptions
 - GEO and llms.txt: https://theseosoul.com/blog/geo-llms-txt-practical-guide
 - Domain history before you buy: https://theseosoul.com/blog/domain-history-before-you-buy
 - XML sitemaps that help: https://theseosoul.com/blog/xml-sitemaps-that-actually-help

@@ -42,7 +42,7 @@ Use it to save crawl budget or keep bots out of infinite junk:
 
 Also remember Google’s warning from the [robots.txt intro](https://developers.google.com/search/docs/crawling-indexing/robots/intro): a disallowed URL can still show up in results *without a snippet* if it’s linked elsewhere. Robots is not a vault. Password protection or noindex (with crawl allowed) are the real “keep it out” tools depending on the goal.
 
-Live check: [Robots.txt Checker](/tools/robots-txt-checker).
+Live check: [Robots.txt Checker](/tools/robots-txt-checker). Longer field guide: [What a free robots.txt checker should tell you](/blog/free-robots-txt-checker-what-matters).
 
 ## When noindex is the right tool
 
@@ -55,7 +55,7 @@ Two supported implementations ([same Google doc](https://developers.google.com/s
 
 `none` means `noindex, nofollow`. Fine on a true dead-end thank-you page. Annoying when a plugin paints it across half the site.
 
-Verify HTML **and** headers: [Noindex Checker](/tools/noindex-checker).
+Verify HTML **and** headers: [Noindex Checker](/tools/noindex-checker). If you suspect a staging leftover: [Find and fix accidental noindex](/blog/find-and-fix-accidental-noindex).
 
 ## When canonical is the right tool
 
