@@ -5,6 +5,8 @@ date: "2026-07-31"
 updated: "2026-08-01"
 tags: ["HTTPS", "SSL", "Security headers"]
 excerpt: "Expired certs create interstitials. Missing CSP usually doesn’t. Fix days remaining before you debate header trivia."
+cover: "/images/blog/ssl-security-headers.webp"
+coverAlt: "Illustration of a TLS padlock and layered security header shields"
 ---
 
 Security-and-SEO conversations go off the rails when someone opens with CSP theater while the certificate dies in nine days.

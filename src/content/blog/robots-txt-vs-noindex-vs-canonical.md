@@ -5,6 +5,8 @@ date: "2026-07-29"
 updated: "2026-08-01"
 tags: ["Crawl", "Indexation", "robots.txt"]
 excerpt: "Three different jobs. The expensive mistake is blocking fetch so Google never sees your noindex."
+cover: "/images/blog/robots-vs-noindex.webp"
+coverAlt: "Three-way diagram contrasting crawl, index, and canonical signals"
 ---
 
 When someone says “just block it in robots,” I get suspicious. Same when they slap `noindex` on a duplicate that should have been a redirect. These three controls answer different questions. Mix them and Search Console starts telling a story that sounds like “Google is broken.”

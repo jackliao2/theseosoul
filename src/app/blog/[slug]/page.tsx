@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogMarkdown } from "@/components/blog/blog-markdown";
@@ -21,6 +22,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPost(slug);
   if (!post) return { title: "Guide not found" };
   const path = `/blog/${post.slug}`;
+  const ogImages = post.cover
+    ? [{ url: post.cover, width: 1600, height: 900, alt: post.coverAlt }]
+    : undefined;
   return {
     title: post.title,
     description: post.description,
@@ -33,6 +37,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: post.date,
       modifiedTime: post.updated ?? post.date,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: post.cover ? [post.cover] : undefined,
     },
   };
 }
@@ -50,6 +61,7 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.description,
     datePublished: post.date,
     dateModified: post.updated ?? post.date,
+    image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
     author: {
       "@type": "Organization",
       name: SITE_NAME,
@@ -92,6 +104,20 @@ export default async function BlogPostPage({ params }: Props) {
       <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-300">
         {post.description}
       </p>
+
+      {post.cover ? (
+        <figure className="mt-8 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          <Image
+            src={post.cover}
+            alt={post.coverAlt ?? post.title}
+            width={1600}
+            height={900}
+            className="h-auto w-full object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, 720px"
+          />
+        </figure>
+      ) : null}
 
       <article className="mt-10">
         <BlogMarkdown content={post.content} />

@@ -4,6 +4,8 @@ description: "A practical field guide to accidental noindex: meta robots vs X-Ro
 date: "2026-08-09"
 tags: ["noindex", "Indexation", "Search Console"]
 excerpt: "If the money page has noindex, you don’t have a ranking problem. You have a ‘please don’t show this’ sign still taped to the door."
+cover: "/images/blog/accidental-noindex.webp"
+coverAlt: "Illustration of a noindex warning sign blocking a webpage from search results"
 ---
 
 The phone call usually starts the same way: “We lost all our traffic.” Sometimes traffic really moved. More often, someone shipped a theme update, a security plugin, or a “preview” flag — and the live HTML still says `noindex`.

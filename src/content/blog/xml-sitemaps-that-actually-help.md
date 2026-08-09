@@ -5,6 +5,8 @@ date: "2026-07-31"
 updated: "2026-08-01"
 tags: ["Sitemaps", "Crawl", "Technical SEO"]
 excerpt: "Google already said it: good internal links discover most sites. Sitemaps help the awkward cases — if the file isn’t lying."
+cover: "/images/blog/xml-sitemaps.webp"
+coverAlt: "Illustration of an XML sitemap tree linking to page nodes"
 ---
 
 People treat sitemaps like a ranking cheat code. They’re not. They’re a hint list: “these URLs exist; please consider them.”

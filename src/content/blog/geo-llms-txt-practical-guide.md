@@ -5,6 +5,8 @@ date: "2026-07-30"
 updated: "2026-08-01"
 tags: ["GEO", "llms.txt", "AI search"]
 excerpt: "GEO is mostly clear writing and fetchable pages. llms.txt is a curated brief — not a Google ranking factor."
+cover: "/images/blog/geo-llms-txt.webp"
+coverAlt: "Illustration of AI crawlers reading a structured site summary file"
 ---
 
 “GEO” gets sold like a new religion. Strip the slides and you’re left with something older: make pages easy to fetch, easy to understand, and easy to trust — then decide, deliberately, what AI crawlers are allowed to do.

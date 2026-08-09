@@ -5,6 +5,8 @@ date: "2026-07-28"
 updated: "2026-08-01"
 tags: ["Technical SEO", "Launch", "Checklist"]
 excerpt: "Most launch disasters aren’t ‘the algorithm.’ They’re staging noindex, a dead cert, or Disallow: / that nobody re-read."
+cover: "/images/blog/launch-checklist.webp"
+coverAlt: "Illustration of a pre-launch technical checklist with HTTPS and crawl checks"
 ---
 
 I’ve lost count of how many “SEO emergencies” were just a staging leftover. Pretty homepage. Press email already sent. Then someone notices `noindex`, or `Disallow: /`, or a certificate that dies mid-campaign.

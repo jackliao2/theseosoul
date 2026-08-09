@@ -87,6 +87,27 @@ const components: Components = {
   hr: () => (
     <hr className="my-10 border-slate-200 dark:border-slate-700" />
   ),
+  img: ({ src, alt }) => {
+    if (!src) return null;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- markdown URLs vary
+      <img
+        src={src}
+        alt={alt || ""}
+        className="mt-8 h-auto w-full rounded-xl border border-slate-200 dark:border-slate-700"
+        loading="lazy"
+      />
+    );
+  },
+  figure: ({ children }) => (
+    <figure className="mt-8">{children}</figure>
+  ),
+  figcaption: ({ children }) => (
+    <figcaption className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
+      {children}
+    </figcaption>
+  ),
+
   table: ({ children }) => (
     <div className="mt-6 overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm text-slate-700 dark:text-slate-300">

@@ -4,6 +4,8 @@ description: "How to read a robots.txt file like an SEO: path tests by user-agen
 date: "2026-08-09"
 tags: ["robots.txt", "Crawl", "Free tools"]
 excerpt: "‘File found’ is useless. You need: can Googlebot fetch /pricing, and did staging leave Disallow: / behind?"
+cover: "/images/blog/robots-txt-checker.webp"
+coverAlt: "Abstract diagram of a robots.txt path test with allow and disallow routes"
 ---
 
 Most “robots.txt checkers” on the internet do one of two things. They either dump the file into a text box and call it a day, or they paint a green checkmark because `https://yoursite.com/robots.txt` returned 200. Neither answers the question you actually have at 11pm with Search Console open: **is this URL fetchable for the bot I care about?**

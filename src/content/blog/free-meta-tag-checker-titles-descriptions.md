@@ -4,6 +4,8 @@ description: "What to check in title tags and meta descriptions: length bands, H
 date: "2026-08-09"
 tags: ["Meta tags", "On-page SEO", "Free tools"]
 excerpt: "Titles aren’t a character tax. Descriptions aren’t rankings. A good checker shows the live HTML after redirects — and whether you accidentally noindexed the page."
+cover: "/images/blog/meta-tag-checker.webp"
+coverAlt: "Illustration of a search result snippet card with title and description lines"
 ---
 
 Meta tag checkers attract a certain kind of anxiety. Someone pastes a URL, sees “Title: 72 characters (too long!),” and rewrites a perfectly clear headline into alphabet soup so a progress bar turns green.

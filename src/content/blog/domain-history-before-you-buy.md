@@ -5,6 +5,8 @@ date: "2026-07-30"
 updated: "2026-08-01"
 tags: ["Domains", "Wayback", "WHOIS"]
 excerpt: "Domain age isn’t a strategy. Open the archive for the weird years before you wire the money."
+cover: "/images/blog/domain-history.webp"
+coverAlt: "Illustration of a domain timeline with archive chapters along a horizontal axis"
 ---
 
 Aged domains get sold like bottles of wine. Some are fine. Some spent half a decade as doorway spam, fake support pages, or pharmaceutical merry-go-rounds. Paying for “age” alone is how you inherit someone else’s inbound junk and a brand string you can’t defend.

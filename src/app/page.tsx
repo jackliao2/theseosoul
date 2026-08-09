@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteWordmark } from "@/components/brand/site-mark";
@@ -288,16 +289,28 @@ export default function HomePage() {
               <li key={post.slug}>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="group flex h-full flex-col rounded-lg border border-slate-300/70 bg-white/60 px-4 py-3.5 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-teal-400/35"
+                  className="group flex h-full flex-col overflow-hidden rounded-lg border border-slate-300/70 bg-white/60 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-teal-400/35"
                 >
-                  <span className="font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
-                    {post.title}
-                  </span>
-                  <span className="mt-1.5 line-clamp-2 text-xs leading-snug text-slate-500 dark:text-slate-400">
-                    {post.excerpt ?? post.description}
-                  </span>
-                  <span className="mt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
-                    {post.readingMinutes} min read
+                  {post.cover ? (
+                    <Image
+                      src={post.cover}
+                      alt={post.coverAlt ?? post.title}
+                      width={640}
+                      height={360}
+                      className="aspect-video h-auto w-full object-cover"
+                      sizes="(max-width: 1024px) 50vw, 360px"
+                    />
+                  ) : null}
+                  <span className="flex flex-1 flex-col px-4 py-3.5">
+                    <span className="font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
+                      {post.title}
+                    </span>
+                    <span className="mt-1.5 line-clamp-2 text-xs leading-snug text-slate-500 dark:text-slate-400">
+                      {post.excerpt ?? post.description}
+                    </span>
+                    <span className="mt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                      {post.readingMinutes} min read
+                    </span>
                   </span>
                 </Link>
               </li>

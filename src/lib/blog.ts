@@ -12,6 +12,9 @@ export type BlogFrontmatter = {
   tags?: string[];
   /** Short card blurb; falls back to description */
   excerpt?: string;
+  /** Public path e.g. /images/blog/foo.webp */
+  cover?: string;
+  coverAlt?: string;
 };
 
 export type BlogPostMeta = BlogFrontmatter & {
@@ -48,6 +51,8 @@ function assertFrontmatter(
       ? data.tags.filter((t): t is string => typeof t === "string")
       : undefined,
     excerpt: typeof data.excerpt === "string" ? data.excerpt : undefined,
+    cover: typeof data.cover === "string" ? data.cover : undefined,
+    coverAlt: typeof data.coverAlt === "string" ? data.coverAlt : undefined,
   };
 }
 

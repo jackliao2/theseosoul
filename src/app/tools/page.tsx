@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import {
@@ -30,6 +31,10 @@ const faqs = [
   },
 ];
 
+const HUB_IMAGE = "/images/site/tools-hub.webp";
+const HUB_ALT =
+  "Abstract toolkit illustration representing free SEO checker tools";
+
 export const metadata: Metadata = {
   title: "Free SEO Tools — Audit, AdSense Readiness, Robots & More",
   description:
@@ -51,6 +56,14 @@ export const metadata: Metadata = {
       "Honest free SEO utilities: robots.txt, meta, canonical, density, OG, redirects, GEO.",
     url: PAGE_PATH,
     type: "website",
+    images: [{ url: HUB_IMAGE, width: 1600, height: 900, alt: HUB_ALT }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free SEO Tools — No Signup",
+    description:
+      "Honest free SEO utilities: robots.txt, meta, canonical, density, OG, redirects, GEO.",
+    images: [HUB_IMAGE],
   },
 };
 
@@ -159,6 +172,18 @@ export default function ToolsPage() {
           See example report →
         </Link>
       </div>
+
+      <figure className="mt-8 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+        <Image
+          src={HUB_IMAGE}
+          alt={HUB_ALT}
+          width={1600}
+          height={900}
+          className="h-auto w-full object-cover"
+          priority
+          sizes="(max-width: 768px) 100vw, 960px"
+        />
+      </figure>
 
       {/* Primary CTA — one clear entry */}
       <Link
