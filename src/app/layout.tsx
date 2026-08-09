@@ -89,14 +89,8 @@ export default function RootLayout({
         description:
           "Free technical SEO audit and inspection reports for any domain.",
         publisher: { "@id": `${SITE_URL}/#organization` },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${SITE_URL}/audit/{search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
+        // No SearchAction → /audit/{term}: that pushed Google toward thin
+        // noindex report URLs instead of indexable tools and guides.
       },
       {
         "@type": "Organization",

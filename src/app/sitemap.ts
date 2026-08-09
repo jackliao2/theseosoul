@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.updated ?? post.date),
     changeFrequency: "monthly" as const,
-    priority: 0.68,
+    priority: 0.72,
   }));
 
   const auditEntries: MetadataRoute.Sitemap = curated.map((domain) => ({

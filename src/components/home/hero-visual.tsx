@@ -12,7 +12,7 @@ export function HeroVisual() {
             <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
             <span className="h-2 w-2 rounded-full bg-[#28c840]" />
             <span className="ml-3 truncate font-mono text-[11px] text-slate-400">
-              theseosoul.com/audit/stripe.com
+              theseosoul.com/audit/theseosoul.com
             </span>
             <span className="ml-auto font-mono text-[10px] text-teal-300/90">
               91 · A · GEO 78
@@ -79,7 +79,7 @@ export function HeroVisual() {
                 </div>
                 <div className="min-w-0">
                   <p className="truncate font-display text-base font-semibold text-white">
-                    stripe.com
+                    theseosoul.com
                   </p>
                   <p className="mt-0.5 font-mono text-[11px] text-slate-400">
                     TLS · DNS · RDAP · live HTML

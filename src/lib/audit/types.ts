@@ -454,11 +454,7 @@ export const SITE_EMAIL = "hello@theseosoul.com";
 
 /**
  * Domains allowed in sitemap + default indexable audit pages.
- * Keep this small and first-party-heavy — indexing many mega-brand
- * /audit/{brand} URLs reads like parasitic SEO.
+ * First-party only — indexing mega-brand /audit/{brand} URLs reads like
+ * parasitic SEO and competes with pages that can actually rank.
  */
-export const INDEXABLE_AUDIT_DOMAINS = [
-  "theseosoul.com",
-  "stripe.com",
-  "vercel.com",
-] as const;
+export const INDEXABLE_AUDIT_DOMAINS = ["theseosoul.com"] as const;

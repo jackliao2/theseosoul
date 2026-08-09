@@ -104,8 +104,28 @@ function ToolTile({
 }
 
 export default function ToolsPage() {
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${SITE_NAME} Free SEO Tools`,
+    itemListElement: TOOL_CATALOG.map((tool, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: tool.title,
+      url: tool.href.startsWith("http")
+        ? tool.href
+        : tool.href.startsWith("/#")
+          ? SITE_URL
+          : `${SITE_URL}${tool.href}`,
+    })),
+  };
+
   return (
     <ContentPage className="max-w-5xl py-10 sm:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
       <ToolFaqJsonLd
         faqs={faqs}
         pageUrl={PAGE_URL}
@@ -122,7 +142,14 @@ export default function ToolsPage() {
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             Live HTML checks only — no fake DA or traffic. Pick a checker or run
-            the full audit.
+            the full audit. Pair tools with our{" "}
+            <Link
+              href="/blog"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              SEO &amp; GEO guides
+            </Link>
+            .
           </p>
         </div>
         <Link

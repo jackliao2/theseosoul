@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteWordmark } from "@/components/brand/site-mark";
@@ -9,15 +10,24 @@ import { HeroVisual } from "@/components/home/hero-visual";
 import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { HOME_FAQS } from "@/lib/home-faqs";
+import { getAllPosts } from "@/lib/blog";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
-/** Public demo chips — skip first-party so the hero doesn’t look like self-promo. */
+export const metadata: Metadata = {
+  title: {
+    absolute:
+      "TheSeoSoul — Free Website SEO Checker, Audit Reports & SEO Tools",
+  },
+  description:
+    "Free website SEO checker with no signup. Run a shareable technical SEO audit, or use free tools for robots.txt, meta tags, sitemap, SSL, security headers, domain history, and AdSense readiness.",
+  alternates: { canonical: "/" },
+};
+
+/** Public demo chips — reports stay noindex; only our own audit is sitemap-listed. */
 const examples = [
   "stripe.com",
-  "vercel.com",
   "github.com",
-  "notion.so",
   "cloudflare.com",
 ];
 
@@ -41,6 +51,8 @@ const featuredTools = featuredToolHrefs.map((href) => {
 });
 
 export default function HomePage() {
+  const guides = getAllPosts().slice(0, 6);
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -234,14 +246,69 @@ export default function HomePage() {
             >
               See our own audit report
             </Link>
+            {" · "}
+            <Link
+              href="/blog"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              Read guides
+            </Link>
             .
           </p>
         </div>
       </section>
 
       <section
-        id="why"
+        id="guides"
         className="border-t border-slate-300/70 bg-[color:var(--surface)] dark:border-slate-700"
+      >
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-teal-800 dark:text-teal-300">
+                Guides
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
+                Practical SEO & GEO reading
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                Short guides that pair with the free tools — robots vs noindex,
+                sitemaps, SSL headers, domain history, and AdSense prep.
+              </p>
+            </div>
+            <Link
+              href="/blog"
+              className="text-sm font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              All guides →
+            </Link>
+          </div>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {guides.map((post) => (
+              <li key={post.slug}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="group flex h-full flex-col rounded-lg border border-slate-300/70 bg-white/60 px-4 py-3.5 transition-colors hover:border-teal-700/40 dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-teal-400/35"
+                >
+                  <span className="font-display text-[15px] font-semibold text-slate-900 group-hover:text-teal-900 dark:text-slate-50 dark:group-hover:text-teal-200">
+                    {post.title}
+                  </span>
+                  <span className="mt-1.5 line-clamp-2 text-xs leading-snug text-slate-500 dark:text-slate-400">
+                    {post.excerpt ?? post.description}
+                  </span>
+                  <span className="mt-3 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                    {post.readingMinutes} min read
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section
+        id="why"
+        className="border-t border-slate-300/70 dark:border-slate-700"
       >
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="max-w-2xl">

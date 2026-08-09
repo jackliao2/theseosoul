@@ -5,7 +5,9 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      // Allow OG image endpoint so social/search previews can fetch it;
+      // keep other /api/ routes out of the crawl graph.
+      allow: ["/", "/api/og-audit"],
       disallow: ["/api/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

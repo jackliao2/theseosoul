@@ -44,10 +44,10 @@ export function SiteSoulSection() {
               <ArrowUpRight className="h-3.5 w-3.5" />
             </AuditCtaLink>
             <Link
-              href="/audit/stripe.com?tab=soul"
+              href="/audit/theseosoul.com?tab=soul"
               className="text-sm font-semibold text-slate-300 transition-colors hover:text-white"
             >
-              See Stripe’s Site Soul →
+              See our Site Soul →
             </Link>
           </div>
         </div>
