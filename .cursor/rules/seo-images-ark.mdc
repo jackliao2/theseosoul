@@ -1,0 +1,36 @@
+---
+description: Ark Seedream SEO image style + generation workflow for blogs and hubs
+alwaysApply: true
+---
+
+# SEO images (Ark Seedream)
+
+When generating images for TheSeoSoul blogs, `/blog`, `/tools`, or similar content pages, match the established cover style and use the Ark API.
+
+## When to add images
+- **Do:** Blog post covers (all guides), `/blog` and `/tools` hub heroes, OG/Twitter images, homepage Guides cards.
+- **Don't:** Clutter homepage hero, audit dashboards, or every tiny tool form with decorative AI art.
+
+## Visual style (keep this)
+Editorial technical illustration for an SEO SaaS brand:
+- Palette: deep slate, teal accents, soft off-white background
+- Flat geometric / diagram style, subtle grain, vector-like shapes
+- No people faces, no readable text, no letter logos, no watermarks, no fake UI screenshots with words
+- 16:9 covers; avoid purple-glow / cream-terracotta / broadsheet looks from the frontend design rules
+
+## API
+- Base URL: `https://ark.cn-beijing.volces.com/api/v3/images/generations`
+- Model / endpoint ID: `ep-20260522165148-sfrn2`
+- Auth: `Authorization: Bearer $ARK_API_KEY` (from env / `.env.local` — **never commit the key**)
+- Required body flags: `watermark: false`, `response_format: "url"`, `sequential_image_generation: "disabled"`, `stream: false`
+- Size: at least ~3.6M pixels (use `2560x1440` or `2K` — `1920x1080` is rejected)
+
+## Post-process & ship
+1. Download the result, convert with `sharp` → WebP (~1600×900, quality ~82)
+2. Save under `public/images/blog/` or `public/images/site/`
+3. Set meaningful English `cover` + `coverAlt` in blog frontmatter (or hub constants)
+4. Wire visible `<Image>`, Open Graph, Twitter `summary_large_image`, and Article JSON-LD `image` when relevant
+5. Reuse / extend `scripts/generate-seo-images.mjs` rather than inventing a new pipeline
+
+## Daily quota
+Free tier is limited (~100/day). Batch thoughtfully; skip regenerating files that already exist unless `FORCE=1`.
