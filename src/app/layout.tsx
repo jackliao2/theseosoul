@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist_Mono, Source_Sans_3 } from "next/font/google";
-import Script from "next/script";
+import { AnalyticsConsent } from "@/components/layout/analytics-consent";
 import { SiteShell } from "@/components/layout/site-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import "./globals.css";
-
-const GA_MEASUREMENT_ID = "G-6GC0B6V6TB";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -129,24 +127,15 @@ export default function RootLayout({
       <body
         className={`${bricolage.variable} ${sourceSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SiteShell>{children}</SiteShell>
+          <AnalyticsConsent />
         </ThemeProvider>
       </body>
     </html>

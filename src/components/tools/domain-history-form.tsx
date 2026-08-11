@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ExternalLink, LoaderCircle } from "lucide-react";
 import { ToolError } from "@/components/tools/url-tool-form";
+import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
 import type {
   DomainHistoryKind,
   DomainHistoryResponse,
@@ -34,18 +35,9 @@ const verdictTone: Record<DomainHistoryVerdictId, string> = {
 };
 
 export function DomainHistoryForm() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useUrlQueryPrefill("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DomainHistoryResponse | null>(null);
-
-  useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search).get("url");
-      if (q?.trim()) setUrl(q.trim());
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();

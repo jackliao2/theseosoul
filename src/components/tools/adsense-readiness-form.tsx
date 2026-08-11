@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { ToolError } from "@/components/tools/url-tool-form";
+import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
 import {
   ADSENSE_GROUPS,
   type AdsenseCheckStatus,
@@ -61,20 +62,11 @@ const statusMeta: Record<
 };
 
 export function AdsenseReadinessForm() {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useUrlQueryPrefill("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AdsenseReadinessResponse | null>(null);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search).get("url");
-      if (q?.trim()) setUrl(q.trim());
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();

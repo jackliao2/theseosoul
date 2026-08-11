@@ -158,7 +158,7 @@ export default function TermsPage() {
             <p>
               Audit results use predictable{" "}
               <code className="rounded bg-slate-200/70 px-1.5 py-0.5 font-mono text-[12px] text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-                /audit/[domain]
+                /audit/[host/path]
               </code>{" "}
               URLs so they can be sent to clients, colleagues, and developers.
               Do not submit a domain if you do not want its publicly observable

@@ -71,7 +71,9 @@ export default function HomePage() {
     <div className="relative overflow-hidden">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-glow" />
@@ -155,7 +157,7 @@ export default function HomePage() {
               {
                 step: "03",
                 title: "Publish the report",
-                body: "Dashboard live at /audit/[domain] — shareable with Why + Fix issues.",
+                body: "Dashboard live at /audit/[host/path] — shareable with Why + Fix issues.",
               },
             ].map((item) => (
               <li
@@ -342,7 +344,7 @@ export default function HomePage() {
             {[
               {
                 t: "Report pages, not popups",
-                d: "Every audit lives at /audit/[domain] — shareable with clients; only curated examples are pushed to search.",
+                d: "Every audit lives at /audit/[host/path] — shareable with clients; only curated examples are pushed to search.",
               },
               {
                 t: "GEO + classic SEO",

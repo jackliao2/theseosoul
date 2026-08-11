@@ -8,7 +8,7 @@ import {
   getSoulProfile,
 } from "@/lib/audit/soul";
 import type { AuditResult } from "@/lib/audit/types";
-import { auditCanonicalUrl, auditShareSlug } from "@/lib/url";
+import { auditCanonicalUrl, auditShareSlug, normalizeUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
 type FlashKind = "link" | "json" | "summary";
@@ -35,11 +35,20 @@ async function writeClipboard(text: string): Promise<boolean> {
   }
 }
 
-export function ReportActions({ audit }: { audit: AuditResult }) {
+export function ReportActions({
+  audit,
+  requestedUrl,
+}: {
+  audit: AuditResult;
+  requestedUrl: string;
+}) {
   const [copied, setCopied] = useState<FlashKind | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const shareUrl = auditCanonicalUrl(audit);
-  const slug = auditShareSlug(audit);
+  const reportTarget = normalizeUrl(requestedUrl);
+  const shareUrl = auditCanonicalUrl(reportTarget);
+  const slug = auditShareSlug(reportTarget);
+  const finalUrlChanged =
+    new URL(audit.url).toString() !== new URL(reportTarget.url).toString();
 
   function flash(kind: FlashKind) {
     setCopied(kind);
@@ -69,7 +78,8 @@ export function ReportActions({ audit }: { audit: AuditResult }) {
       priority.urgent
         ? `Fix first: ${priority.title} — ${priority.fix}`
         : "Priority: No urgent issues today.",
-      `URL: ${audit.url}`,
+      `Requested URL: ${reportTarget.url}`,
+      ...(finalUrlChanged ? [`Final URL: ${audit.url}`] : []),
       `Title: ${audit.title.content ?? "N/A"} (${audit.title.length})`,
       `Description: ${audit.description.content ?? "N/A"} (${audit.description.length})`,
       `GEO: ${audit.geo.score}/100`,

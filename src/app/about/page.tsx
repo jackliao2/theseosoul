@@ -85,7 +85,7 @@ const steps = [
   {
     n: "03",
     title: "Share the report URL",
-    body: "Every run lands at /audit/[domain] so you can send it to a client or teammate — not a private popup.",
+    body: "Every run lands at /audit/[host/path] so you can send it to a client or teammate — not a private popup.",
   },
 ];
 
@@ -142,7 +142,7 @@ export default function AboutPage() {
             related public files, score what we can prove, and publish a
             dashboard at{" "}
             <code className="rounded bg-slate-200/70 px-1.5 py-0.5 text-[13px] dark:bg-slate-800">
-              /audit/[domain]
+              /audit/[host/path]
             </code>
             . The free tier stays honest: no invented Domain Authority, no fake
             traffic graphs.

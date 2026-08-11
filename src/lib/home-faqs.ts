@@ -2,11 +2,11 @@
 export const HOME_FAQS = [
   {
     q: "Is TheSeoSoul free — and what isn’t?",
-    a: "The technical SEO + GEO audit is free forever for public URLs: no signup, no credit card. You get on-page checks, structure, keywords, AI crawler / llms.txt signals, TLS, DNS, security headers, RDAP domain age when registries answer, and a shareable /audit/[domain] report. What we do not invent on the free tier: Domain Authority, traffic charts, or a full backlink index. Tools like Seobility’s backlink checker need paid link databases and daily query caps — when we add backlinks / SERP / traffic, it will be a clear Pro layer with real data, not fake numbers.",
+    a: "The technical SEO + GEO audit is free forever for public URLs: no signup, no credit card. You get on-page checks, structure, keywords, AI crawler / llms.txt signals, TLS, DNS, security headers, RDAP domain age when registries answer, and a shareable /audit/[host/path] report. What we do not invent on the free tier: Domain Authority, traffic charts, or a full backlink index. Tools like Seobility’s backlink checker need paid link databases and daily query caps — when we add backlinks / SERP / traffic, it will be a clear Pro layer with real data, not fake numbers.",
   },
   {
     q: "How does an audit work?",
-    a: "You paste a URL. Our servers normalize the host (apex vs www), fetch live HTML over HTTP/1.1, follow the redirect chain, and in parallel probe robots.txt, sitemap.xml, TLS certificate metadata, DNS/SPF/DMARC, and RDAP/WHOIS. We parse titles, metas, headings, alts, links, Open Graph, schema, and GEO citability signals, then score Meta / Structure / Technical / GEO subscores plus a prioritized Issues list with Why and Fix guidance. The dashboard publishes at /audit/[domain]. Results are lightly cached (about 15 minutes in memory) so free upstreams stay healthy and shared links stay fast — hit Refresh on a report when you need a new crawl.",
+    a: "You paste a URL. Our servers normalize the host (apex vs www), fetch live HTML over HTTP/1.1, follow the redirect chain, and in parallel probe robots.txt, sitemap.xml, TLS certificate metadata, DNS/SPF/DMARC, and RDAP/WHOIS. We parse titles, metas, headings, alts, links, Open Graph, schema, and GEO citability signals, then score Meta / Structure / Technical / GEO subscores plus a prioritized Issues list with Why and Fix guidance. The dashboard publishes at /audit/[host/path]. Results are lightly cached (about 15 minutes in memory) so free upstreams stay healthy and shared links stay fast — hit Refresh on a report when you need a new crawl.",
   },
   {
     q: "How is this different from other free SEO tools?",

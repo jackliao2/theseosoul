@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,7 +53,14 @@ function retryHref(error: AuditErrorResult): string {
 }
 
 export function AuditError({ error }: { error: AuditErrorResult }) {
+  const router = useRouter();
   const detail = detailForDisplay(error);
+
+  function retry() {
+    const target = new URL(retryHref(error), window.location.origin);
+    target.searchParams.set("t", String(Date.now()));
+    router.push(`${target.pathname}${target.search}${target.hash}`);
+  }
 
   return (
     <Card className="border-rose-200 dark:border-rose-900/50">
@@ -81,11 +91,9 @@ export function AuditError({ error }: { error: AuditErrorResult }) {
           ) : null}
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href={`${retryHref(error)}?t=${Date.now()}`}>
-              <RefreshCw className="h-4 w-4" />
-              Try again
-            </Link>
+          <Button type="button" onClick={retry}>
+            <RefreshCw className="h-4 w-4" />
+            Try again
           </Button>
           <Button asChild variant="outline">
             <Link href="/">

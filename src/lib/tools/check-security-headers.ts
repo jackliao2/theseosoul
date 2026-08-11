@@ -412,7 +412,7 @@ export async function checkSecurityHeaders(
 
   // Core max 5*16=80, https 14, extras 3*2=6 → 100
   let raw = https ? 14 : 0;
-  let max = 14 + 5 * 16 + 3 * 2;
+  const max = 14 + 5 * 16 + 3 * 2;
   for (const row of rows) {
     raw += pointsFor(row.status, row.weight);
   }

@@ -137,7 +137,9 @@ export default function ToolsPage() {
     <ContentPage className="max-w-5xl py-10 sm:py-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <ToolFaqJsonLd
         faqs={faqs}

@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 export async function GET(request: NextRequest) {
   const raw = request.nextUrl.searchParams.get("target") ?? "site";
   let label = raw;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Check, Circle } from "lucide-react";
 import {
@@ -21,17 +21,60 @@ const ARC_ORDER: LadderArcId[] = [
   "monetize",
   "systems",
 ];
+const CHANGE_EVENT = "theseosoul:seo-ladder-change";
+let memorySnapshot = "";
 
-function loadChecked(): Record<string, boolean> {
-  if (typeof window === "undefined") return {};
+function loadChecked(snapshot: string | null): Record<string, boolean> {
+  if (!snapshot) return {};
   try {
-    const raw = localStorage.getItem(SEO_LADDER_STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, boolean>;
+    const parsed = JSON.parse(snapshot) as Record<string, boolean>;
     return parsed && typeof parsed === "object" ? parsed : {};
   } catch {
     return {};
   }
+}
+
+function getLadderSnapshot() {
+  try {
+    const snapshot = localStorage.getItem(SEO_LADDER_STORAGE_KEY);
+    if (snapshot !== null) {
+      memorySnapshot = snapshot;
+      return snapshot;
+    }
+    return memorySnapshot;
+  } catch {
+    return memorySnapshot;
+  }
+}
+
+function getServerLadderSnapshot() {
+  return null;
+}
+
+function subscribeToLadder(onStoreChange: () => void) {
+  function onStorage(event: StorageEvent) {
+    if (event.key === SEO_LADDER_STORAGE_KEY || event.key === null) {
+      memorySnapshot = event.newValue ?? "";
+      onStoreChange();
+    }
+  }
+
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(CHANGE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function saveChecked(checked: Record<string, boolean>) {
+  memorySnapshot = JSON.stringify(checked);
+  try {
+    localStorage.setItem(SEO_LADDER_STORAGE_KEY, memorySnapshot);
+  } catch {
+    /* keep the in-memory value for this tab */
+  }
+  window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
 function StageCard({
@@ -174,22 +217,13 @@ function StageCard({
 }
 
 export function SeoLadder() {
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setChecked(loadChecked());
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(SEO_LADDER_STORAGE_KEY, JSON.stringify(checked));
-    } catch {
-      /* ignore quota */
-    }
-  }, [checked, hydrated]);
+  const snapshot = useSyncExternalStore(
+    subscribeToLadder,
+    getLadderSnapshot,
+    getServerLadderSnapshot
+  );
+  const checked = useMemo(() => loadChecked(snapshot), [snapshot]);
+  const hydrated = snapshot !== null;
 
   const position = resolveLadderPosition(checked);
   const focus = SEO_LADDER_STAGES.find((s) => s.id === position.focusStage)!;
@@ -198,11 +232,11 @@ export function SeoLadder() {
   );
 
   function toggle(key: string) {
-    setChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+    saveChecked({ ...checked, [key]: !checked[key] });
   }
 
   function reset() {
-    setChecked({});
+    saveChecked({});
   }
 
   return (

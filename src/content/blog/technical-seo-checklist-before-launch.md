@@ -123,4 +123,4 @@ Draft check: [GEO Content Checker](/tools/geo-content-checker). Whole-site pass:
 
 A green checklist does not buy rankings. It stops you from donating the first month to avoidable crawl/index accidents. When those are clean, content and distribution can do their jobs.
 
-If the team wants one shareable pass, run a [TheSeoSoul audit](/#home-audit-url) and drop the `/audit/[domain]` link in the launch channel.
+If the team wants one shareable pass, run a [TheSeoSoul audit](/#home-audit-url) and drop the `/audit/[host/path]` link in the launch channel.

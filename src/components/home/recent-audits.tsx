@@ -1,23 +1,92 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 const KEY = "theseosoul-recent-audits";
+const CHANGE_EVENT = "theseosoul:recent-audits-change";
 
-/** Remember a share slug like "stripe.com" or "stripe.com/docs". */
-function readRecentList(raw: string | null): string[] {
+type RecentAudit = { label: string; href: string };
+let memorySnapshot: string | null = null;
+
+function getRecentSnapshot() {
+  try {
+    const snapshot = localStorage.getItem(KEY);
+    if (snapshot !== null) {
+      memorySnapshot = snapshot;
+      return snapshot;
+    }
+    return memorySnapshot;
+  } catch {
+    return memorySnapshot;
+  }
+}
+
+function getServerRecentSnapshot() {
+  return null;
+}
+
+function subscribeToRecentAudits(onStoreChange: () => void) {
+  function onStorage(event: StorageEvent) {
+    if (event.key !== KEY && event.key !== null) return;
+    memorySnapshot = event.newValue;
+    onStoreChange();
+  }
+
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(CHANGE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function notifyRecentAuditsChanged() {
+  window.dispatchEvent(new Event(CHANGE_EVENT));
+}
+
+/** Read current entries and migrate the previous slug-only storage format. */
+function readRecentList(raw: string | null): RecentAudit[] {
   if (!raw) return [];
   const parsed = JSON.parse(raw) as unknown;
   if (!Array.isArray(parsed)) return [];
-  return parsed.filter((item): item is string => typeof item === "string");
+
+  return parsed.flatMap((item): RecentAudit[] => {
+    if (typeof item === "string" && item.trim()) {
+      return [{ label: item, href: `/audit/${item}` }];
+    }
+    if (
+      item &&
+      typeof item === "object" &&
+      "label" in item &&
+      "href" in item &&
+      typeof item.label === "string" &&
+      typeof item.href === "string" &&
+      item.label.trim() &&
+      item.href.startsWith("/audit/")
+    ) {
+      return [{ label: item.label, href: item.href }];
+    }
+    return [];
+  });
 }
 
-export function rememberRecentAudit(slug: string) {
+/** Remember both the readable label and exact report href. */
+export function rememberRecentAudit(label: string, href?: string) {
   try {
-    const list = readRecentList(localStorage.getItem(KEY));
-    const next = [slug, ...list.filter((d) => d !== slug)].slice(0, 8);
-    localStorage.setItem(KEY, JSON.stringify(next));
+    const list = readRecentList(getRecentSnapshot());
+    const safeHref = href?.startsWith("/audit/") ? href : `/audit/${label}`;
+    const next = [
+      { label, href: safeHref },
+      ...list.filter((item) => item.href !== safeHref),
+    ].slice(0, 8);
+    memorySnapshot = JSON.stringify(next);
+    try {
+      localStorage.setItem(KEY, memorySnapshot);
+    } catch {
+      // Keep the in-memory value for this tab.
+    }
+    notifyRecentAuditsChanged();
   } catch {
     // ignore
   }
@@ -29,23 +98,27 @@ export function rememberRecentDomain(domain: string) {
 }
 
 export function RecentAudits() {
-  const [items, setItems] = useState<string[]>([]);
-
-  useEffect(() => {
+  const snapshot = useSyncExternalStore(
+    subscribeToRecentAudits,
+    getRecentSnapshot,
+    getServerRecentSnapshot
+  );
+  const items = useMemo(() => {
     try {
-      setItems(readRecentList(localStorage.getItem(KEY)));
+      return readRecentList(snapshot);
     } catch {
-      // ignore
+      return [];
     }
-  }, []);
+  }, [snapshot]);
 
   function clearRecent() {
+    memorySnapshot = null;
     try {
       localStorage.removeItem(KEY);
     } catch {
       // ignore
     }
-    setItems([]);
+    notifyRecentAuditsChanged();
   }
 
   if (items.length === 0) return null;
@@ -65,14 +138,14 @@ export function RecentAudits() {
         </button>
       </div>
       <div className="mt-1.5 flex flex-wrap justify-center gap-1.5">
-        {items.map((slug) => (
+        {items.map((item) => (
           <Link
-            key={slug}
-            href={`/audit/${slug}`}
+            key={item.href}
+            href={item.href}
             className="max-w-[14rem] truncate rounded-md border border-slate-200 bg-white/80 px-2 py-0.5 text-xs font-medium text-slate-700 transition-colors hover:border-teal-700 hover:text-teal-800 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-teal-400 dark:hover:text-teal-300"
-            title={slug}
+            title={item.label}
           >
-            {slug}
+            {item.label}
           </Link>
         ))}
       </div>

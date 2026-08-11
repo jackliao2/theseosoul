@@ -1,27 +1,116 @@
 import { SITE_URL } from "@/lib/audit/types";
 
-/**
- * Normalize a user-provided URL or bare domain into a canonical https URL.
- * Handles missing protocol, trailing slashes, and lowercase hostnames.
- * Preserves path and query (hash stripped).
- */
-export function normalizeUrl(input: string): {
+export type NormalizedUrl = {
   url: string;
   domain: string;
   hostname: string;
-} {
+};
+
+export type AuditRouteSearchParams = Record<
+  string,
+  string | string[] | undefined
+>;
+
+/** Reserved report query param used only when the clean route cannot be exact. */
+export const AUDIT_EXACT_URL_PARAM = "url";
+export const MAX_AUDIT_URL_BYTES = 4_096;
+
+const SENSITIVE_QUERY_NAMES = new Set([
+  "access_key",
+  "access_token",
+  "assertion",
+  "apikey",
+  "api_key",
+  "auth",
+  "authorization",
+  "awsaccesskeyid",
+  "bearer",
+  "client_secret",
+  "code",
+  "credential",
+  "credentials",
+  "id_token",
+  "jwt",
+  "key",
+  "oauth_code",
+  "nonce",
+  "otp",
+  "password",
+  "passwd",
+  "relaystate",
+  "samlresponse",
+  "secret",
+  "session",
+  "session_id",
+  "sessionid",
+  "sid",
+  "sig",
+  "signature",
+  "state",
+  "ticket",
+  "token",
+]);
+
+function normalizedQueryName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function sensitiveQueryName(name: string): boolean {
+  const normalized = normalizedQueryName(name);
+  if (SENSITIVE_QUERY_NAMES.has(normalized)) return true;
+
+  const parts = normalized.split("_");
+  const sensitivePart = parts.some((part) =>
+    [
+      "credential",
+      "jwt",
+      "key",
+      "password",
+      "passwd",
+      "secret",
+      "session",
+      "signature",
+      "token",
+    ].includes(part)
+  );
+  return (
+    sensitivePart ||
+    /(credential|password|passwd|secret|sessionid|signature|token)$/.test(
+      normalized
+    )
+  );
+}
+
+function assertAuditUrlSize(value: string): void {
+  if (new TextEncoder().encode(value).byteLength > MAX_AUDIT_URL_BYTES) {
+    throw new Error(
+      `URLs longer than ${MAX_AUDIT_URL_BYTES.toLocaleString("en-US")} bytes cannot be audited.`
+    );
+  }
+}
+
+/**
+ * Normalize a user-provided URL or bare domain.
+ * Bare domains default to HTTPS; an explicit HTTP URL stays HTTP.
+ * Preserves host, path and query (hash stripped).
+ */
+export function normalizeUrl(input: string): NormalizedUrl {
   const trimmed = input.trim();
 
   if (!trimmed) {
     throw new Error("URL is required");
   }
+  assertAuditUrlSize(trimmed);
 
   let candidate = trimmed;
 
   // Strip common prefixes users paste
   candidate = candidate.replace(/^\/+/, "");
 
-  if (!/^https?:\/\//i.test(candidate)) {
+  if (!/^[a-z][a-z\d+.-]*:\/\//i.test(candidate)) {
     candidate = `https://${candidate}`;
   }
 
@@ -34,6 +123,22 @@ export function normalizeUrl(input: string): {
 
   if (!["http:", "https:"].includes(parsed.protocol)) {
     throw new Error("Only HTTP and HTTPS URLs are supported");
+  }
+
+  if (parsed.username || parsed.password) {
+    throw new Error(
+      "URLs containing a username or password cannot be audited. Remove sign-in credentials and try again."
+    );
+  }
+
+  for (const name of parsed.searchParams.keys()) {
+    if (sensitiveQueryName(name)) {
+      const displayName =
+        name.length > 64 ? `${name.slice(0, 61)}...` : name;
+      throw new Error(
+        `This URL contains a sensitive query parameter ("${displayName}"). Remove credentials, authentication codes, tokens, keys, or signed-link parameters before auditing.`
+      );
+    }
   }
 
   const hostname = parsed.hostname.toLowerCase();
@@ -51,24 +156,24 @@ export function normalizeUrl(input: string): {
     throw new Error("Please enter a public website domain");
   }
 
-  parsed.protocol = "https:";
   parsed.hostname = hostname;
   parsed.hash = "";
 
-  // Normalize path: root stays as origin without trailing slash noise
-  const pathname =
-    parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/+$/, "");
+  // Root stays as the origin without trailing-slash noise. A non-root trailing
+  // slash is significant and is preserved by the exact report URL marker.
+  const pathname = parsed.pathname === "/" ? "" : parsed.pathname;
 
   const url = `${parsed.origin}${pathname}${parsed.search}`;
+  assertAuditUrlSize(url);
   const domain = hostname.replace(/^www\./, "");
 
   return { url, domain, hostname };
 }
 
 /**
- * Shareable audit path segment(s) after /audit/
+ * Readable audit path segment(s) after /audit/.
  * e.g. "stripe.com" or "stripe.com/docs"
- * Query strings are omitted from the pretty share URL (path is enough for SEO tests).
+ * Protocol and query are omitted here; auditHref carries them when required.
  */
 export function auditShareSlug(input: {
   domain: string;
@@ -78,10 +183,10 @@ export function auditShareSlug(input: {
     const parsed = new URL(input.url);
     const pathname =
       parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/+$/, "");
-    const domain = input.domain.replace(/^www\./, "");
-    return pathname ? `${domain}${pathname}` : domain;
+    const hostname = parsed.hostname.toLowerCase();
+    return pathname ? `${hostname}${pathname}` : hostname;
   } catch {
-    return input.domain.replace(/^www\./, "");
+    return input.domain;
   }
 }
 
@@ -90,10 +195,9 @@ export function auditCanonicalUrl(
   input: string | { domain: string; url: string }
 ): string {
   if (typeof input === "string") {
-    const domain = input.replace(/^www\./, "");
-    return `${SITE_URL}/audit/${domain}`;
+    return `${SITE_URL}/audit/${input}`;
   }
-  return `${SITE_URL}/audit/${auditShareSlug(input)}`;
+  return `${SITE_URL}${auditHref(input)}`;
 }
 
 /** Client/router path: /audit/example.com or /audit/example.com/blog */
@@ -101,7 +205,27 @@ export function auditHref(input: {
   domain: string;
   url: string;
 }): string {
-  return `/audit/${auditShareSlug(input)}`;
+  const base = `/audit/${auditShareSlug(input)}`;
+
+  try {
+    const parsed = new URL(input.url);
+    const nonRootTrailingSlash =
+      parsed.pathname !== "/" && parsed.pathname.endsWith("/");
+    const needsExactUrl =
+      parsed.protocol !== "https:" ||
+      Boolean(parsed.search) ||
+      Boolean(parsed.port) ||
+      nonRootTrailingSlash ||
+      /%[0-9a-f]{2}/i.test(parsed.pathname);
+
+    if (!needsExactUrl) return base;
+
+    const params = new URLSearchParams();
+    params.set(AUDIT_EXACT_URL_PARAM, input.url);
+    return `${base}?${params.toString()}`;
+  } catch {
+    return base;
+  }
 }
 
 /**
@@ -130,7 +254,7 @@ export function auditReportHref(
       /* fall through */
     }
   }
-  return `/audit/${domain.replace(/^www\./, "")}`;
+  return `/audit/${domain}`;
 }
 
 /** Join catch-all [...target] segments into a normalizable host[/path]. */
@@ -143,10 +267,51 @@ export function targetFromSegments(segments: string[]): {
     throw new Error("URL is required");
   }
   const joined = segments
-    .map((s) => decodeURIComponent(s).trim())
+    // Next.js route params are already decoded. Decoding again breaks valid
+    // paths such as `/100%25`, whose param value is the literal `100%`.
+    .map((segment) => segment.trim())
     .filter(Boolean)
     .join("/");
   return normalizeUrl(joined);
+}
+
+function decodeRouteSlugOnce(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
+/** Rebuild the exact audited URL from a clean catch-all route plus its marker. */
+export function targetFromAuditRoute(
+  segments: string[],
+  searchParams: AuditRouteSearchParams
+): NormalizedUrl {
+  const routeTarget = targetFromSegments(segments);
+  const encoded = searchParams[AUDIT_EXACT_URL_PARAM];
+
+  if (encoded === undefined) return routeTarget;
+  if (typeof encoded !== "string" || !encoded.trim()) {
+    throw new Error("This audit link contains an invalid exact URL.");
+  }
+
+  const exactTarget = normalizeUrl(encoded);
+  const routeSlug = segments.join("/");
+  const exactSlug = auditShareSlug(exactTarget);
+  // Next.js 16 can expose catch-all values in their encoded form during a
+  // production request, while direct function callers may already have decoded
+  // them once. Accept exactly those two representations of the generated slug.
+  const matchesRoute =
+    routeSlug === exactSlug || routeSlug === decodeRouteSlugOnce(exactSlug);
+
+  if (!matchesRoute) {
+    throw new Error(
+      "The exact URL does not match this report path. Start a new audit with the full URL."
+    );
+  }
+
+  return exactTarget;
 }
 
 export function isValidDomainParam(param: string): boolean {
@@ -167,14 +332,11 @@ export function isValidAuditTarget(segments: string[]): boolean {
   }
 }
 
-/** Cache key must distinguish path audits on the same host. */
+/** Cache key must distinguish scheme, exact host, path and query audits. */
 export function auditCacheKey(url: string, domain: string): string {
   try {
     const parsed = new URL(url);
-    const path =
-      parsed.pathname === "/" ? "" : parsed.pathname.replace(/\/+$/, "");
-    const search = parsed.search;
-    return `audit:${domain.toLowerCase()}${path}${search}`;
+    return `audit:${parsed.protocol}//${parsed.host.toLowerCase()}${parsed.pathname}${parsed.search}`;
   } catch {
     return `audit:${domain.toLowerCase()}`;
   }

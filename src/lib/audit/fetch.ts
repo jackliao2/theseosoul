@@ -1,4 +1,8 @@
-import { Agent, fetch as undiciFetch } from "undici";
+import { fetch as undiciFetch } from "undici";
+import {
+  createPinnedAgent,
+  resolvePublicUrl,
+} from "@/lib/audit/network-guard";
 import type { RedirectHop } from "@/lib/audit/types";
 
 /**
@@ -8,16 +12,9 @@ import type { RedirectHop } from "@/lib/audit/types";
 export const FETCH_TIMEOUT_MS = 14_000;
 const FALLBACK_TIMEOUT_MS = 10_000;
 const BODY_TIMEOUT_MS = 16_000;
+const MAX_RESPONSE_BYTES = 5 * 1024 * 1024;
 
-/** Force HTTP/1.1 — many enterprise CDNs break Node's default HTTP/2 streams. */
-const http1Agent = new Agent({
-  allowH2: false,
-  connectTimeout: 8_000,
-  headersTimeout: 14_000,
-  bodyTimeout: 20_000,
-  keepAliveTimeout: 8_000,
-});
-
+/** Browser-like headers; each pinned dispatcher below forces HTTP/1.1. */
 const BROWSER_HEADERS = {
   "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -148,27 +145,106 @@ function collectHeaders(responseHeaders: Headers): Record<string, string> {
   return headers;
 }
 
-async function readTextWithTimeout(
-  read: () => Promise<string>,
-  timeoutMs: number
-): Promise<string> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      read(),
-      new Promise<string>((_, reject) => {
-        timer = setTimeout(() => {
-          reject(
-            new FetchTimeoutError(
-              `Timed out after ${timeoutMs / 1000}s reading response body`
-            )
-          );
-        }, timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
+type UndiciResponse = Awaited<ReturnType<typeof undiciFetch>>;
+type PinnedAgent = ReturnType<typeof createPinnedAgent>;
+
+class ResponseTooLargeError extends Error {
+  constructor(maxBytes: number) {
+    super(
+      `Response body exceeded the ${Math.floor(maxBytes / (1024 * 1024))} MB safety limit`
+    );
+    this.name = "ResponseTooLargeError";
   }
+}
+
+async function destroyAgent(
+  agent: PinnedAgent,
+  error: unknown = null
+): Promise<void> {
+  try {
+    await agent.destroy(error instanceof Error ? error : null);
+  } catch {
+    // The original request/body error is more useful than cleanup failures.
+  }
+}
+
+async function closeAgent(agent: PinnedAgent): Promise<void> {
+  try {
+    await agent.close();
+  } catch {
+    // The response has already been consumed successfully.
+  }
+}
+
+async function cancelResponse(
+  response: UndiciResponse,
+  controller: AbortController,
+  agent: PinnedAgent,
+  reason: unknown = new Error("Response body was not consumed")
+): Promise<void> {
+  if (!controller.signal.aborted) controller.abort(reason);
+  try {
+    await response.body?.cancel(reason);
+  } catch {
+    // The abort may already have errored or closed the stream.
+  }
+  await destroyAgent(agent, reason);
+}
+
+async function readTextWithLimit(
+  response: UndiciResponse,
+  controller: AbortController,
+  timeoutMs: number,
+  maxBytes: number
+): Promise<string> {
+  const contentLength = Number(response.headers.get("content-length"));
+  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+    throw new ResponseTooLargeError(maxBytes);
+  }
+  if (!response.body) return "";
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const parts: string[] = [];
+  let receivedBytes = 0;
+  let timeoutError: FetchTimeoutError | null = null;
+  const timer = setTimeout(() => {
+    timeoutError = new FetchTimeoutError(
+      `Timed out after ${timeoutMs / 1000}s reading response body`
+    );
+    if (!controller.signal.aborted) controller.abort(timeoutError);
+    void reader.cancel(timeoutError).catch(() => undefined);
+  }, timeoutMs);
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      receivedBytes += value.byteLength;
+      if (receivedBytes > maxBytes) {
+        const tooLarge = new ResponseTooLargeError(maxBytes);
+        if (!controller.signal.aborted) controller.abort(tooLarge);
+        await reader.cancel(tooLarge).catch(() => undefined);
+        throw tooLarge;
+      }
+      parts.push(decoder.decode(value, { stream: true }));
+    }
+    parts.push(decoder.decode());
+    return parts.join("");
+  } catch (error) {
+    if (timeoutError) throw timeoutError;
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    reader.releaseLock();
+  }
+}
+
+function timeoutForRequest(timeoutMs: number, url: string): FetchTimeoutError {
+  return new FetchTimeoutError(
+    `Timed out after ${timeoutMs / 1000}s requesting ${url}`
+  );
 }
 
 /**
@@ -184,55 +260,101 @@ async function requestWithRedirects(
   finalUrl: string;
   headers: Headers;
   text: () => Promise<string>;
+  cancel: () => Promise<void>;
   redirectChain: RedirectHop[];
 }> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
   const redirectChain: RedirectHop[] = [];
+  const deadline = Date.now() + timeoutMs;
   let current = startUrl;
 
-  try {
-    for (let hop = 0; hop < 8; hop += 1) {
-      const response = await undiciFetch(current, {
+  for (let hop = 0; hop < 8; hop += 1) {
+    const lookupBudget = deadline - Date.now();
+    if (lookupBudget <= 0) throw timeoutForRequest(timeoutMs, current);
+
+    // Revalidate every redirect hop and pin the connection to this exact set of
+    // vetted A/AAAA answers so a second DNS lookup cannot rebind the request.
+    const target = await resolvePublicUrl(current, {
+      timeoutMs: lookupBudget,
+    });
+    const requestBudget = deadline - Date.now();
+    if (requestBudget <= 0) throw timeoutForRequest(timeoutMs, current);
+
+    const controller = new AbortController();
+    const agent = createPinnedAgent(target, {
+      bodyTimeoutMs: 20_000,
+      connectTimeoutMs: Math.min(8_000, requestBudget),
+      headersTimeoutMs: Math.min(14_000, requestBudget),
+      maxResponseBytes: MAX_RESPONSE_BYTES,
+    });
+    const timeoutError = timeoutForRequest(timeoutMs, current);
+    const timer = setTimeout(() => controller.abort(timeoutError), requestBudget);
+
+    let response: UndiciResponse;
+    try {
+      response = await undiciFetch(target.url, {
         signal: controller.signal,
         redirect: "manual",
-        dispatcher: http1Agent,
+        dispatcher: agent,
         headers: {
           ...BROWSER_HEADERS,
           Accept: accept,
         },
       });
-
-      redirectChain.push({ url: current, status: response.status });
-
-      if (response.status >= 300 && response.status < 400) {
-        const location = response.headers.get("location");
-        try {
-          await response.body?.cancel();
-        } catch {
-          // ignore
-        }
-        if (!location) {
-          throw new Error(`Redirect ${response.status} without Location`);
-        }
-        current = new URL(location, current).toString();
-        continue;
-      }
-
-      return {
-        ok: response.ok,
-        status: response.status,
-        finalUrl: response.url || current,
-        headers: response.headers as unknown as Headers,
-        text: () => response.text(),
-        redirectChain,
-      };
+    } catch (error) {
+      const failure = controller.signal.aborted
+        ? (controller.signal.reason ?? timeoutError)
+        : error;
+      await destroyAgent(agent, failure);
+      throw failure;
+    } finally {
+      clearTimeout(timer);
     }
 
-    throw new Error("Too many redirects");
-  } finally {
-    clearTimeout(timer);
+    redirectChain.push({ url: current, status: response.status });
+
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("location");
+      await cancelResponse(response, controller, agent);
+      if (!location) {
+        throw new Error(`Redirect ${response.status} without Location`);
+      }
+      current = new URL(location, current).toString();
+      continue;
+    }
+
+    let bodySettled = false;
+    return {
+      ok: response.ok,
+      status: response.status,
+      finalUrl: response.url || current,
+      headers: response.headers as unknown as Headers,
+      async text() {
+        if (bodySettled) throw new TypeError("Response body has already been used");
+        bodySettled = true;
+        try {
+          const text = await readTextWithLimit(
+            response,
+            controller,
+            BODY_TIMEOUT_MS,
+            MAX_RESPONSE_BYTES
+          );
+          await closeAgent(agent);
+          return text;
+        } catch (error) {
+          await cancelResponse(response, controller, agent, error);
+          throw error;
+        }
+      },
+      async cancel() {
+        if (bodySettled) return;
+        bodySettled = true;
+        await cancelResponse(response, controller, agent);
+      },
+      redirectChain,
+    };
   }
+
+  throw new Error("Too many redirects");
 }
 
 async function fetchHtmlCandidate(
@@ -252,6 +374,7 @@ async function fetchHtmlCandidate(
   );
 
   if (!response.ok) {
+    await response.cancel();
     throw new Error(`HTTP ${response.status}: Unable to fetch page`);
   }
 
@@ -261,10 +384,11 @@ async function fetchHtmlCandidate(
     !contentType.includes("text/html") &&
     !contentType.includes("application/xhtml")
   ) {
+    await response.cancel();
     throw new Error("Target URL did not return HTML content");
   }
 
-  const html = await readTextWithTimeout(response.text, BODY_TIMEOUT_MS);
+  const html = await response.text();
   return {
     html,
     finalUrl: response.finalUrl,
@@ -328,8 +452,11 @@ export async function fetchText(
       timeoutMs,
       "text/plain,*/*;q=0.8"
     );
-    if (!response.ok) return null;
-    return await readTextWithTimeout(response.text, BODY_TIMEOUT_MS);
+    if (!response.ok) {
+      await response.cancel();
+      return null;
+    }
+    return await response.text();
   } catch {
     return null;
   }
@@ -357,7 +484,7 @@ export async function traceRedirects(
         budget,
         BROWSER_HEADERS.Accept
       );
-      await response.text().catch(() => null);
+      await response.cancel();
       return {
         startUrl: candidate,
         finalUrl: response.finalUrl,

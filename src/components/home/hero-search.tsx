@@ -87,7 +87,7 @@ export function HeroSearch({
               name="url"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="example.com or https://example.com/blog"
+              placeholder="example.com or http://www.example.com/page?lang=en"
               className={cn("pl-11", size === "lg" && "h-14 text-base")}
               autoComplete="url"
               inputMode="url"
@@ -122,7 +122,7 @@ export function HeroSearch({
           </p>
         ) : (
           <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-left">
-            Audits the exact URL you paste — homepage or a specific path.
+            Exact URL preserved — protocol, www, path, and non-sensitive query.
           </p>
         )}
       </form>

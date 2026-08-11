@@ -46,7 +46,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await traceRedirects(normalized.url);
-    const hops = result.redirectChain.length;
+    // redirectChain also includes the final non-redirect response for display.
+    // A hop is an actual redirect, not the final landing request.
+    const hops = result.redirectChain.filter(
+      ({ status }) => status >= 300 && status < 400
+    ).length;
     return NextResponse.json({
       success: true,
       domain: normalized.domain,
@@ -58,7 +62,7 @@ export async function GET(request: NextRequest) {
       note:
         hops > 3
           ? "Long chain — prefer linking to the final URL."
-          : hops > 1
+          : hops > 0
             ? "Redirects found — fine if intentional (HTTP→HTTPS / www)."
             : "No redirect hops — request landed on the start URL.",
     });

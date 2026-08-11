@@ -1,6 +1,11 @@
 import tls from "node:tls";
+import { isIP } from "node:net";
 import { Agent, fetch as undiciFetch } from "undici";
 import { PROBE_CACHE_TTL_MS, cacheGet, cacheSet } from "@/lib/audit/cache";
+import {
+  createPinnedLookup,
+  resolvePublicHostname,
+} from "@/lib/audit/network-guard";
 import type { CheckStatus, DnsProbe, SslProbe } from "@/lib/audit/types";
 
 const probeAgent = new Agent({
@@ -115,12 +120,29 @@ export async function probeSsl(hostname: string): Promise<SslProbe> {
   const cached = cacheGet<SslProbe>(cacheKey);
   if (cached) return cached;
 
+  let target;
+  try {
+    target = await resolvePublicHostname(host, { timeoutMs: 2_800 });
+  } catch {
+    const failed: SslProbe = {
+      available: false,
+      validTo: null,
+      daysRemaining: null,
+      issuer: null,
+      status: "warn",
+      message: "TLS probe failed.",
+    };
+    cacheSet(cacheKey, failed, 30 * 60 * 1000);
+    return failed;
+  }
+
   const result = await new Promise<SslProbe>((resolve) => {
     const socket = tls.connect(
       {
-        host: hostname,
-        servername: hostname,
+        host: target.hostname,
+        servername: isIP(target.hostname) ? undefined : target.hostname,
         port: 443,
+        lookup: createPinnedLookup(target),
         rejectUnauthorized: false,
         timeout: 3_000,
       },
@@ -152,6 +174,9 @@ export async function probeSsl(hostname: string): Promise<SslProbe> {
         if (daysRemaining < 0) {
           status = "fail";
           message = "TLS certificate has expired.";
+        } else if (!socket.authorized) {
+          status = "fail";
+          message = "TLS certificate is not trusted for this hostname.";
         } else if (daysRemaining <= 21) {
           status = "warn";
           message = `TLS certificate expires soon (${daysRemaining} days).`;

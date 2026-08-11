@@ -10,13 +10,14 @@ import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import {
   auditCanonicalUrl,
   auditShareSlug,
-  isValidAuditTarget,
-  targetFromSegments,
+  targetFromAuditRoute,
 } from "@/lib/url";
 
 type PageProps = {
   params: Promise<{ target: string[] }>;
-  searchParams: Promise<{ t?: string; tab?: string }>;
+  searchParams: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
 };
 
 /** ISR: refresh audit snapshots hourly for long-tail pages */
@@ -25,27 +26,42 @@ export const revalidate = 3600;
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+function targetLabel(segments: string[]): string {
+  // Dynamic route params have already been decoded by Next.js.
+  return segments.join("/");
+}
+
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { target } = await params;
+  const sp = await searchParams;
   let domain = target[0] ?? "site";
   let label = domain;
   let canonical = `${SITE_URL}/audit/${domain}`;
+  let cleanIndexableHomepage = false;
 
   try {
-    const normalized = targetFromSegments(target);
+    const normalized = targetFromAuditRoute(target, sp);
+    const parsed = new URL(normalized.url);
     domain = normalized.domain;
     const slug = auditShareSlug(normalized);
     label = slug;
     canonical = auditCanonicalUrl(normalized);
+    cleanIndexableHomepage =
+      parsed.protocol === "https:" &&
+      parsed.hostname === normalized.domain &&
+      parsed.pathname === "/" &&
+      !parsed.search;
   } catch {
-    label = target.map((s) => decodeURIComponent(s)).join("/");
+    label = targetLabel(target);
   }
 
   const title = `${label} SEO Audit & Technical Analysis | ${SITE_NAME}`;
   const description = `Free technical SEO audit for ${label}: on-page SEO, structure, GEO, TLS, DNS, and shareable /audit report.`;
-  const indexable = isIndexableAuditDomain(domain) && !label.includes("/");
+  const indexable =
+    isIndexableAuditDomain(domain) && cleanIndexableHomepage;
   const ogImage = `${SITE_URL}/api/og-audit?target=${encodeURIComponent(label)}`;
 
   return {
@@ -78,9 +94,12 @@ export default async function AuditTargetPage({
 }: PageProps) {
   const { target } = await params;
   const sp = await searchParams;
-  const rawLabel = target.map((s) => decodeURIComponent(s)).join("/");
+  const rawLabel = targetLabel(target);
 
-  if (!isValidAuditTarget(target)) {
+  let normalized: ReturnType<typeof targetFromAuditRoute>;
+  try {
+    normalized = targetFromAuditRoute(target, sp);
+  } catch (error) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <AuditError
@@ -89,7 +108,9 @@ export default async function AuditTargetPage({
             domain: rawLabel,
             url: null,
             error:
-              "Please provide a valid public URL (e.g. shopify.com or example.com/blog).",
+              error instanceof Error
+                ? error.message
+                : "Please provide a valid public URL (e.g. shopify.com or example.com/blog).",
             code: "INVALID_URL",
           }}
         />
@@ -97,7 +118,6 @@ export default async function AuditTargetPage({
     );
   }
 
-  const normalized = targetFromSegments(target);
   const h = await headers();
   const audit = await runGuardedAudit(
     normalized.url,
@@ -116,7 +136,7 @@ export default async function AuditTargetPage({
     );
   }
 
-  const share = auditCanonicalUrl(audit);
+  const share = auditCanonicalUrl(normalized);
 
   return (
     <>
@@ -126,7 +146,7 @@ export default async function AuditTargetPage({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: `${auditShareSlug(audit)} SEO Audit & Technical Analysis`,
+            headline: `${auditShareSlug(normalized)} SEO Audit & Technical Analysis`,
             description: audit.summary,
             dateModified: audit.fetchedAt,
             author: { "@type": "Organization", name: SITE_NAME },
@@ -136,8 +156,8 @@ export default async function AuditTargetPage({
               url: SITE_URL,
             },
             mainEntityOfPage: share,
-            about: audit.url,
-          }),
+            about: normalized.url,
+          }).replace(/</g, "\\u003c"),
         }}
       />
       <Suspense
@@ -147,7 +167,7 @@ export default async function AuditTargetPage({
           </div>
         }
       >
-        <AuditDashboard audit={audit} />
+        <AuditDashboard audit={audit} requestedUrl={normalized.url} />
       </Suspense>
     </>
   );

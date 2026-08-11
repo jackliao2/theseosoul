@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { AnalyticsChoicesButton } from "@/components/layout/analytics-consent";
 import { ContentEyebrow, ContentPage } from "@/components/layout/content-page";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
 
@@ -65,7 +66,7 @@ export default function PrivacyPage() {
             </p>
           </div>
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
-            Updated July 31, 2026 · v1.0
+            Updated August 11, 2026 · v1.1
           </p>
         </div>
 
@@ -197,11 +198,15 @@ export default function PrivacyPage() {
             <p>
               Audit results are published at predictable{" "}
               <code className="rounded bg-slate-200/70 px-1.5 py-0.5 font-mono text-[12px] text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-                /audit/[domain]
+                /audit/[host/path]
               </code>{" "}
-              URLs. Anyone with the link can open the report. Treat it as public
-              and do not submit a domain if you do not want its publicly
-              observable technical signals summarized this way.
+              routes. When protocol, port, trailing slash, encoded path, or an
+              allowed query matters, the full submitted URL is also included in
+              the report address as an encoded{" "}
+              <code className="font-mono text-[12px]">?url=</code> parameter.
+              Anyone with the link can open the report. Treat it as public and do
+              not submit a URL if you do not want it or its publicly observable
+              technical signals summarized this way.
             </p>
             <p>
               A shareable URL is not the same as broad search distribution.
@@ -220,14 +225,27 @@ export default function PrivacyPage() {
           >
             <p>
               The “Recent audits” convenience list is stored in your browser
-              using local storage. It helps you return to domains you checked
-              without creating an account. This list stays on that browser and
-              can be removed with the Clear action or by clearing site data in
-              your browser settings.
+              using local storage. It keeps a readable label and the exact public
+              report link, which can include the submitted path and allowed query
+              parameters, so you can return without creating an account. This
+              list stays on that browser and can be removed with the Clear action
+              or by clearing site data in your browser settings.
             </p>
             <p>
               Theme preference may also be stored locally so dark or light mode
-              persists between visits.
+              persists between visits. Interactive tools, including the SEO Site
+              Ladder, may store progress locally so you can continue later.
+            </p>
+            <p>
+              Your analytics choice is stored under the local-storage key{" "}
+              <code className="font-mono text-[12px]">
+                theseosoul:analytics-consent:v1
+              </code>
+              . It contains only{" "}
+              <code className="font-mono text-[12px]">granted</code> or{" "}
+              <code className="font-mono text-[12px]">denied</code>. Clearing
+              site data removes this choice and we will ask again on a later
+              visit.
             </p>
           </PrivacySection>
 
@@ -257,14 +275,39 @@ export default function PrivacyPage() {
           >
             <p>
               The current free product does not embed third-party advertising
-              and does not sell personal information. We may use technically
-              necessary storage for product behavior and security.
+              and does not sell personal information. Essential product
+              features do not require analytics consent.
             </p>
             <p>
-              If we add audience analytics, accounts, advertising, or paid
-              features that materially change this data use, this policy will
-              be updated before those practices are described as current.
+              We use Google Analytics 4 (measurement ID{" "}
+              <code className="font-mono text-[12px]">G-6GC0B6V6TB</code>) only
+              after you select <strong>Allow analytics</strong>. Before that
+              choice, the Google Analytics script is not requested and no
+              analytics event is sent by our code. If allowed, your browser
+              connects to Google and sends visit and usage events with page,
+              referrer, browser, device, and related technical data. Google
+              Analytics may set first-party identifiers such as{" "}
+              <code className="font-mono text-[12px]">_ga</code> cookies.
             </p>
+            <p>
+              The choice itself is remembered in local storage, not in an
+              analytics cookie. You can change it at any time. Selecting{" "}
+              <strong>Decline</strong> disables future Google Analytics events
+              from this site and attempts to remove Google Analytics cookies
+              accessible to us; it cannot recall information already sent. You
+              can also clear this site&apos;s data in your browser.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <AnalyticsChoicesButton className="inline-flex min-h-11 items-center rounded-lg bg-teal-800 px-4 text-sm font-semibold text-white transition-colors hover:bg-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 dark:bg-teal-500 dark:text-slate-950 dark:hover:bg-teal-400" />
+              <a
+                href="https://policies.google.com/privacy"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-sm font-semibold text-teal-800 underline decoration-teal-700/30 underline-offset-2 dark:text-teal-300"
+              >
+                Google Privacy Policy
+              </a>
+            </div>
           </PrivacySection>
 
           <PrivacySection
@@ -278,6 +321,31 @@ export default function PrivacyPage() {
               process request metadata under their own privacy terms and
               security practices. We disclose only what is reasonably needed to
               make the requested check operate.
+            </p>
+            <p>
+              Google acts as our analytics provider only when you allow
+              analytics. Google processes those events under its own terms and
+              privacy practices. Analytics retention is also governed by the
+              settings of our Google Analytics property and Google&apos;s provider
+              rules.
+            </p>
+            <p>
+              When error monitoring is configured, Sentry helps us diagnose
+              failures and protect service reliability independently of optional
+              audience analytics. An error event may include a stack trace,
+              browser or server metadata, the affected page or tool, and the URL
+              submitted for that failed check. We configure Sentry not to collect
+              default personal identifiers. Retention follows our project
+              settings and Sentry&apos;s provider rules. See the{" "}
+              <a
+                href="https://sentry.io/privacy/"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="font-semibold text-teal-800 underline decoration-teal-700/30 underline-offset-2 dark:text-teal-300"
+              >
+                Sentry Privacy Policy
+              </a>
+              .
             </p>
             <p>
               Fetching a target website also reveals our server request to that
@@ -309,6 +377,10 @@ export default function PrivacyPage() {
             <ul>
               <li>Do not submit a URL you do not want summarized.</li>
               <li>Clear recent audits from the homepage or browser storage.</li>
+              <li>
+                Review or withdraw analytics permission using the control in
+                the Cookies &amp; analytics section above.
+              </li>
               <li>
                 Use your site’s robots.txt and access controls to express
                 crawler policy.

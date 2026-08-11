@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
 
 export function UrlToolForm({
   defaultUrl,
@@ -15,18 +16,8 @@ export function UrlToolForm({
   loadingLabel?: string;
   onResult: (url: string) => Promise<void>;
 }) {
-  const [url, setUrl] = useState(defaultUrl);
+  const [url, setUrl] = useUrlQueryPrefill(defaultUrl);
   const [loading, setLoading] = useState(false);
-
-  // Prefill from ?url= when linked from an audit Next Step or share.
-  useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search).get("url");
-      if (q?.trim()) setUrl(q.trim());
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

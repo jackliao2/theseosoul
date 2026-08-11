@@ -50,7 +50,7 @@ export function FeaturesSection() {
               A complete technical snapshot with prioritized Why + Fix issues,
               published at a shareable{" "}
               <code className="rounded bg-slate-200/80 px-1 py-0.5 font-mono text-[12px] text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-                /audit/[domain]
+                /audit/[host/path]
               </code>
               .
             </p>

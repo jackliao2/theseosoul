@@ -21,31 +21,36 @@ import { resolveAuditTabId } from "@/components/audit/dashboard/nav-config";
 import { rememberRecentAudit } from "@/components/home/recent-audits";
 import { Button } from "@/components/ui/button";
 import type { AuditResult, AuditTabId } from "@/lib/audit/types";
-import { auditShareSlug } from "@/lib/url";
+import { auditHref, normalizeUrl } from "@/lib/url";
 import { cn } from "@/lib/utils";
 
-export function AuditDashboard({ audit }: { audit: AuditResult }) {
+export function AuditDashboard({
+  audit,
+  requestedUrl,
+}: {
+  audit: AuditResult;
+  requestedUrl: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [active, setActive] = useState<AuditTabId>(() =>
-    resolveAuditTabId(tabParam)
-  );
+  const active = resolveAuditTabId(tabParam);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isRefreshing, startRefresh] = useTransition();
+  const reportTarget = normalizeUrl(requestedUrl);
+  const reportHref = auditHref(reportTarget);
+  const requested = new URL(reportTarget.url);
+  const displayPath = requested.pathname === "/" ? "" : requested.pathname;
+  const protocolLabel = requested.protocol === "http:" ? "http://" : "";
+  const displayLabel = `${protocolLabel}${requested.host}${displayPath}${requested.search}`;
 
   useEffect(() => {
-    setActive(resolveAuditTabId(tabParam));
-  }, [tabParam]);
-
-  useEffect(() => {
-    rememberRecentAudit(auditShareSlug(audit));
-  }, [audit]);
+    rememberRecentAudit(displayLabel, reportHref);
+  }, [displayLabel, reportHref]);
 
   const selectTab = useCallback(
     (id: AuditTabId) => {
-      setActive(id);
       setMobileNavOpen(false);
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", id);
@@ -99,7 +104,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
 
             <div className="min-w-0 flex-1">
               <h1 className="truncate font-display text-sm font-bold text-slate-900 dark:text-white">
-                {auditShareSlug(audit)}
+                <span title={reportTarget.url}>{displayLabel}</span>
               </h1>
               <p className="text-[11px] tabular-nums text-slate-500">
                 <span
@@ -123,7 +128,7 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
             <div className="hidden min-w-0 flex-1 justify-center sm:flex md:max-w-xs lg:max-w-md no-print">
               <DashboardSearch
                 currentDomain={audit.domain}
-                fallbackUrl={audit.url}
+                fallbackUrl={reportTarget.url}
               />
             </div>
 
@@ -131,11 +136,11 @@ export function AuditDashboard({ audit }: { audit: AuditResult }) {
               <div className="sm:hidden no-print">
                 <DashboardSearch
                   currentDomain={audit.domain}
-                  fallbackUrl={audit.url}
+                  fallbackUrl={reportTarget.url}
                   compact
                 />
               </div>
-              <ReportActions audit={audit} />
+              <ReportActions audit={audit} requestedUrl={reportTarget.url} />
               <Button
                 variant="ghost"
                 size="icon"

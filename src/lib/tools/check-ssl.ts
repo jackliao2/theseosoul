@@ -55,6 +55,10 @@ export async function checkSsl(
   if (ssl.available && ssl.daysRemaining != null) {
     if (ssl.daysRemaining < 0) {
       summary = `Certificate expired ${Math.abs(ssl.daysRemaining)} day(s) ago${ssl.issuer ? ` · issuer ${ssl.issuer}` : ""}.`;
+    } else if (ssl.status === "fail") {
+      // Preserve hostname/chain trust failures reported by the TLS probe even
+      // when the certificate's date range itself has not expired.
+      summary = ssl.message;
     } else if (ssl.daysRemaining <= 21) {
       summary = `Certificate expires in ${ssl.daysRemaining} day(s)${ssl.issuer ? ` · ${ssl.issuer}` : ""}. Renew soon to avoid browser warnings.`;
     } else {

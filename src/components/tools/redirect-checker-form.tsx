@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
 import { auditReportHref } from "@/lib/url";
 
 type Hop = { url: string; status: number };
@@ -20,18 +21,9 @@ type Result =
   | { success: false; error: string };
 
 export function RedirectCheckerForm() {
-  const [url, setUrl] = useState("https://www.github.com");
+  const [url, setUrl] = useUrlQueryPrefill("https://www.github.com");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-
-  useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search).get("url");
-      if (q?.trim()) setUrl(q.trim());
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
