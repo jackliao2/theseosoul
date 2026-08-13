@@ -27,17 +27,23 @@ export function AuditLoadingSteps() {
   return (
     <section
       className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/80 bg-[color:var(--surface)]/95 p-6 text-center shadow-[0_24px_70px_-38px_rgba(15,23,42,0.5)] backdrop-blur sm:p-8 dark:border-slate-700 dark:shadow-[0_28px_80px_-38px_rgba(0,0,0,0.85)]"
-      role="status"
-      aria-live="polite"
+      aria-labelledby="audit-loading-status"
       aria-busy="true"
     >
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-800 text-white shadow-[0_12px_30px_-14px_rgba(15,118,110,0.8)] dark:bg-teal-400 dark:text-slate-950">
         <LoaderCircle className="h-7 w-7 animate-spin" />
       </div>
 
-      <h1 className="mt-5 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+      <p
+        id="audit-loading-status"
+        className="mt-5 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         Running technical audit…
-      </h1>
+        <span className="sr-only"> Current step: {STEPS[active]}.</span>
+      </p>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-slate-500 dark:text-slate-400">
         Checking the live URL you pasted. Most sites finish in a few seconds.
       </p>

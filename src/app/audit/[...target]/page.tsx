@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AuditDashboard } from "@/components/audit/dashboard/audit-dashboard";
 import { AuditError } from "@/components/audit/audit-error";
@@ -26,38 +27,29 @@ export const revalidate = 3600;
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-function targetLabel(segments: string[]): string {
-  // Dynamic route params have already been decoded by Next.js.
-  return segments.join("/");
-}
-
 export async function generateMetadata({
   params,
   searchParams,
 }: PageProps): Promise<Metadata> {
   const { target } = await params;
   const sp = await searchParams;
-  let domain = target[0] ?? "site";
-  let label = domain;
-  let canonical = `${SITE_URL}/audit/${domain}`;
-  let cleanIndexableHomepage = false;
+  let normalized: ReturnType<typeof targetFromAuditRoute>;
 
   try {
-    const normalized = targetFromAuditRoute(target, sp);
-    const parsed = new URL(normalized.url);
-    domain = normalized.domain;
-    const slug = auditShareSlug(normalized);
-    label = slug;
-    canonical = auditCanonicalUrl(normalized);
-    cleanIndexableHomepage =
-      parsed.protocol === "https:" &&
-      parsed.hostname === normalized.domain &&
-      parsed.pathname === "/" &&
-      !parsed.search;
+    normalized = targetFromAuditRoute(target, sp);
   } catch {
-    label = targetLabel(target);
+    notFound();
   }
 
+  const parsed = new URL(normalized.url);
+  const domain = normalized.domain;
+  const label = auditShareSlug(normalized);
+  const canonical = auditCanonicalUrl(normalized);
+  const cleanIndexableHomepage =
+    parsed.protocol === "https:" &&
+    parsed.hostname === normalized.domain &&
+    parsed.pathname === "/" &&
+    !parsed.search;
   const title = `${label} SEO Audit & Technical Analysis | ${SITE_NAME}`;
   const description = `Free technical SEO audit for ${label}: on-page SEO, structure, GEO, TLS, DNS, and shareable /audit report.`;
   const indexable =
@@ -94,28 +86,12 @@ export default async function AuditTargetPage({
 }: PageProps) {
   const { target } = await params;
   const sp = await searchParams;
-  const rawLabel = targetLabel(target);
 
   let normalized: ReturnType<typeof targetFromAuditRoute>;
   try {
     normalized = targetFromAuditRoute(target, sp);
-  } catch (error) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <AuditError
-          error={{
-            success: false,
-            domain: rawLabel,
-            url: null,
-            error:
-              error instanceof Error
-                ? error.message
-                : "Please provide a valid public URL (e.g. shopify.com or example.com/blog).",
-            code: "INVALID_URL",
-          }}
-        />
-      </div>
-    );
+  } catch {
+    notFound();
   }
 
   const h = await headers();

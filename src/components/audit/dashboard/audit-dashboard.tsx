@@ -104,7 +104,9 @@ export function AuditDashboard({
 
             <div className="min-w-0 flex-1">
               <h1 className="truncate font-display text-sm font-bold text-slate-900 dark:text-white">
-                <span title={reportTarget.url}>{displayLabel}</span>
+                <span title={`${displayLabel} SEO audit report`}>
+                  {displayLabel} SEO audit report
+                </span>
               </h1>
               <p className="text-[11px] tabular-nums text-slate-500">
                 <span

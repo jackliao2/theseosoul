@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState, useTransition } from "react";
+import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,12 +18,15 @@ export function HeroSearch({
   size = "default",
   /** When true, this instance is the homepage target for #home-audit-url */
   anchorTarget = false,
+  examples,
 }: {
   className?: string;
   size?: "default" | "lg";
   anchorTarget?: boolean;
+  examples?: readonly string[];
 }) {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -70,6 +73,12 @@ export function HeroSearch({
     }
   }
 
+  function chooseExample(example: string) {
+    setValue(example);
+    setError(null);
+    inputRef.current?.focus();
+  }
+
   return (
     <div
       id={anchorTarget ? HOME_AUDIT_HASH : undefined}
@@ -83,6 +92,7 @@ export function HeroSearch({
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
+              ref={inputRef}
               id={inputId}
               name="url"
               value={value}
@@ -126,6 +136,31 @@ export function HeroSearch({
           </p>
         )}
       </form>
+      {examples?.length ? (
+        <>
+          <p className="mt-4 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+            Free · No signup · Shareable /audit/… reports · homepage or path
+          </p>
+          <div
+            role="group"
+            aria-label="Try an example website"
+            className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400"
+          >
+            {examples.map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => chooseExample(example)}
+                disabled={isPending}
+                aria-label={`Use ${example} as the website URL`}
+                className="rounded-md border border-slate-300/80 bg-white/80 px-2.5 py-1 font-medium text-slate-700 transition-colors hover:border-teal-700 hover:text-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-teal-400 dark:hover:text-teal-300 dark:focus-visible:ring-teal-400"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

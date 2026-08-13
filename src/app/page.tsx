@@ -25,12 +25,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-/** Public demo chips — reports stay noindex; only our own audit is sitemap-listed. */
-const examples = [
-  "stripe.com",
-  "github.com",
-  "cloudflare.com",
-];
+/** Example inputs only — clicking one fills the form without starting an audit. */
+const examples = ["stripe.com", "github.com", "cloudflare.com"] as const;
 
 const featuredToolHrefs = [
   "/tools/domain-history",
@@ -94,24 +90,9 @@ export default function HomePage() {
             <HeroSearch
               anchorTarget
               size="lg"
+              examples={examples}
               className="mx-auto max-w-2xl"
             />
-          </div>
-
-          <p className="animate-fade-up-delay-2 mt-4 text-center text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
-            Free · No signup · Shareable /audit/… reports · homepage or path
-          </p>
-
-          <div className="animate-fade-up-delay-2 mt-5 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-            {examples.map((domain) => (
-              <Link
-                key={domain}
-                href={`/audit/${domain}`}
-                className="rounded-md border border-slate-300/80 bg-white/80 px-2.5 py-1 font-medium text-slate-700 transition-colors hover:border-teal-700 hover:text-teal-800 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-teal-400 dark:hover:text-teal-300"
-              >
-                {domain}
-              </Link>
-            ))}
           </div>
 
           <div className="mt-5 flex justify-center">
