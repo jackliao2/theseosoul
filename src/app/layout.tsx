@@ -4,6 +4,7 @@ import { AnalyticsConsent } from "@/components/layout/analytics-consent";
 import { SiteShell } from "@/components/layout/site-shell";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { HOME_SEO_DESCRIPTION, HOME_SEO_TITLE } from "@/lib/home-seo";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -26,11 +27,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "TheSeoSoul — Free Website SEO Checker & Shareable Audit Reports",
+    default: HOME_SEO_TITLE,
     template: `%s | TheSeoSoul`,
   },
-  description:
-    "Free website SEO checker with no signup. Check meta tags, headings, robots.txt, keyword density, Open Graph, TLS, DNS, WHOIS, and GEO readiness — then share an /audit report.",
+  description: HOME_SEO_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: [
     "free SEO audit",
@@ -52,15 +52,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
-    description:
-      "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
-    description:
-      "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION,
   },
   alternates: {
     canonical: SITE_URL,

@@ -108,7 +108,7 @@ Ship `Organization` / `WebSite` / real `Article` or `Product` markup when the pa
 
 For AI-ish discovery, a short honest [`llms.txt`](https://llmstxt.org/) beats a slogan dump. More on that in [GEO and llms.txt](/blog/geo-llms-txt-practical-guide).
 
-Draft check: [GEO Content Checker](/tools/geo-content-checker). Whole-site pass: [free audit](/#home-audit-url).
+Draft check: [GEO Content Checker](/tools/geo-content-checker). Technical pass: [free technical SEO audit and report](/#home-audit-url).
 
 ## Cutover day (boring on purpose)
 
@@ -123,4 +123,4 @@ Draft check: [GEO Content Checker](/tools/geo-content-checker). Whole-site pass:
 
 A green checklist does not buy rankings. It stops you from donating the first month to avoidable crawl/index accidents. When those are clean, content and distribution can do their jobs.
 
-If the team wants one shareable pass, run a [TheSeoSoul audit](/#home-audit-url) and drop the `/audit/[host/path]` link in the launch channel.
+If the team wants one shareable pass, run a [free website SEO audit](/#home-audit-url) and drop the `/audit/[host/path]` link in the launch channel.

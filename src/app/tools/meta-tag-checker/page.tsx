@@ -67,7 +67,7 @@ export default function MetaTagCheckerPage() {
       <ToolFaqJsonLd
         faqs={faqs}
         pageUrl={PAGE_URL}
-        name="Free Meta Tag Checker"
+        name="Free Meta Title & Description Checker"
       />
 
       <ContentEyebrow>
@@ -77,7 +77,7 @@ export default function MetaTagCheckerPage() {
         <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
         On-page
       </ContentEyebrow>
-      <ContentTitle>Free Meta Tag Checker</ContentTitle>
+      <ContentTitle>Free Meta Title &amp; Description Checker</ContentTitle>
       <p className="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300">
         Check a live page’s title and meta description (length + status), or
         simulate a Google-style SERP snippet before you publish. Free title and

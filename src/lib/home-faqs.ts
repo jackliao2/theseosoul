@@ -6,7 +6,11 @@ export const HOME_FAQS = [
   },
   {
     q: "How does an audit work?",
-    a: "You paste a URL. Our servers normalize the host (apex vs www), fetch live HTML over HTTP/1.1, follow the redirect chain, and in parallel probe robots.txt, sitemap.xml, TLS certificate metadata, DNS/SPF/DMARC, and RDAP/WHOIS. We parse titles, metas, headings, alts, links, Open Graph, schema, and GEO citability signals, then score Meta / Structure / Technical / GEO subscores plus a prioritized Issues list with Why and Fix guidance. The dashboard publishes at /audit/[host/path]. Results are lightly cached (about 15 minutes in memory) so free upstreams stay healthy and shared links stay fast — hit Refresh on a report when you need a new crawl.",
+    a: "You paste a URL. Our servers normalize the host (apex vs www), fetch that page’s live HTML over HTTP/1.1, follow the redirect chain, and in parallel probe site-level signals such as robots.txt, sitemap.xml, TLS certificate metadata, DNS/SPF/DMARC, and RDAP/WHOIS. We parse titles, metas, headings, alts, links, Open Graph, schema, and GEO citability signals, then score Meta / Structure / Technical / GEO subscores plus a prioritized Issues list with Why and Fix guidance. This is a focused URL audit with site-level probes, not a crawl of every URL on the domain. The dashboard publishes at /audit/[host/path]. Results are lightly cached (about 15 minutes in memory) so free upstreams stay healthy and shared links stay fast — hit Refresh on a report when you need a new crawl.",
+  },
+  {
+    q: "Can I generate, share, or download a free SEO report?",
+    a: "Yes. Run the free audit and you get a live /audit/[host/path] report URL that you can send to a client or teammate. Use Print / PDF to print the report or save it as a PDF through your browser, or use Download JSON for the underlying audit data. No account is required.",
   },
   {
     q: "How is this different from other free SEO tools?",

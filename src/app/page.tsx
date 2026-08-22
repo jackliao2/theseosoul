@@ -11,16 +11,16 @@ import { HeroVisual } from "@/components/home/hero-visual";
 import { SiteSoulSection } from "@/components/home/site-soul-section";
 import { AuditCtaLink } from "@/components/layout/audit-cta-link";
 import { HOME_FAQS } from "@/lib/home-faqs";
+import { HOME_SEO_DESCRIPTION, HOME_SEO_TITLE } from "@/lib/home-seo";
 import { getAllPosts } from "@/lib/blog";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
+    absolute: HOME_SEO_TITLE,
   },
-  description:
-    "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
+  description: HOME_SEO_DESCRIPTION,
   alternates: { canonical: "/" },
 };
 
@@ -79,13 +79,16 @@ export default function HomePage() {
           <p className="animate-fade-up text-center">
             <SiteWordmark size="hero" withDomain className="justify-center" />
           </p>
-          <h1 className="animate-fade-up-delay mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
-            Free website SEO checker — paste a URL for a shareable audit, scores
-            and fixes, plus a Site Soul profile that reads what kind of presence
-            the site has.
+          <h1 className="animate-fade-up-delay mx-auto mt-5 max-w-3xl text-center font-display text-3xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-5xl">
+            Free Website SEO Audit &amp; Report Generator
           </h1>
+          <p className="animate-fade-up-delay-2 mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
+            Use the free technical SEO checker on any public URL and get a
+            shareable report with scores and prioritized fixes. Print or save as
+            PDF, download JSON, or send the live link — no signup.
+          </p>
 
-          <div className="animate-fade-up-delay-2 mt-8 w-full">
+          <div className="animate-fade-up-delay-2 mt-7 w-full">
             <HeroSearch
               anchorTarget
               size="lg"
@@ -114,11 +117,11 @@ export default function HomePage() {
               Process
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
-              One fetch. Full technical picture.
+              One URL. A focused technical SEO report.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              Unlike browser-only checkers, every audit becomes a public URL you
-              can share with clients or teammates.
+              We inspect the submitted page plus site-level signals — not every
+              URL on the domain — then publish a report you can share or export.
             </p>
           </div>
 
@@ -137,7 +140,7 @@ export default function HomePage() {
               {
                 step: "03",
                 title: "Publish the report",
-                body: "Dashboard live at /audit/[host/path] — shareable with Why + Fix issues.",
+                body: "Open a shareable /audit report, print or save it as PDF, or download the audit data as JSON.",
               },
             ].map((item) => (
               <li
@@ -316,15 +319,16 @@ export default function HomePage() {
             <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
               Most SEO tools bury free checks behind signup walls, or dump results
               into a private popup. TheSeoSoul ships a clean technical report URL
-              per domain — on-page, GEO/AI crawlers, TLS, DNS, and WHOIS — with no
-              credit card and no fake traffic numbers.
+              per audit — on-page, GEO/AI crawlers, TLS, DNS, and WHOIS — that you
+              can share, print, save as PDF, or download as JSON. No credit card
+              and no fake traffic numbers.
             </p>
           </div>
           <dl className="mt-10 grid gap-8 border-t border-slate-300/70 pt-8 sm:grid-cols-3 dark:border-slate-700">
             {[
               {
                 t: "Report pages, not popups",
-                d: "Every audit lives at /audit/[host/path] — shareable with clients; only curated examples are pushed to search.",
+                d: "Every audit lives at /audit/[host/path] — share the live link, print or save a PDF, or download JSON.",
               },
               {
                 t: "GEO + classic SEO",

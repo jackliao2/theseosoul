@@ -63,7 +63,11 @@ export const metadata: Metadata = {
 export default function NoindexCheckerPage() {
   return (
     <ContentPage>
-      <ToolFaqJsonLd faqs={faqs} pageUrl={PAGE_URL} name="Free Noindex Checker" />
+      <ToolFaqJsonLd
+        faqs={faqs}
+        pageUrl={PAGE_URL}
+        name="Free Noindex & X-Robots-Tag Checker"
+      />
 
       <ContentEyebrow>
         <Link href="/tools" className="hover:underline">
@@ -72,7 +76,7 @@ export default function NoindexCheckerPage() {
         <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
         On-page
       </ContentEyebrow>
-      <ContentTitle>Free Noindex Checker</ContentTitle>
+      <ContentTitle>Free Noindex &amp; X-Robots-Tag Checker</ContentTitle>
       <p className="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300">
         Check whether a live URL tells search engines not to index it. We read
         meta robots, googlebot meta, and the X-Robots-Tag header — free, no
