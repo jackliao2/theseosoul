@@ -155,6 +155,49 @@ export function ToolFaqSection({ faqs }: { faqs: ToolFaq[] }) {
   );
 }
 
+export function ToolGuideCard({
+  href,
+  title,
+  description,
+  cta,
+}: {
+  href: string;
+  title: string;
+  description: string;
+  cta: string;
+}) {
+  return (
+    <aside
+      aria-label="Related practical guide"
+      className="mt-14 overflow-hidden rounded-2xl border border-teal-800/20 bg-teal-950/[0.035] p-5 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-6 dark:border-teal-300/20 dark:bg-teal-300/[0.045]"
+    >
+      <div className="max-w-2xl">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">
+          Practical guide
+        </p>
+        <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          {description}
+        </p>
+      </div>
+      <Link
+        href={href}
+        className="group mt-5 inline-flex shrink-0 items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2 dark:bg-teal-300 dark:text-slate-950 dark:hover:bg-teal-200 dark:focus-visible:ring-teal-300 dark:focus-visible:ring-offset-slate-950 sm:mt-0"
+      >
+        {cta}
+        <span
+          aria-hidden="true"
+          className="transition-transform group-hover:translate-x-0.5"
+        >
+          &rarr;
+        </span>
+      </Link>
+    </aside>
+  );
+}
+
 export function ToolRelated({
   tools,
   hint = "Same diagnosis, different angle — these usually come next.",

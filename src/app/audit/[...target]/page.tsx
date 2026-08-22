@@ -68,6 +68,7 @@ export async function generateMetadata({
       description,
       url: canonical,
       siteName: SITE_NAME,
+      locale: "en_US",
       type: "article",
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },

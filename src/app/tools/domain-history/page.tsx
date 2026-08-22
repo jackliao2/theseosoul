@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/domain-history";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -55,13 +57,12 @@ export const metadata: Metadata = {
     "expired domain history",
     "whois archive check",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Domain History Checker",
     description:
       "Read a domain’s archive chapters and WHOIS contrast before you buy — free, no signup.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function DomainHistoryPage() {
@@ -134,6 +135,13 @@ export default function DomainHistoryPage() {
             with your own judgement — and a current technical audit.
           </p>
         </ToolProse>
+
+        <ToolGuideCard
+          href="/blog/domain-history-before-you-buy"
+          title="Buying an aged domain? Investigate the story, not the age"
+          description="Use Wayback snapshots and WHOIS/RDAP together to separate a real brand history from parking, spam eras, ownership resets, and archive gaps."
+          cta="Follow the due-diligence workflow"
+        />
 
         <ToolFaqSection faqs={faqs} />
 

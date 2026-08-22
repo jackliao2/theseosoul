@@ -5,11 +5,17 @@ import { ArrowUpRight } from "lucide-react";
 import { AnalyticsChoicesButton } from "@/components/layout/analytics-consent";
 import { ContentEyebrow, ContentPage } from "@/components/layout/content-page";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: `How ${SITE_NAME} handles submitted URLs, public website data, shareable audit reports, browser storage, and service logs.`,
   alternates: { canonical: "/privacy" },
+  ...createSocialMetadata({
+    url: "/privacy",
+    title: `${SITE_NAME} Privacy Policy`,
+    description: `How ${SITE_NAME} handles submitted URLs, public website data, shareable audit reports, browser storage, analytics choices, and service logs.`,
+  }),
 };
 
 const contents = [

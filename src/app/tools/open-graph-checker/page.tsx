@@ -15,6 +15,7 @@ import {
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/open-graph-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +51,12 @@ export const metadata: Metadata = {
     "twitter card checker",
     "og tag checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Open Graph Checker",
     description:
       "Validate OG and Twitter Card tags with a live share preview — free.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function OpenGraphCheckerPage() {

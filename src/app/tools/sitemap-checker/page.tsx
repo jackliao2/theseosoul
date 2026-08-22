@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/sitemap-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -39,9 +41,9 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Free Sitemap Checker — XML Sitemap & robots.txt Sitemap:",
+  title: "Free Sitemap Checker — Validate XML & Discovery",
   description:
-    "Free XML sitemap checker: verify /sitemap.xml, robots.txt Sitemap: directives, urlset vs index, and sample URLs. No signup.",
+    "Free XML sitemap checker: validate sitemap.xml and sitemap indexes, confirm robots.txt discovery, and sample listed URLs. No signup.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "sitemap checker",
@@ -50,13 +52,12 @@ export const metadata: Metadata = {
     "robots sitemap directive",
     "sitemap validator",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Sitemap Checker",
     description:
       "Check XML sitemaps and robots.txt Sitemap: discovery — free, no signup.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function SitemapCheckerPage() {
@@ -132,6 +133,13 @@ export default function SitemapCheckerPage() {
           for indexability and on-page issues.
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/xml-sitemaps-that-actually-help"
+        title="Build a sitemap that helps discovery instead of creating noise"
+        description="Decide which canonical URLs belong, keep lastmod honest, validate sitemap indexes, and interpret Search Console errors without treating submission as an indexing guarantee."
+        cta="Read the practical sitemap guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

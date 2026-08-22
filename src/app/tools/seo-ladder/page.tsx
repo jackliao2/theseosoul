@@ -16,6 +16,7 @@ import {
 } from "@/components/tools/tool-page-guide";
 import { SEO_LADDER_STAGES } from "@/lib/tools/seo-ladder";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/seo-ladder";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -57,13 +58,12 @@ export const metadata: Metadata = {
     "site maturity ladder",
     "seo beginner to advanced",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "SEO Site Ladder — Capability Stages 1–10",
     description:
       "Find your stage with honest proofs: crawlable → indexed → query match → trust → value loop → durable systems.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function SeoLadderPage() {

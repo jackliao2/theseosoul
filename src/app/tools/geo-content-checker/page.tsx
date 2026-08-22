@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/geo-content-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -41,7 +43,7 @@ const faqs = [
 export const metadata: Metadata = {
   title: "Free GEO Content Checker — AI Citation Readiness",
   description:
-    "Free GEO content checker: paste a draft and score citation readiness across structure, facts, clarity, completeness, authority, and differentiation. Rule-based — no ChatGPT API, no signup.",
+    "Free GEO content checker: score a draft for clear structure, verifiable facts, authority cues, and AI citation readiness. Rule-based, no API or signup.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "geo content checker",
@@ -49,13 +51,12 @@ export const metadata: Metadata = {
     "ai citation checker",
     "geo seo tool",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free GEO Content Checker",
     description:
       "Rule-based AI citation readiness score for drafts — free, no API key.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function GeoContentCheckerPage() {
@@ -133,6 +134,13 @@ export default function GeoContentCheckerPage() {
           for the live site.
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/geo-llms-txt-practical-guide"
+        title="Make content easier to quote without inventing an AI score"
+        description="Connect citation-friendly writing with crawl policy, llms.txt, Google-Extended, and evidence that readers can verify—while keeping classic search fundamentals intact."
+        cta="Read the practical GEO guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

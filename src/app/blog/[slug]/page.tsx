@@ -13,6 +13,9 @@ import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 
 type Props = { params: Promise<{ slug: string }> };
 
+const EDITORIAL_TEAM_NAME = "TheSeoSoul editorial team";
+const EDITORIAL_TEAM_URL = `${SITE_URL}/about`;
+
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
 }
@@ -29,14 +32,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: post.title,
     description: post.description,
     alternates: { canonical: path },
+    authors: [{ name: EDITORIAL_TEAM_NAME, url: EDITORIAL_TEAM_URL }],
+    creator: EDITORIAL_TEAM_NAME,
+    publisher: SITE_NAME,
     keywords: post.tags,
     openGraph: {
+      locale: "en_US",
+      siteName: SITE_NAME,
       title: post.title,
       description: post.description,
       url: path,
       type: "article",
       publishedTime: post.date,
       modifiedTime: post.updated ?? post.date,
+      authors: [EDITORIAL_TEAM_URL],
       images: ogImages,
     },
     twitter: {
@@ -64,11 +73,13 @@ export default async function BlogPostPage({ params }: Props) {
     image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
     author: {
       "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
+      "@id": `${EDITORIAL_TEAM_URL}#editorial-team`,
+      name: EDITORIAL_TEAM_NAME,
+      url: EDITORIAL_TEAM_URL,
     },
     publisher: {
       "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
     },
@@ -93,6 +104,17 @@ export default async function BlogPostPage({ params }: Props) {
       </ContentEyebrow>
       <ContentTitle>{post.title}</ContentTitle>
       <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+        <span>
+          By{" "}
+          <Link
+            href="/about"
+            rel="author"
+            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+          >
+            {EDITORIAL_TEAM_NAME}
+          </Link>
+        </span>
+        <span aria-hidden>·</span>
         <time dateTime={post.date}>{formatDate(post.date)}</time>
         <span aria-hidden>·</span>
         <span>{post.readingMinutes} min read</span>

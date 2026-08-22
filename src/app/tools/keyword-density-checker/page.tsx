@@ -15,6 +15,7 @@ import {
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/keyword-density-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +51,12 @@ export const metadata: Metadata = {
     "seo keyword density",
     "free keyword density checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Keyword Density Checker",
     description:
       "1–3 word phrase frequencies from a URL or draft, plus focus keyword — free.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function KeywordDensityCheckerPage() {

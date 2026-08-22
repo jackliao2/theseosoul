@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/noindex-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +52,12 @@ export const metadata: Metadata = {
     "check if page is noindex",
     "indexing checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Noindex Checker",
     description:
       "Read meta robots and X-Robots-Tag to see if a URL should be indexed.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function NoindexCheckerPage() {
@@ -130,6 +131,13 @@ export default function NoindexCheckerPage() {
           .
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/find-and-fix-accidental-noindex"
+        title="Found an accidental noindex? Trace it to the source"
+        description="Work through meta robots, X-Robots-Tag, CMS defaults, staging leftovers, and the robots.txt trap—then verify that the production URL is genuinely eligible for indexing."
+        cta="Use the noindex recovery checklist"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

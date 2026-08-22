@@ -4,11 +4,17 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ContentEyebrow, ContentPage } from "@/components/layout/content-page";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
   description: `Terms governing use of ${SITE_NAME}'s free SEO audits, tools, and shareable reports.`,
   alternates: { canonical: "/terms" },
+  ...createSocialMetadata({
+    url: "/terms",
+    title: `${SITE_NAME} Terms of Use`,
+    description: `Rules for using ${SITE_NAME}'s free SEO audits, tools, public-web checks, and shareable reports.`,
+  }),
 };
 
 const contents = [

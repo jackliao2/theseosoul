@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/robots-txt-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -43,9 +45,9 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Free Robots.txt Checker Online — robots txt checker",
+  title: "Free Robots.txt Checker — Test Crawl Rules Online",
   description:
-    "Free robots txt checker online: fetch any domain’s robots.txt, see crawl-all Disallow rules, Sitemap directives, and AI crawler blocks (GPTBot, ClaudeBot, and more). No signup. Instant technical SEO check.",
+    "Free robots.txt checker: fetch live crawl rules, flag site-wide blocks, find Sitemap directives, and review common AI crawler policies. No signup.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "robots txt checker",
@@ -55,13 +57,12 @@ export const metadata: Metadata = {
     "free robots.txt checker",
     "check robots.txt",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Robots.txt Checker Online",
     description:
       "Fetch robots.txt, spot Disallow: /, Sitemap lines, and AI bot blocks — free, no signup.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function RobotsTxtCheckerPage() {
@@ -156,6 +157,13 @@ export default function RobotsTxtCheckerPage() {
           XML sitemap when you want discovery help.
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/free-robots-txt-checker-what-matters"
+        title="Turn a robots.txt result into a safe crawl decision"
+        description="Learn how to test path rules by user-agent, spot the dangerous Disallow: / case, review AI crawler policy, and verify Sitemap lines without confusing crawl control with noindex."
+        cta="Learn how to audit robots.txt"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

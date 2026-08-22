@@ -19,7 +19,7 @@ import type {
 const MAX_SAMPLE_PAGES = 8;
 const SAMPLE_TIMEOUT_MS = 8_000;
 
-/** Practical readiness bars — not published Google word-count minima. */
+/** Editorial review markers — not published Google word-count minima. */
 const HOME_WORDS_MIN = 300;
 const CONTENT_MEDIAN_MIN = 500;
 const DEEP_CONTENT_MEDIAN = 800;
@@ -488,7 +488,9 @@ function median(values: number[]): number {
     : Math.round((sorted[midpoint - 1] + sorted[midpoint]) / 2);
 }
 
-function scoreChecks(checks: AdsenseReadinessCheck[]): number {
+export function scoreAdsenseReadinessChecks(
+  checks: AdsenseReadinessCheck[]
+): number {
   const weights: Record<AdsenseCheckImpact, number> = {
     critical: 4,
     important: 2,
@@ -513,7 +515,7 @@ function scoreChecks(checks: AdsenseReadinessCheck[]): number {
   return score;
 }
 
-function hasClearSitePurpose(title: string, words: number): boolean {
+function hasClearSitePurpose(title: string): boolean {
   const normalized = title.replace(/\s+/g, " ").trim().toLowerCase();
   if (!normalized || normalized === "untitled") return false;
   if (
@@ -523,7 +525,131 @@ function hasClearSitePurpose(title: string, words: number): boolean {
   ) {
     return false;
   }
-  return words >= HOME_WORDS_MIN;
+  return true;
+}
+
+type ContentSignal = Pick<AdsenseReadinessCheck, "status" | "impact">;
+
+type ContentHeuristicAssessment = {
+  sitePurpose: ContentSignal;
+  homepageContent: ContentSignal;
+  contentInventory: ContentSignal;
+  sampleSize: ContentSignal;
+  contentDepth: ContentSignal;
+  deepContent: ContentSignal;
+  thinPages: ContentSignal;
+  placeholders: ContentSignal;
+  sampleMedian: number;
+  thinPagesCount: number;
+  blankPagesCount: number;
+  placeholderPagesCount: number;
+};
+
+/**
+ * Classifies crawler-observable content signals without treating word count as
+ * an AdSense requirement. Short, non-placeholder copy prompts human review;
+ * only independent evidence such as a blank or placeholder page is a fix.
+ */
+export function assessAdsenseContentHeuristics({
+  homeTitle,
+  homeWords,
+  homePlaceholder,
+  inventoryCount,
+  sampledPages,
+}: {
+  homeTitle: string;
+  homeWords: number;
+  homePlaceholder: boolean;
+  inventoryCount: number;
+  sampledPages: AdsenseSamplePage[];
+}): ContentHeuristicAssessment {
+  const sampleMedian = median(sampledPages.map((page) => page.words));
+  const thinPagesCount = sampledPages.filter(
+    (page) => page.words < THIN_WORDS
+  ).length;
+  const blankPagesCount = sampledPages.filter((page) => page.words === 0).length;
+  const placeholderPagesCount = sampledPages.filter(
+    (page) => page.placeholder
+  ).length;
+  const homepageIncomplete = homeWords === 0 || homePlaceholder;
+  const purposeClear = hasClearSitePurpose(homeTitle);
+
+  return {
+    sitePurpose: purposeClear
+      ? { status: "pass", impact: "important" }
+      : homepageIncomplete
+        ? { status: "fix", impact: "important" }
+        : { status: "review", impact: "advisory" },
+    homepageContent: homepageIncomplete
+      ? { status: "fix", impact: "critical" }
+      : homeWords >= HOME_WORDS_MIN
+        ? { status: "pass", impact: "advisory" }
+        : { status: "review", impact: "advisory" },
+    contentInventory:
+      inventoryCount === 0
+        ? { status: "fix", impact: "critical" }
+        : inventoryCount >= MIN_CONTENT_INVENTORY
+          ? { status: "pass", impact: "advisory" }
+          : { status: "review", impact: "advisory" },
+    sampleSize:
+      sampledPages.length === 0
+        ? { status: "fix", impact: "critical" }
+        : sampledPages.length >= MIN_SAMPLE_PAGES
+          ? { status: "pass", impact: "advisory" }
+          : { status: "review", impact: "advisory" },
+    contentDepth:
+      sampledPages.length > 0 && sampleMedian >= CONTENT_MEDIAN_MIN
+        ? { status: "pass", impact: "advisory" }
+        : { status: "review", impact: "advisory" },
+    deepContent:
+      sampledPages.length > 0 && sampleMedian >= DEEP_CONTENT_MEDIAN
+        ? { status: "pass", impact: "advisory" }
+        : { status: "review", impact: "advisory" },
+    thinPages:
+      blankPagesCount > 0
+        ? { status: "fix", impact: "critical" }
+        : sampledPages.length > 0 && thinPagesCount === 0
+          ? { status: "pass", impact: "advisory" }
+          : { status: "review", impact: "advisory" },
+    placeholders:
+      placeholderPagesCount > 0
+        ? { status: "fix", impact: "critical" }
+        : { status: "pass", impact: "critical" },
+    sampleMedian,
+    thinPagesCount,
+    blankPagesCount,
+    placeholderPagesCount,
+  };
+}
+
+export function determineAdsenseReadinessOutcome(
+  checks: AdsenseReadinessCheck[]
+): {
+  score: number;
+  criticalFixes: number;
+  foundationReady: boolean;
+  verdict: AdsenseReadinessResult["verdict"];
+} {
+  const score = scoreAdsenseReadinessChecks(checks);
+  const criticalFixes = checks.filter(
+    (item) => item.status === "fix" && item.impact === "critical"
+  ).length;
+  const foundationReady =
+    criticalFixes === 0 &&
+    checks.some(
+      (item) => item.id === "privacy-disclosure" && item.status === "pass"
+    ) &&
+    checks.some(
+      (item) => item.id === "trust-bundle" && item.status === "pass"
+    );
+  const verdict: AdsenseReadinessResult["verdict"] =
+    score >= 85 && foundationReady
+      ? "Strong foundation"
+      : score >= 50 && criticalFixes <= 2
+        ? "Some work needed"
+        : "Not ready yet";
+
+  return { score, criticalFixes, foundationReady, verdict };
 }
 
 export async function checkAdsenseReadiness(
@@ -752,13 +878,17 @@ export async function checkAdsenseReadiness(
   );
 
   const sampleCount = sampledPages.length;
-  const sampleMedian = median(sampledPages.map((page) => page.words));
-  const thinPages = sampledPages.filter((page) => page.words < THIN_WORDS);
-  const placeholderPages = sampledPages.filter((page) => page.placeholder);
   const missingH1 = sampledPages.filter((page) => page.h1Count === 0);
   const indexableSamples = sampledPages.filter((page) => !page.noindex);
   const homeTitle = $("title").first().text().replace(/\s+/g, " ").trim();
-  const sitePurposeClear = hasClearSitePurpose(homeTitle, homeWords);
+  const homePlaceholder = hasPlaceholder(homeText);
+  const contentAssessment = assessAdsenseContentHeuristics({
+    homeTitle,
+    homeWords,
+    homePlaceholder,
+    inventoryCount: inventoryUrls.length,
+    sampledPages,
+  });
   const titled = sampledPages
     .map((page) => page.title.trim().toLowerCase())
     .filter((title) => title && title !== "untitled");
@@ -769,79 +899,99 @@ export async function checkAdsenseReadiness(
       "site-purpose",
       "content",
       "Homepage explains the site’s purpose",
-      sitePurposeClear ? "pass" : "fix",
-      "critical",
-      sitePurposeClear
-        ? `Homepage title “${homeTitle}” plus about ${homeWords.toLocaleString()} readable words suggest a clear public purpose.`
-        : `Homepage title “${homeTitle || "Untitled"}” and ${homeWords.toLocaleString()} readable words do not clearly explain what the site is for.`,
-      "State what the site does, who it serves, and what visitors can find — on the homepage itself."
+      contentAssessment.sitePurpose.status,
+      contentAssessment.sitePurpose.impact,
+      contentAssessment.sitePurpose.status === "pass"
+        ? `The homepage title “${homeTitle}” communicates a specific public purpose.`
+        : contentAssessment.sitePurpose.status === "fix"
+          ? `The homepage title “${homeTitle || "Untitled"}” is generic or missing, and the homepage is ${homePlaceholder ? "marked as unfinished" : "blank"}.`
+          : `The homepage title “${homeTitle || "Untitled"}” is generic or missing. The crawler cannot reliably judge whether the visible copy still explains the purpose.`,
+      "Make the site purpose explicit in the title and homepage copy: what the site does, who it serves, and what visitors can find."
     ),
     check(
       "homepage-content",
       "content",
       "Homepage has readable substance",
-      homeWords >= HOME_WORDS_MIN ? "pass" : "fix",
-      "critical",
-      `Approximately ${homeWords.toLocaleString()} readable words were found outside navigation and footer chrome (practical bar: ${HOME_WORDS_MIN}+).`,
-      "Use the homepage to explain what the site offers and guide visitors to substantive pages."
+      contentAssessment.homepageContent.status,
+      contentAssessment.homepageContent.impact,
+      homePlaceholder
+        ? `The homepage contains placeholder or under-construction language; approximately ${homeWords.toLocaleString()} readable words were found.`
+        : homeWords === 0
+          ? "No readable homepage copy was found outside navigation and footer chrome."
+          : `Approximately ${homeWords.toLocaleString()} readable words were found outside navigation and footer chrome. ${HOME_WORDS_MIN}+ is an editorial review marker, not an AdSense minimum.`,
+      contentAssessment.homepageContent.status === "review"
+        ? "Review whether the concise homepage clearly explains the offer and guides visitors to complete pages; add copy only where it helps visitors."
+        : "Use the homepage to explain what the site offers and guide visitors to substantive pages."
     ),
     check(
       "content-inventory",
       "content",
-      "Enough public content URLs are discoverable",
-      inventoryUrls.length >= MIN_CONTENT_INVENTORY ? "pass" : "fix",
-      "critical",
-      `${inventoryUrls.length} eligible content URL(s) were found via sitemap and homepage links (practical bar: ${MIN_CONTENT_INVENTORY}+).`,
-      "Build a real inventory of useful articles or pages before applying — not just a homepage and a few stubs."
+      "Public content inventory is discoverable",
+      contentAssessment.contentInventory.status,
+      contentAssessment.contentInventory.impact,
+      inventoryUrls.length === 0
+        ? "No eligible content URLs were found via the sitemap or homepage links."
+        : `${inventoryUrls.length} eligible content URL(s) were found via the sitemap and homepage links. ${MIN_CONTENT_INVENTORY}+ is an observation marker, not an AdSense requirement.`,
+      inventoryUrls.length === 0
+        ? "Publish and internally link at least one complete public content page that a crawler can reach."
+        : "Review whether the available pages collectively serve the site's purpose; add pages for missing user needs, not to hit a quota."
     ),
     check(
       "sample-size",
       "content",
-      "Multiple content pages are sampleable",
-      sampleCount >= MIN_SAMPLE_PAGES ? "pass" : "fix",
-      "critical",
-      `${sampleCount} unique content page(s) were successfully sampled (target ${MIN_SAMPLE_PAGES}+, maximum ${MAX_SAMPLE_PAGES}).`,
-      "Publish and internally link several complete, useful content pages that a crawler can reach."
+      "Public content pages are sampleable",
+      contentAssessment.sampleSize.status,
+      contentAssessment.sampleSize.impact,
+      sampleCount === 0
+        ? `None of the ${sampleTargets.length} eligible target(s) could be sampled.`
+        : `${sampleCount} unique content page(s) were successfully sampled (up to ${MAX_SAMPLE_PAGES}). ${MIN_SAMPLE_PAGES}+ is an observation marker, not an AdSense requirement.`,
+      sampleCount === 0
+        ? "Check that at least one complete public content page is linked and fetchable without authentication or blocking."
+        : "Use the available sample for manual quality review; publish more pages only when they answer additional user needs."
     ),
     check(
       "content-depth",
       "content",
       "Sample shows meaningful content depth",
-      sampleCount > 0 && sampleMedian >= CONTENT_MEDIAN_MIN ? "pass" : "fix",
-      "critical",
+      contentAssessment.contentDepth.status,
+      contentAssessment.contentDepth.impact,
       sampleCount
-        ? `The sampled median is approximately ${sampleMedian.toLocaleString()} words (practical bar: ${CONTENT_MEDIAN_MIN}+).`
-        : "No eligible content pages could be sampled.",
-      `Expand thin topics. The ${CONTENT_MEDIAN_MIN}-word median marker is a readiness heuristic used by publishers in practice — not a published Google minimum.`
+        ? `The sampled median is approximately ${contentAssessment.sampleMedian.toLocaleString()} words. ${CONTENT_MEDIAN_MIN}+ is an editorial review marker, not an AdSense minimum.`
+        : "No eligible content pages could be sampled; the separate sampling check reports whether this is a crawl or inventory problem.",
+      `Review whether each sampled page answers its topic completely. The ${CONTENT_MEDIAN_MIN}-word marker is only a prompt for manual review — Google publishes no minimum.`
     ),
     check(
       "deep-content",
       "content",
       "Sample approaches in-depth article length",
-      sampleCount > 0 && sampleMedian >= DEEP_CONTENT_MEDIAN ? "pass" : "fix",
-      "important",
+      contentAssessment.deepContent.status,
+      contentAssessment.deepContent.impact,
       sampleCount
-        ? `Median sample depth is about ${sampleMedian.toLocaleString()} words (stretch bar: ${DEEP_CONTENT_MEDIAN}+).`
+        ? `Median sample depth is about ${contentAssessment.sampleMedian.toLocaleString()} words (${DEEP_CONTENT_MEDIAN}+ editorial stretch marker).`
         : "No eligible content pages could be sampled.",
-      `Many publishers aim for roughly ${DEEP_CONTENT_MEDIAN}–1,500 words on core articles. This is a competitive signal, not an official AdSense rule.`
+      "Use this only to select pages for editorial review. A concise page can be complete, and Google publishes no preferred article length."
     ),
     check(
       "thin-pages",
       "content",
-      "Sampled pages are not thin",
-      sampleCount > 0 && thinPages.length === 0 ? "pass" : "fix",
-      "critical",
-      `${thinPages.length}/${sampleCount} sampled page(s) contained fewer than approximately ${THIN_WORDS} readable words.`,
-      "Improve or remove thin public pages before requesting review. Zero thin pages in the sample is the bar used here."
+      "Short pages receive a quality review",
+      contentAssessment.thinPages.status,
+      contentAssessment.thinPages.impact,
+      contentAssessment.blankPagesCount
+        ? `${contentAssessment.blankPagesCount}/${sampleCount} sampled page(s) had no readable body copy.`
+        : `${contentAssessment.thinPagesCount}/${sampleCount} sampled page(s) contained fewer than ${THIN_WORDS} readable words. Short length alone is not a defect.`,
+      contentAssessment.blankPagesCount
+        ? "Finish, remove, or keep blank public pages out of the review inventory."
+        : "Manually confirm that each concise page fully satisfies its purpose; expand it only when useful information is missing."
     ),
     check(
       "placeholders",
       "content",
       "No placeholder content was detected",
-      placeholderPages.length === 0 ? "pass" : "fix",
-      "critical",
-      placeholderPages.length
-        ? `${placeholderPages.length} sampled page(s) contained placeholder or under-construction language.`
+      contentAssessment.placeholders.status,
+      contentAssessment.placeholders.impact,
+      contentAssessment.placeholderPagesCount
+        ? `${contentAssessment.placeholderPagesCount} sampled page(s) contained placeholder or under-construction language.`
         : "No common placeholder phrases were detected in the sample.",
       "Finish or remove placeholder pages before submitting the site."
     ),
@@ -969,29 +1119,11 @@ export async function checkAdsenseReadiness(
     )
   );
 
-  const score = scoreChecks(checks);
+  const { score, verdict } = determineAdsenseReadinessOutcome(checks);
   const fixes = checks.filter((item) => item.status === "fix").length;
-  const criticalFixes = checks.filter(
-    (item) => item.status === "fix" && item.impact === "critical"
-  ).length;
   const reviews = checks.filter((item) => item.status === "review").length;
   const informational = checks.filter((item) => item.status === "info").length;
   const passed = checks.filter((item) => item.status === "pass").length;
-  const foundationReady =
-    criticalFixes === 0 &&
-    checks.some(
-      (item) => item.id === "content-depth" && item.status === "pass"
-    ) &&
-    checks.some(
-      (item) => item.id === "privacy-disclosure" && item.status === "pass"
-    ) &&
-    checks.some((item) => item.id === "trust-bundle" && item.status === "pass");
-  const verdict =
-    score >= 85 && foundationReady
-      ? "Strong foundation"
-      : score >= 50 && criticalFixes <= 2
-        ? "Some work needed"
-        : "Not ready yet";
 
   return {
     success: true,

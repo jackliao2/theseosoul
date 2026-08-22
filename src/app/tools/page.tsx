@@ -12,6 +12,7 @@ import { ContentPage } from "@/components/layout/content-page";
 import { ToolFaqJsonLd } from "@/components/tools/tool-page-guide";
 import { TOOL_CATALOG } from "@/lib/tools/catalog";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -38,7 +39,7 @@ const HUB_ALT =
 export const metadata: Metadata = {
   title: "Free SEO Tools — Audit, AdSense Readiness, Robots & More",
   description:
-    "Free SEO tools with no registration: website SEO audit, SEO site ladder, domain history, AdSense readiness checker, robots.txt, meta tags, canonical, keyword density, Open Graph, noindex, redirects, and GEO.",
+    "Free SEO tools with no signup: website audit, domain history, AdSense readiness, robots.txt, meta tags, sitemaps, redirects, security headers, and GEO checks.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "free seo tools",
@@ -50,21 +51,13 @@ export const metadata: Metadata = {
     "canonical tag checker",
     "adsense readiness checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free SEO Tools — No Signup",
     description:
       "Honest free SEO utilities: robots.txt, meta, canonical, density, OG, redirects, GEO.",
     url: PAGE_PATH,
-    type: "website",
-    images: [{ url: HUB_IMAGE, width: 1600, height: 900, alt: HUB_ALT }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Free SEO Tools — No Signup",
-    description:
-      "Honest free SEO utilities: robots.txt, meta, canonical, density, OG, redirects, GEO.",
-    images: [HUB_IMAGE],
-  },
+    image: { url: HUB_IMAGE, width: 1600, height: 900, alt: HUB_ALT },
+  }),
 };
 
 const featured = TOOL_CATALOG.find((t) => t.group === "featured")!;

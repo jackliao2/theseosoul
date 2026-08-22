@@ -10,14 +10,33 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/adsense-readiness-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
+
+const verificationBoundary = {
+  automated: [
+    "Reachability, HTTPS, redirects, robots.txt, and page-level indexability",
+    "Discoverable Privacy, About, Contact, and Terms pages",
+    "Privacy-page references to cookies, advertising, and user choices",
+    "Sitemap, ads.txt, internal navigation, and a bounded sample of public pages",
+    "Missing titles, weak heading structure, placeholder text, and unusually sparse pages that deserve review",
+  ],
+  human: [
+    "Your age, country availability, identity, account standing, and completed AdSense tasks",
+    "Whether you own the content, control the site, and hold the necessary rights",
+    "Originality, usefulness, policy context, and the quality of pages outside the sample",
+    "Traffic sources, invalid activity, ad placement, and the complete visitor experience",
+    "The final approval decision, which belongs to Google alone",
+  ],
+} as const;
 
 const googleExpectations = [
   {
@@ -84,6 +103,10 @@ const googleExpectations = [
 
 const faqs = [
   {
+    q: "How can I check AdSense eligibility before applying?",
+    a: "Start with two separate checks. Confirm the account-level requirements yourself — including age, country availability, ownership, and control of the site — then use this checker to inspect public website-readiness signals such as crawler access, trust pages, disclosures, navigation, and sampled content. Google verifies the complete account and site during review.",
+  },
+  {
     q: "Does a passing result guarantee Google AdSense approval?",
     a: "No. This is a rules-based pre-check of public website signals. Google makes the final decision and can consider account history, site ownership, traffic quality, originality, policy context, and pages that were not included in our bounded sample.",
   },
@@ -97,7 +120,7 @@ const faqs = [
   },
   {
     q: "Does Google require a minimum article word count?",
-    a: "Google does not publish a universal minimum word count for AdSense approval. This report still uses stricter practical bars (roughly 300+ homepage words, 500+ median sample depth, zero thin pages under ~300 words, and a stretch bar near 800+) because thin sites often look “fine” on crawl checks alone. Those markers are readiness heuristics, not official Google thresholds.",
+    a: "No universal minimum word count is published for AdSense approval. The report uses content length only as a readiness heuristic to flag unusually sparse or placeholder-like pages for human review — not as a Google requirement or proof of quality. A page should complete its intended job with original, useful information; adding filler does not make low-value content valuable.",
   },
   {
     q: "Does the tool use AI to judge originality or prohibited content?",
@@ -110,9 +133,9 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Free AdSense Readiness Checker — Website Approval Pre-Check",
+  title: "Free AdSense Eligibility Checker — Website Readiness Test",
   description:
-    "Free AdSense readiness checker: inspect crawl access, privacy/About/Contact pages, ads.txt, sitemap, and a bounded content sample before requesting Google review. No signup.",
+    "Check AdSense eligibility signals and site readiness before you apply. Review crawl access, trust pages, privacy, ads.txt, and sampled content — free.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "AdSense readiness checker",
@@ -123,13 +146,12 @@ export const metadata: Metadata = {
     "AdSense privacy policy checker",
     "ads txt checker",
   ],
-  openGraph: {
-    title: "Free AdSense Readiness Checker",
+  ...createSocialMetadata({
+    title: "Free AdSense Eligibility Checker & Readiness Test",
     description:
-      "Check public crawl, trust, content, and monetization signals before requesting Google AdSense review.",
+      "Check public crawl, trust, disclosure, and content signals before requesting Google AdSense review.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function AdsenseReadinessCheckerPage() {
@@ -138,7 +160,7 @@ export default function AdsenseReadinessCheckerPage() {
       <ToolFaqJsonLd
         faqs={faqs}
         pageUrl={PAGE_URL}
-        name="Free AdSense Readiness Checker"
+        name="Free AdSense Eligibility Checker & Readiness Test"
       />
 
       <ContentEyebrow>
@@ -148,16 +170,78 @@ export default function AdsenseReadinessCheckerPage() {
         <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
         Growth & monetization
       </ContentEyebrow>
-      <ContentTitle>AdSense readiness checker</ContentTitle>
+      <ContentTitle>AdSense eligibility &amp; readiness checker</ContentTitle>
       <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
-        Public-site pre-check before you request Google review — crawl access,
-        trust pages, disclosures, and a bounded content sample. Not an approval
-        guarantee.
+        Check AdSense eligibility signals visible on the public web: crawl
+        access, trust pages, disclosures, navigation, and a bounded content
+        sample. Use the readiness report before you apply; Google alone decides
+        whether a site is approved.
       </p>
 
       <div className="mt-8">
         <AdsenseReadinessForm />
       </div>
+
+      <section className="mt-14" aria-labelledby="verification-boundary-title">
+        <div className="max-w-3xl">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            An honest eligibility check
+          </p>
+          <h2
+            id="verification-boundary-title"
+            className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl"
+          >
+            What the tool can verify — and what it cannot
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+            A public crawl can find useful evidence, but it cannot see your
+            account, prove authorship, audit every traffic source, or reproduce
+            Google&apos;s review. The report keeps that boundary visible.
+          </p>
+        </div>
+
+        <div className="mt-7 grid gap-4 lg:grid-cols-2">
+          <article className="rounded-2xl border border-teal-800/20 bg-teal-800/[0.04] p-5 dark:border-teal-300/20 dark:bg-teal-300/[0.04] sm:p-6">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">
+              Automatically checked
+            </p>
+            <h3 className="mt-2 font-display text-lg font-bold text-slate-900 dark:text-white">
+              Public website signals
+            </h3>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+              {verificationBoundary.automated.map((item) => (
+                <li key={item} className="flex gap-2.5">
+                  <span
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-700 dark:bg-teal-300"
+                    aria-hidden
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="rounded-2xl border border-amber-700/20 bg-amber-700/[0.035] p-5 dark:border-amber-300/20 dark:bg-amber-300/[0.035] sm:p-6">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
+              Requires human or Google review
+            </p>
+            <h3 className="mt-2 font-display text-lg font-bold text-slate-900 dark:text-white">
+              Account, rights, policy, and final approval
+            </h3>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+              {verificationBoundary.human.map((item) => (
+                <li key={item} className="flex gap-2.5">
+                  <span
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-700 dark:bg-amber-300"
+                    aria-hidden
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </section>
 
       <section className="mt-14">
         <div className="max-w-2xl">
@@ -300,6 +384,13 @@ export default function AdsenseReadinessCheckerPage() {
             complete site.
           </p>
         </ToolProse>
+
+        <ToolGuideCard
+          href="/blog/adsense-readiness-honest-checklist"
+          title="Prepare for review without chasing fake approval formulas"
+          description="Separate account eligibility from website readiness, work through the evidence Google can review, and respond to low-value-content or policy feedback with specific fixes."
+          cta="Use the honest approval checklist"
+        />
 
         <ToolFaqSection faqs={faqs} />
 

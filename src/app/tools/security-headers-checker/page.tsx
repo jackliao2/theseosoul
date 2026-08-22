@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/security-headers-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +52,12 @@ export const metadata: Metadata = {
     "x-frame-options checker",
     "http security headers",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Security Headers Checker",
     description:
       "Check HSTS, CSP, framing, and related HTTP security headers — free.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function SecurityHeadersCheckerPage() {
@@ -136,6 +137,13 @@ export default function SecurityHeadersCheckerPage() {
           for crawl and on-page issues.
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/ssl-and-security-headers-for-seo"
+        title="Prioritize HTTPS hygiene before chasing a perfect header score"
+        description="Separate ranking-critical availability and TLS basics from defense-in-depth controls, then sequence HSTS, CSP, framing, and referrer policies without security-score theater."
+        cta="See what matters for SEO and trust"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

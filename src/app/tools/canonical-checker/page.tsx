@@ -15,6 +15,7 @@ import {
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/canonical-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +51,12 @@ export const metadata: Metadata = {
     "canonical url checker",
     "rel canonical checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Canonical Tag Checker",
     description:
       "Inspect rel=canonical — present, self-ref, or cross-host — free, no signup.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function CanonicalCheckerPage() {

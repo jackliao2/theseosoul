@@ -9,11 +9,17 @@ import {
 } from "@/components/layout/content-page";
 import { SiteWordmark } from "@/components/brand/site-mark";
 import { SITE_EMAIL, SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Contact ${SITE_NAME} at ${SITE_EMAIL} for product questions, privacy requests, or partnership.`,
+  description: `Contact ${SITE_NAME} at ${SITE_EMAIL} for product questions, privacy requests, report corrections, or partnership inquiries.`,
   alternates: { canonical: "/contact" },
+  ...createSocialMetadata({
+    url: "/contact",
+    title: `Contact ${SITE_NAME}`,
+    description: `Email ${SITE_NAME} about product feedback, audit reports, privacy requests, corrections, partnerships, or press.`,
+  }),
 };
 
 const topics = [

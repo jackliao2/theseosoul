@@ -9,11 +9,17 @@ import {
 import { SiteWordmark } from "@/components/brand/site-mark";
 import { SOUL_ARCHETYPES } from "@/lib/audit/soul";
 import { SITE_EMAIL, SITE_NAME } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 export const metadata: Metadata = {
   title: "About TheSeoSoul — Free SEO Audits & Site Soul",
   description: `What ${SITE_NAME} is: free technical SEO + GEO audits, shareable reports, Site Soul profiles, and an honest free tier without fake traffic charts.`,
   alternates: { canonical: "/about" },
+  ...createSocialMetadata({
+    url: "/about",
+    title: "About TheSeoSoul — How Our SEO Audits Work",
+    description: `Learn how ${SITE_NAME} builds free technical SEO and GEO audits, reviews its guides, and keeps recommendations evidence-based.`,
+  }),
 };
 
 const covered = [
@@ -174,6 +180,34 @@ export default function AboutPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mt-16 border-t border-slate-300/70 pt-12 dark:border-slate-800">
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
+          How we write and review guides
+        </h2>
+        <div className="mt-4 max-w-3xl space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <p>
+            Guides are published by our{" "}
+            <strong>TheSeoSoul editorial team</strong>. We start with primary
+            sources such as search engine documentation and public standards,
+            then reproduce important checks against live pages where practical.
+          </p>
+          <p>
+            Before publishing, we review claims against their sources, verify
+            steps and links, and separate measured findings from
+            recommendations. Material revisions receive an updated date. If
+            something is unclear or wrong, send the page and correction through
+            our{" "}
+            <Link
+              href="/contact"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              contact page
+            </Link>
+            .
+          </p>
+        </div>
       </section>
 
       <section

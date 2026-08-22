@@ -52,15 +52,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "TheSeoSoul — Free Technical SEO Audit",
+    title: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
     description:
-      "Paste a URL. Get a shareable technical SEO report: on-page, GEO, TLS, DNS, and domain age — free.",
+      "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TheSeoSoul — Free Technical SEO Audit",
+    title: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
     description:
-      "Shareable technical SEO reports for any domain. No signup. No fake traffic charts.",
+      "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
   },
   alternates: {
     canonical: SITE_URL,
@@ -96,7 +96,15 @@ export default function RootLayout({
         name: SITE_NAME,
         url: SITE_URL,
         email: SITE_EMAIL,
-        logo: `${SITE_URL}/icon`,
+        logo: {
+          "@type": "ImageObject",
+          "@id": `${SITE_URL}/#logo`,
+          url: `${SITE_URL}/apple-icon`,
+          contentUrl: `${SITE_URL}/apple-icon`,
+          width: 180,
+          height: 180,
+          caption: SITE_NAME,
+        },
         contactPoint: {
           "@type": "ContactPoint",
           email: SITE_EMAIL,

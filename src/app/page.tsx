@@ -17,11 +17,10 @@ import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: {
-    absolute:
-      "TheSeoSoul — Free Website SEO Checker, Audit Reports & SEO Tools",
+    absolute: "TheSeoSoul — Free Website SEO Checker & Practical SEO Tools",
   },
   description:
-    "Free website SEO checker with no signup. Run a shareable technical SEO audit, or use free tools for robots.txt, meta tags, sitemap, SSL, security headers, domain history, and AdSense readiness.",
+    "Run a free website SEO audit with no signup. Check robots.txt, meta tags, sitemaps, SSL, domain history, AdSense readiness, and get prioritized fixes.",
   alternates: { canonical: "/" },
 };
 

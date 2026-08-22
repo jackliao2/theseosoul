@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/ssl-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +52,12 @@ export const metadata: Metadata = {
     "https certificate checker",
     "ssl expiration checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free SSL Days Checker",
     description:
       "Check TLS certificate days remaining, issuer, and HTTPS final URL — free.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function SslCheckerPage() {
@@ -121,6 +122,13 @@ export default function SslCheckerPage() {
           for HSTS after HTTPS is stable.
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/ssl-and-security-headers-for-seo"
+        title="Put certificate expiry in its proper SEO context"
+        description="Prioritize valid HTTPS and reliable renewals first, then understand where HSTS, CSP, mixed content, and other browser protections affect trust and technical hygiene."
+        cta="Plan the HTTPS and headers checks"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

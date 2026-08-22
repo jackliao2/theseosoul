@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server.js";
 import { NextRequest } from "next/server";
 
 import robots from "@/app/robots";
@@ -8,7 +9,7 @@ import { INDEXABLE_AUDIT_DOMAINS, SITE_URL } from "@/lib/audit/types";
 import { getAllPosts } from "@/lib/blog";
 import { SITEMAP_STATIC_PATHS } from "@/lib/site-urls";
 import { auditHref, normalizeUrl } from "@/lib/url";
-import { proxy } from "@/proxy";
+import { config as proxyConfig, proxy } from "@/proxy";
 
 describe("search crawler routes", () => {
   it("publishes only the intended canonical URL inventory", async () => {
@@ -95,5 +96,62 @@ describe("search crawler routes", () => {
       new URL(response.headers.get("x-middleware-rewrite")!).pathname,
       "/_not-found"
     );
+  });
+
+  it("retires confirmed parking and parameter-spam routes with 410", () => {
+    for (const legacyPath of [
+      "/__media__/js/netsoltrademark.php?d=spam.example",
+      "/search.php?uid=old-parking-id",
+      "/page.php?theseosoul=old-parking-id",
+      "/Build_a_Web_Site.cfm?kt=207",
+      "/phpmyadmin/error.php",
+      "/rmgdsc/rprivacypolicy.php",
+    ]) {
+      const response = proxy(new NextRequest(new URL(legacyPath, SITE_URL)));
+
+      assert.equal(response.status, 410, legacyPath);
+      assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    }
+  });
+
+  it("runs the proxy only for audit and confirmed legacy pollution routes", () => {
+    for (const path of [
+      "/audit/example.com",
+      "/__media__/js/netsoltrademark.php?d=spam.example",
+      "/phpmyadmin/error.php",
+      "/rmgdsc/rprivacypolicy.php",
+      "/search.php?uid=old-parking-id",
+    ]) {
+      assert.equal(
+        unstable_doesMiddlewareMatch({ config: proxyConfig, url: path }),
+        true,
+        path
+      );
+    }
+
+    for (const path of [
+      "/2010/03/steady-seo-checkups-essential/",
+      "/tools/search.php",
+      "/search.php/extra",
+      "/apple-icon",
+      "/_next/static/chunks/app.js",
+    ]) {
+      assert.equal(
+        unstable_doesMiddlewareMatch({ config: proxyConfig, url: path }),
+        false,
+        path
+      );
+    }
+  });
+
+  it("does not retire genuine legacy SEO paths without redirect evidence", () => {
+    const response = proxy(
+      new NextRequest(
+        `${SITE_URL}/2010/03/steady-seo-checkups-essential/`
+      )
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-middleware-next"), "1");
   });
 });

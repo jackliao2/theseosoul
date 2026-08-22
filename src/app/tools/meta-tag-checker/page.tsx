@@ -10,11 +10,13 @@ import {
   ToolBulletSection,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/meta-tag-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -39,7 +41,7 @@ const faqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Free Meta Tag Checker — Title & Meta Description + SERP Preview",
+  title: "Free Meta Tag Checker — Title, Description & SERP Preview",
   description:
     "Free meta tag checker and SERP preview: pull title & meta description from any URL, check length bands, or simulate a Google-style snippet. No signup.",
   alternates: { canonical: PAGE_PATH },
@@ -51,13 +53,12 @@ export const metadata: Metadata = {
     "seo title checker",
     "serp preview",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Meta Tag Checker",
     description:
       "Live title & meta description check plus Google-style SERP preview — free.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function MetaTagCheckerPage() {
@@ -136,6 +137,13 @@ export default function MetaTagCheckerPage() {
           .
         </p>
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/free-meta-tag-checker-titles-descriptions"
+        title="Write stronger snippets without chasing pixel myths"
+        description="Use the checker as editorial QA: align the title with the page, make the description useful to searchers, and understand when Google may choose different snippet text."
+        cta="Read the title and description guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

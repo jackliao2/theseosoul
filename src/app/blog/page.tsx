@@ -9,6 +9,7 @@ import {
 } from "@/components/layout/content-page";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_NAME } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const HUB_IMAGE = "/images/site/guides-hub.webp";
 const HUB_ALT =
@@ -19,21 +20,13 @@ export const metadata: Metadata = {
   description:
     "Practical technical SEO and GEO guides from TheSeoSoul — robots vs noindex, sitemaps, SSL, domain history, AdSense readiness, and honest free tools. No fake DA charts.",
   alternates: { canonical: "/blog" },
-  openGraph: {
+  ...createSocialMetadata({
     title: `SEO & GEO Guides · ${SITE_NAME}`,
     description:
       "Long-form guides on technical SEO, crawl control, GEO, and the free tools we ship.",
     url: "/blog",
-    type: "website",
-    images: [{ url: HUB_IMAGE, width: 1600, height: 900, alt: HUB_ALT }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `SEO & GEO Guides · ${SITE_NAME}`,
-    description:
-      "Long-form guides on technical SEO, crawl control, GEO, and the free tools we ship.",
-    images: [HUB_IMAGE],
-  },
+    image: { url: HUB_IMAGE, width: 1600, height: 900, alt: HUB_ALT },
+  }),
 };
 
 export default function BlogIndexPage() {

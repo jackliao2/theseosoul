@@ -15,6 +15,7 @@ import {
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/redirect-checker";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -50,13 +51,12 @@ export const metadata: Metadata = {
     "301 redirect checker",
     "url redirect checker",
   ],
-  openGraph: {
+  ...createSocialMetadata({
     title: "Free Redirect Checker",
     description:
       "Trace redirect hops and status codes to the final URL — free, no signup.",
     url: PAGE_PATH,
-    type: "website",
-  },
+  }),
 };
 
 export default function RedirectCheckerPage() {
