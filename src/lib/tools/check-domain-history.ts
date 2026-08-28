@@ -142,11 +142,15 @@ async function fetchCdx(
   const settled = await Promise.all(hosts.map((host) => fetchCdxHost(host)));
   const rows: CdxRow[] = [];
   const seen = new Set<string>();
-  let archiveOk = false;
+  let successes = 0;
+  let failures = 0;
 
   for (const result of settled) {
-    if (result === null) continue;
-    archiveOk = true;
+    if (result === null) {
+      failures += 1;
+      continue;
+    }
+    successes += 1;
     for (const row of result) {
       const key = `${row.timestamp}:${row.digest}`;
       if (seen.has(key)) continue;
@@ -154,6 +158,10 @@ async function fetchCdx(
       rows.push(row);
     }
   }
+
+  // An empty answer from one host plus a timeout on the other is not proof
+  // the domain has no archive trail — treat that as Archive unavailable.
+  const archiveOk = successes > 0 && (rows.length > 0 || failures === 0);
 
   return {
     rows: rows.sort((a, b) => a.timestamp.localeCompare(b.timestamp)),
