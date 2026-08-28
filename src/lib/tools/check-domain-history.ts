@@ -19,6 +19,7 @@ const MAX_HTML_SAMPLES = 10;
 const CDX_TIMEOUT_MS = 18_000;
 const HTML_TIMEOUT_MS = 8_000;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const CACHE_KEY_PREFIX = "domain-history:v2:";
 
 const http1Agent = new Agent({
   allowH2: false,
@@ -97,10 +98,13 @@ async function fetchText(url: string, timeoutMs: number): Promise<string> {
   }
 }
 
-async function fetchCdx(domain: string): Promise<CdxRow[]> {
+async function fetchCdx(
+  domain: string
+): Promise<{ rows: CdxRow[]; archiveOk: boolean }> {
   const hosts = [domain, `www.${domain}`];
   const rows: CdxRow[] = [];
   const seen = new Set<string>();
+  let archiveOk = false;
 
   for (const host of hosts) {
     const url =
@@ -110,7 +114,9 @@ async function fetchCdx(domain: string): Promise<CdxRow[]> {
     try {
       const text = await fetchText(url, CDX_TIMEOUT_MS);
       const data = JSON.parse(text) as string[][];
-      if (!Array.isArray(data) || data.length < 2) continue;
+      if (!Array.isArray(data)) continue;
+      archiveOk = true;
+      if (data.length < 2) continue;
       for (const row of data.slice(1)) {
         const [timestamp, original, statuscode, digest, mimetype] = row;
         if (!timestamp || !original) continue;
@@ -130,7 +136,10 @@ async function fetchCdx(domain: string): Promise<CdxRow[]> {
     }
   }
 
-  return rows.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  return {
+    rows: rows.sort((a, b) => a.timestamp.localeCompare(b.timestamp)),
+    archiveOk,
+  };
 }
 
 function classifyPage(input: {
@@ -446,14 +455,20 @@ export async function checkDomainHistory(
   domainInput: string
 ): Promise<DomainHistoryResult> {
   const domain = bareDomain(domainInput);
-  const cacheKey = `domain-history:v1:${domain}`;
+  const cacheKey = `${CACHE_KEY_PREFIX}${domain}`;
   const cached = cacheGet<DomainHistoryResult>(cacheKey);
   if (cached) return cached;
 
-  const [rows, whois] = await Promise.all([
+  const [cdx, whois] = await Promise.all([
     fetchCdx(domain),
     lookupWhois(domain),
   ]);
+  if (!cdx.archiveOk) {
+    throw new Error(
+      "Internet Archive did not respond in time. Retry this report in a minute."
+    );
+  }
+  const rows = cdx.rows;
 
   const sampleRows = pickSampleRows(rows);
   const fetched = await mapPool(sampleRows, 3, async (row) => {
