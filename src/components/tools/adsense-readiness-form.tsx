@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { ToolError } from "@/components/tools/url-tool-form";
-import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
+import { useToolLookup } from "@/components/tools/use-tool-lookup";
 import {
   ADSENSE_GROUPS,
   type AdsenseCheckStatus,
@@ -62,18 +62,11 @@ const statusMeta: Record<
 };
 
 export function AdsenseReadinessForm() {
-  const [url, setUrl] = useUrlQueryPrefill("");
-  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AdsenseReadinessResponse | null>(null);
   const [copied, setCopied] = useState(false);
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    const value = url.trim();
-    if (!value || loading) return;
-
-    setLoading(true);
+  const { url, setUrl, loading, run } = useToolLookup("", async (value) => {
     setProgress(0);
     setResult(null);
     setCopied(false);
@@ -95,8 +88,12 @@ export function AdsenseReadinessForm() {
       });
     } finally {
       timers.forEach((timer) => window.clearTimeout(timer));
-      setLoading(false);
     }
+  });
+
+  async function onSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    await run(url);
   }
 
   async function copyReport(data: AdsenseReadinessResult) {

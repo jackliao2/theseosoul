@@ -28,6 +28,8 @@ const LEGACY_GONE_PATHS = new Set([
 function isConfirmedLegacyPollution(pathname: string): boolean {
   return (
     LEGACY_GONE_PATHS.has(pathname) ||
+    pathname === "/2010" ||
+    pathname.startsWith("/2010/") ||
     pathname.startsWith("/__media__/js/netsoltrademark.php") ||
     pathname.startsWith("/phpmyadmin/") ||
     pathname.startsWith("/rmgdsc/")
@@ -84,6 +86,8 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/audit/:path+",
+    "/2010",
+    "/2010/:path*",
     "/__media__/:path*",
     "/phpmyadmin/:path*",
     "/rmgdsc/:path*",

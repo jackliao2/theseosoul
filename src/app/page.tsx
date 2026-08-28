@@ -28,11 +28,11 @@ export const metadata: Metadata = {
 const examples = ["stripe.com", "github.com", "cloudflare.com"] as const;
 
 const featuredToolHrefs = [
-  "/tools/domain-history",
-  "/tools/seo-ladder",
   "/tools/adsense-readiness-checker",
-  "/tools/robots-txt-checker",
+  "/tools/domain-history",
   "/tools/meta-tag-checker",
+  "/tools/robots-txt-checker",
+  "/tools/noindex-checker",
   "/tools/geo-content-checker",
 ] as const;
 
@@ -96,6 +96,31 @@ export default function HomePage() {
               className="mx-auto max-w-2xl"
             />
           </div>
+
+          <nav
+            aria-label="High-intent tools"
+            className="mt-5 flex flex-wrap justify-center gap-2"
+          >
+            {[
+              {
+                href: "/tools/adsense-readiness-checker",
+                label: "AdSense eligibility",
+              },
+              { href: "/tools/domain-history", label: "Domain history" },
+              {
+                href: "/tools/meta-tag-checker",
+                label: "Title & SERP preview",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full border border-slate-300/80 bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-teal-700/40 hover:text-teal-900 dark:border-slate-600 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:border-teal-400/40 dark:hover:text-teal-200"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
           <div className="mt-5 flex justify-center">
             <RecentAudits />
@@ -227,10 +252,17 @@ export default function HomePage() {
             </Link>
             {" · "}
             <Link
+              href="/tools/domain-history/theseosoul.com"
+              className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+            >
+              This domain’s history
+            </Link>
+            {" · "}
+            <Link
               href="/audit/theseosoul.com"
               className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
             >
-              See our own audit report
+              Our audit report
             </Link>
             {" · "}
             <Link

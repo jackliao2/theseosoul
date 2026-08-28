@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --experimental-loader=./test/tsconfig-paths-loader.mjs --test src/lib/url.test.ts src/lib/audit/network-guard.test.ts src/lib/seo-routes.test.ts src/lib/tools/check-adsense-readiness.test.ts",
+    "test": "node --experimental-strip-types --experimental-loader=./test/tsconfig-paths-loader.mjs --test src/lib/url.test.ts src/lib/audit/network-guard.test.ts src/lib/seo-routes.test.ts src/lib/tools/check-adsense-readiness.test.ts src/lib/tools/domain-history-url.test.ts",
     "typecheck": "tsc --noEmit --incremental false"
   },
   "dependencies": {

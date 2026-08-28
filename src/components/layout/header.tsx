@@ -23,6 +23,9 @@ const NAV = [
 const navLinkClass =
   "hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white md:inline-block";
 
+const growthLinkClass =
+  "hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white lg:inline-block";
+
 export function Header({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
 
@@ -51,7 +54,13 @@ export function Header({ compact = false }: { compact?: boolean }) {
           {!compact ? (
             <>
               <ToolsNavMenu />
-              <Link href="/tools/domain-history" className={navLinkClass}>
+              <Link
+                href="/tools/adsense-readiness-checker"
+                className={growthLinkClass}
+              >
+                AdSense
+              </Link>
+              <Link href="/tools/domain-history" className={growthLinkClass}>
                 Domain History
               </Link>
               {NAV.map((item) => (
@@ -75,6 +84,14 @@ export function Header({ compact = false }: { compact?: boolean }) {
           ) : (
             <>
               <ToolsNavMenu openInNewTab />
+              <Link
+                href="/tools/adsense-readiness-checker"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white lg:inline-block"
+              >
+                AdSense
+              </Link>
               <Link
                 href="/tools/domain-history"
                 target="_blank"
@@ -107,6 +124,16 @@ export function Header({ compact = false }: { compact?: boolean }) {
       {open ? (
         <div className="border-t border-slate-200 bg-[color:var(--surface)] px-4 py-3 dark:border-slate-700 md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1">
+            <Link
+              href="/tools/adsense-readiness-checker"
+              {...(compact
+                ? { target: "_blank" as const, rel: "noopener noreferrer" }
+                : {})}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+            >
+              AdSense eligibility
+            </Link>
             <Link
               href="/tools/domain-history"
               {...(compact

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { useUrlQueryPrefill } from "@/components/tools/use-url-query-prefill";
+import type { ReactNode } from "react";
+import { useToolLookup } from "@/components/tools/use-tool-lookup";
 
 export function UrlToolForm({
   defaultUrl,
@@ -16,17 +16,11 @@ export function UrlToolForm({
   loadingLabel?: string;
   onResult: (url: string) => Promise<void>;
 }) {
-  const [url, setUrl] = useUrlQueryPrefill(defaultUrl);
-  const [loading, setLoading] = useState(false);
+  const { url, setUrl, loading, run } = useToolLookup(defaultUrl, onResult);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await onResult(url.trim());
-    } finally {
-      setLoading(false);
-    }
+    await run(url);
   }
 
   return (

@@ -20,6 +20,7 @@
 ## Free tools
 - AdSense readiness: https://theseosoul.com/tools/adsense-readiness-checker
 - Domain history (Wayback + WHOIS): https://theseosoul.com/tools/domain-history
+- Example domain history report: https://theseosoul.com/tools/domain-history/theseosoul.com
 - SEO site ladder (10 capability stages): https://theseosoul.com/tools/seo-ladder
 - Sitemap checker: https://theseosoul.com/tools/sitemap-checker
 - Security headers checker: https://theseosoul.com/tools/security-headers-checker

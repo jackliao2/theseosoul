@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { DomainHistoryForm } from "@/components/tools/domain-history-form";
 import {
   ContentEyebrow,
@@ -16,6 +17,7 @@ import {
   ToolRelated,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
+import { domainHistoryPathFromInput } from "@/lib/tools/domain-history-url";
 import { createSocialMetadata } from "@/lib/social-metadata";
 
 const PAGE_PATH = "/tools/domain-history";
@@ -40,14 +42,14 @@ const faqs = [
   },
   {
     q: "Is the domain history tool free?",
-    a: `Yes. ${SITE_NAME} domain history needs no account. Pair it with the full technical audit when you want current on-page and crawl signals too.`,
+    a: `Yes. ${SITE_NAME} domain history needs no account. Each lookup opens a shareable /tools/domain-history/[domain] report. Pair it with the full technical audit when you want current on-page and crawl signals too.`,
   },
 ];
 
 export const metadata: Metadata = {
   title: "Free Domain History Checker — Wayback & WHOIS Past Lives",
   description:
-    "Free domain history checker: reconstruct Internet Archive chapters, spot parking eras, and contrast WHOIS for second-hand domains. No signup, no AI paywall.",
+    "Free domain history checker: reconstruct Internet Archive chapters, spot parking eras, and contrast WHOIS for second-hand domains. Shareable report URL — no signup.",
   alternates: { canonical: PAGE_PATH },
   keywords: [
     "domain history checker",
@@ -65,7 +67,23 @@ export const metadata: Metadata = {
   }),
 };
 
-export default function DomainHistoryPage() {
+export default async function DomainHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const raw = typeof sp.url === "string" ? sp.url : Array.isArray(sp.url) ? sp.url[0] : "";
+  if (raw?.trim()) {
+    let href: string | undefined;
+    try {
+      href = domainHistoryPathFromInput(raw);
+    } catch {
+      href = undefined;
+    }
+    if (href) redirect(href);
+  }
+
   return (
     <ContentPage wide className="max-w-6xl py-10 sm:py-12">
       <ToolFaqJsonLd
@@ -85,7 +103,19 @@ export default function DomainHistoryPage() {
       <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300">
         Before you buy or brand a name, read its past lives: archive chapters,
         parking eras, and whether WHOIS looks first-hand. Public Wayback + RDAP
-        only — no credits, no fake DA.
+        only — no credits, no fake DA. Each lookup publishes a shareable{" "}
+        <code className="text-[13px]">/tools/domain-history/[domain]</code>{" "}
+        report.
+      </p>
+      <p className="mt-3 text-sm text-slate-500">
+        Example:{" "}
+        <Link
+          href="/tools/domain-history/theseosoul.com"
+          className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
+        >
+          theseosoul.com’s own past lives
+        </Link>
+        .
       </p>
 
       <div className="mt-8">

@@ -1,6 +1,7 @@
 import { getIndexableAuditDomains } from "@/lib/audit/store";
 import { SITE_URL } from "@/lib/audit/types";
 import { getAllPosts } from "@/lib/blog";
+import { getIndexableDomainHistoryDomains } from "@/lib/tools/domain-history-url";
 
 /** Static paths that belong in the public sitemap (leading slash). */
 export const SITEMAP_STATIC_PATHS = [
@@ -36,5 +37,8 @@ export function getIndexableSiteUrls(baseUrl: string = SITE_URL): string[] {
   const auditUrls = getIndexableAuditDomains().map(
     (domain) => `${origin}/audit/${domain}`
   );
-  return [...staticUrls, ...blogUrls, ...auditUrls];
+  const historyUrls = getIndexableDomainHistoryDomains().map(
+    (domain) => `${origin}/tools/domain-history/${domain}`
+  );
+  return [...staticUrls, ...blogUrls, ...auditUrls, ...historyUrls];
 }

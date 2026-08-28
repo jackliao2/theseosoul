@@ -1,11 +1,13 @@
 import * as cheerio from "cheerio";
 import { Agent, fetch as undiciFetch } from "undici";
 import { cacheGet, cacheSet } from "@/lib/audit/cache";
+import { checkAuditRateLimit } from "@/lib/audit/limit";
 import { lookupWhois } from "@/lib/audit/whois";
 import {
   KIND_LABELS,
   type DomainHistoryChapter,
   type DomainHistoryKind,
+  type DomainHistoryResponse,
   type DomainHistoryResult,
   type DomainHistorySnapshot,
   type DomainHistoryVerdictId,
@@ -567,4 +569,36 @@ export async function checkDomainHistory(
 
   cacheSet(cacheKey, result, CACHE_TTL_MS);
   return result;
+}
+
+/** Rate-limit + error wrapper for shareable /tools/domain-history/[domain] pages. */
+export async function runGuardedDomainHistory(
+  domainInput: string,
+  clientIp: string
+): Promise<DomainHistoryResponse> {
+  const domain = bareDomain(domainInput);
+
+  if (domain.includes(".")) {
+    const limited = checkAuditRateLimit(clientIp, domain);
+    if (!limited.ok) {
+      const who =
+        limited.reason === "domain" ? `this domain (${domain})` : "your IP";
+      return {
+        success: false,
+        error: `Too many lookups for ${who}. Try again in ~${limited.retryAfterSec}s.`,
+      };
+    }
+  }
+
+  try {
+    return await checkDomainHistory(domain);
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Domain history check failed",
+    };
+  }
 }

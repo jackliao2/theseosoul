@@ -22,6 +22,14 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     mark: "SEO",
   },
   {
+    href: "/tools/adsense-readiness-checker",
+    title: "AdSense Readiness Checker",
+    nav: "AdSense eligibility",
+    short: "Trust pages, content sample & approval prep",
+    group: "growth",
+    mark: "AD",
+  },
+  {
     href: "/tools/domain-history",
     title: "Domain History Checker",
     nav: "Domain History Checker",
@@ -30,20 +38,20 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     mark: "DH",
   },
   {
-    href: "/tools/adsense-readiness-checker",
-    title: "AdSense Readiness Checker",
-    nav: "AdSense readiness",
-    short: "Trust pages, content sample & approval prep",
-    group: "growth",
-    mark: "AD",
-  },
-  {
     href: "/tools/seo-ladder",
     title: "SEO Site Ladder",
     nav: "SEO ladder",
     short: "10 capability stages — not a dollar chart",
     group: "growth",
     mark: "10",
+  },
+  {
+    href: "/tools/meta-tag-checker",
+    title: "Meta Tag Checker",
+    nav: "Meta tags",
+    short: "Title, description, H1, lang, viewport & SERP",
+    group: "checkers",
+    mark: "MT",
   },
   {
     href: "/tools/sitemap-checker",
@@ -76,14 +84,6 @@ export const TOOL_CATALOG: ToolCatalogItem[] = [
     short: "Path + UA tester, Sitemaps, AI bot blocks",
     group: "checkers",
     mark: "RB",
-  },
-  {
-    href: "/tools/meta-tag-checker",
-    title: "Meta Tag Checker",
-    nav: "Meta tags",
-    short: "Title, description, H1, lang, viewport & SERP",
-    group: "checkers",
-    mark: "MT",
   },
   {
     href: "/tools/canonical-checker",

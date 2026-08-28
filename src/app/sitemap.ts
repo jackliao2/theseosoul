@@ -3,9 +3,11 @@ import { getIndexableAuditDomains } from "@/lib/audit/store";
 import { SITE_URL } from "@/lib/audit/types";
 import { getAllPosts } from "@/lib/blog";
 import { SITEMAP_STATIC_PATHS } from "@/lib/site-urls";
+import { getIndexableDomainHistoryDomains } from "@/lib/tools/domain-history-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const curated = getIndexableAuditDomains();
+  const historyDomains = getIndexableDomainHistoryDomains();
 
   const staticEntries: MetadataRoute.Sitemap = SITEMAP_STATIC_PATHS.map(
     (path) => ({
@@ -22,5 +24,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}/audit/${domain}`,
   }));
 
-  return [...staticEntries, ...blogEntries, ...auditEntries];
+  const historyEntries: MetadataRoute.Sitemap = historyDomains.map((domain) => ({
+    url: `${SITE_URL}/tools/domain-history/${domain}`,
+  }));
+
+  return [...staticEntries, ...blogEntries, ...auditEntries, ...historyEntries];
 }

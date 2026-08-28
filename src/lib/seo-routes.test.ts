@@ -6,6 +6,7 @@ import { NextRequest } from "next/server";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { INDEXABLE_AUDIT_DOMAINS, SITE_URL } from "@/lib/audit/types";
+import { INDEXABLE_DOMAIN_HISTORY_DOMAINS } from "@/lib/tools/domain-history-url";
 import { getAllPosts } from "@/lib/blog";
 import { SITEMAP_STATIC_PATHS } from "@/lib/site-urls";
 import { auditHref, normalizeUrl } from "@/lib/url";
@@ -18,7 +19,8 @@ describe("search crawler routes", () => {
     const expectedCount =
       SITEMAP_STATIC_PATHS.length +
       getAllPosts().length +
-      INDEXABLE_AUDIT_DOMAINS.length;
+      INDEXABLE_AUDIT_DOMAINS.length +
+      INDEXABLE_DOMAIN_HISTORY_DOMAINS.length;
 
     assert.equal(entries.length, expectedCount);
     assert.equal(new Set(urls).size, entries.length);
@@ -26,6 +28,10 @@ describe("search crawler routes", () => {
     for (const url of urls) {
       assert.equal(new URL(url).origin, SITE_URL);
     }
+
+    assert.ok(
+      urls.includes(`${SITE_URL}/tools/domain-history/theseosoul.com`)
+    );
   });
 
   it("uses real article dates and omits unverifiable sitemap hints", async () => {
@@ -117,6 +123,8 @@ describe("search crawler routes", () => {
   it("runs the proxy only for audit and confirmed legacy pollution routes", () => {
     for (const path of [
       "/audit/example.com",
+      "/2010/03/steady-seo-checkups-essential/",
+      "/2010/09/get-1-x-pr-7-backlink-now",
       "/__media__/js/netsoltrademark.php?d=spam.example",
       "/phpmyadmin/error.php",
       "/rmgdsc/rprivacypolicy.php",
@@ -130,7 +138,6 @@ describe("search crawler routes", () => {
     }
 
     for (const path of [
-      "/2010/03/steady-seo-checkups-essential/",
       "/tools/search.php",
       "/search.php/extra",
       "/apple-icon",
@@ -144,14 +151,18 @@ describe("search crawler routes", () => {
     }
   });
 
-  it("does not retire genuine legacy SEO paths without redirect evidence", () => {
-    const response = proxy(
-      new NextRequest(
-        `${SITE_URL}/2010/03/steady-seo-checkups-essential/`
-      )
-    );
+  it("retires 2010 WordPress spam and leftover blog paths with 410", () => {
+    for (const legacyPath of [
+      "/2010",
+      "/2010/03/steady-seo-checkups-essential/",
+      "/2010/09/get-1-x-pr-7-backlink-now",
+      "/2010/09/1-dofollow-pr-6-instantly/",
+      "/2010/02/hello-world/",
+    ]) {
+      const response = proxy(new NextRequest(new URL(legacyPath, SITE_URL)));
 
-    assert.equal(response.status, 200);
-    assert.equal(response.headers.get("x-middleware-next"), "1");
+      assert.equal(response.status, 410, legacyPath);
+      assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    }
   });
 });
