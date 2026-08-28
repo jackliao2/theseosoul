@@ -16,7 +16,7 @@ import {
 
 const GAP_MONTHS = 13;
 const MAX_HTML_SAMPLES = 10;
-const CDX_TIMEOUT_MS = 18_000;
+const CDX_TIMEOUT_MS = 22_000;
 const HTML_TIMEOUT_MS = 8_000;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const CACHE_KEY_PREFIX = "domain-history:v2:";
@@ -98,41 +98,60 @@ async function fetchText(url: string, timeoutMs: number): Promise<string> {
   }
 }
 
+function cdxSearchUrl(host: string): string {
+  return (
+    `https://web.archive.org/cdx/search/cdx?url=${encodeURIComponent(`${host}/`)}` +
+    `&matchType=exact&output=json&fl=timestamp,original,statuscode,digest,mimetype` +
+    `&filter=mimetype:text/html&collapse=timestamp:6`
+  );
+}
+
+function parseCdxPayload(text: string): CdxRow[] | null {
+  const data = JSON.parse(text) as string[][];
+  if (!Array.isArray(data)) return null;
+  if (data.length < 2) return [];
+  const rows: CdxRow[] = [];
+  for (const row of data.slice(1)) {
+    const [timestamp, original, statuscode, digest, mimetype] = row;
+    if (!timestamp || !original) continue;
+    rows.push({
+      timestamp,
+      original,
+      statuscode: statuscode ?? "",
+      digest: digest ?? "",
+      mimetype: mimetype ?? "",
+    });
+  }
+  return rows;
+}
+
+/** null = host failed; [] = Archive answered with no captures. */
+async function fetchCdxHost(host: string): Promise<CdxRow[] | null> {
+  try {
+    const text = await fetchText(cdxSearchUrl(host), CDX_TIMEOUT_MS);
+    return parseCdxPayload(text);
+  } catch {
+    return null;
+  }
+}
+
 async function fetchCdx(
   domain: string
 ): Promise<{ rows: CdxRow[]; archiveOk: boolean }> {
   const hosts = [domain, `www.${domain}`];
+  const settled = await Promise.all(hosts.map((host) => fetchCdxHost(host)));
   const rows: CdxRow[] = [];
   const seen = new Set<string>();
   let archiveOk = false;
 
-  for (const host of hosts) {
-    const url =
-      `https://web.archive.org/cdx/search/cdx?url=${encodeURIComponent(`${host}/`)}` +
-      `&matchType=exact&output=json&fl=timestamp,original,statuscode,digest,mimetype` +
-      `&filter=mimetype:text/html&collapse=timestamp:6`;
-    try {
-      const text = await fetchText(url, CDX_TIMEOUT_MS);
-      const data = JSON.parse(text) as string[][];
-      if (!Array.isArray(data)) continue;
-      archiveOk = true;
-      if (data.length < 2) continue;
-      for (const row of data.slice(1)) {
-        const [timestamp, original, statuscode, digest, mimetype] = row;
-        if (!timestamp || !original) continue;
-        const key = `${timestamp}:${digest}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        rows.push({
-          timestamp,
-          original,
-          statuscode: statuscode ?? "",
-          digest: digest ?? "",
-          mimetype: mimetype ?? "",
-        });
-      }
-    } catch {
-      // try next host
+  for (const result of settled) {
+    if (result === null) continue;
+    archiveOk = true;
+    for (const row of result) {
+      const key = `${row.timestamp}:${row.digest}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      rows.push(row);
     }
   }
 

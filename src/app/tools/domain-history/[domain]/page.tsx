@@ -22,7 +22,7 @@ import {
 } from "@/lib/tools/domain-history-url";
 import { createSocialMetadata } from "@/lib/social-metadata";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
