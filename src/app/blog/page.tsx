@@ -18,7 +18,7 @@ const HUB_ALT =
 export const metadata: Metadata = {
   title: "SEO & GEO Guides",
   description:
-    "Practical technical SEO and GEO guides from TheSeoSoul — robots vs noindex, sitemaps, SSL, domain history, AdSense readiness, and honest free tools. No fake DA charts.",
+    "Practical technical SEO and GEO guides from TheSeoSoul — crawled not indexed, robots vs noindex, sitemaps, SSL, domain history, AdSense readiness, and honest free tools.",
   alternates: { canonical: "/blog" },
   ...createSocialMetadata({
     title: `SEO & GEO Guides · ${SITE_NAME}`,

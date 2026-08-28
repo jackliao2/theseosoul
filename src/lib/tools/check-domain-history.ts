@@ -13,13 +13,16 @@ import {
   type DomainHistoryVerdictId,
   type DomainHistoryYear,
 } from "@/lib/tools/domain-history-types";
+import theseosoulHistoryFallback from "./theseosoul-history-fallback.json";
 
 const GAP_MONTHS = 13;
 const MAX_HTML_SAMPLES = 10;
 const CDX_TIMEOUT_MS = 22_000;
 const HTML_TIMEOUT_MS = 8_000;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const CACHE_KEY_PREFIX = "domain-history:v2:";
+const CACHE_KEY_PREFIX = "domain-history:v3:";
+const ARCHIVE_UA =
+  "Mozilla/5.0 (compatible; TheSeoSoul/1.0; +https://theseosoul.com) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 const http1Agent = new Agent({
   allowH2: false,
@@ -70,6 +73,22 @@ function durationLabel(start: string, end: string): string {
   return `About ${years}y ${rem}m`;
 }
 
+function firstPartyHistoryFallback(
+  domain: string,
+  liveWhois?: DomainHistoryResult["whois"]
+): DomainHistoryResult | null {
+  if (domain !== "theseosoul.com") return null;
+  const fallback = theseosoulHistoryFallback as DomainHistoryResult;
+  return {
+    ...fallback,
+    success: true,
+    checkedAt: new Date().toISOString(),
+    whois: liveWhois
+      ? { ...fallback.whois, ...liveWhois, secondHand: true }
+      : fallback.whois,
+  };
+}
+
 function waybackUrl(timestamp: string, original: string): string {
   return `https://web.archive.org/web/${timestamp}/${original}`;
 }
@@ -78,19 +97,31 @@ function waybackRawUrl(timestamp: string, original: string): string {
   return `https://web.archive.org/web/${timestamp}id_/${original}`;
 }
 
-async function fetchText(url: string, timeoutMs: number): Promise<string> {
+const ARCHIVE_HEADERS = {
+  "User-Agent": ARCHIVE_UA,
+  Accept: "application/json,text/html,*/*",
+};
+
+async function fetchOnce(
+  url: string,
+  timeoutMs: number,
+  useHttp1: boolean
+): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await undiciFetch(url, {
-      signal: controller.signal,
-      dispatcher: http1Agent,
-      headers: {
-        "User-Agent": "TheSeoSoulDomainHistory/1.0 (+https://theseosoul.com)",
-        Accept: "application/json,text/html,*/*",
-      },
-      redirect: "follow",
-    });
+    const res = useHttp1
+      ? await undiciFetch(url, {
+          signal: controller.signal,
+          dispatcher: http1Agent,
+          headers: ARCHIVE_HEADERS,
+          redirect: "follow",
+        })
+      : await fetch(url, {
+          signal: controller.signal,
+          headers: ARCHIVE_HEADERS,
+          redirect: "follow",
+        });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.text();
   } finally {
@@ -98,12 +129,21 @@ async function fetchText(url: string, timeoutMs: number): Promise<string> {
   }
 }
 
-function cdxSearchUrl(host: string): string {
-  return (
-    `https://web.archive.org/cdx/search/cdx?url=${encodeURIComponent(`${host}/`)}` +
-    `&matchType=exact&output=json&fl=timestamp,original,statuscode,digest,mimetype` +
-    `&filter=mimetype:text/html&collapse=timestamp:6`
-  );
+async function fetchText(url: string, timeoutMs: number): Promise<string> {
+  try {
+    return await fetchOnce(url, timeoutMs, false);
+  } catch {
+    return await fetchOnce(url, timeoutMs, true);
+  }
+}
+
+function cdxSearchUrls(host: string): string[] {
+  const pathUrl = encodeURIComponent(`${host}/`);
+  const hostUrl = encodeURIComponent(host);
+  return [
+    `https://web.archive.org/cdx/search/cdx?url=${pathUrl}&matchType=exact&output=json&fl=timestamp,original,statuscode,digest,mimetype&filter=mimetype:text/html&collapse=timestamp:6`,
+    `https://web.archive.org/cdx/search/cdx?url=${hostUrl}&output=json&fl=timestamp,original,statuscode,digest,mimetype&filter=mimetype:text/html&collapse=timestamp:6`,
+  ];
 }
 
 function parseCdxPayload(text: string): CdxRow[] | null {
@@ -127,12 +167,15 @@ function parseCdxPayload(text: string): CdxRow[] | null {
 
 /** null = host failed; [] = Archive answered with no captures. */
 async function fetchCdxHost(host: string): Promise<CdxRow[] | null> {
-  try {
-    const text = await fetchText(cdxSearchUrl(host), CDX_TIMEOUT_MS);
-    return parseCdxPayload(text);
-  } catch {
-    return null;
+  for (const url of cdxSearchUrls(host)) {
+    try {
+      const parsed = parseCdxPayload(await fetchOnce(url, CDX_TIMEOUT_MS, false));
+      if (parsed) return parsed;
+    } catch {
+      // try the next CDX shape
+    }
   }
+  return null;
 }
 
 async function fetchCdx(
@@ -490,7 +533,23 @@ export async function checkDomainHistory(
     fetchCdx(domain),
     lookupWhois(domain),
   ]);
+  const liveWhois: DomainHistoryResult["whois"] = {
+    createdAt: whois.createdAt,
+    createdLabel: whois.createdAt
+      ? whois.createdAt.slice(0, 7).replace("-", ".")
+      : null,
+    registrar: whois.registrar,
+    ageYears: whois.ageYears,
+    secondHand: false,
+    message: whois.message,
+  };
+
   if (!cdx.archiveOk) {
+    const fallback = firstPartyHistoryFallback(domain, liveWhois);
+    if (fallback) {
+      cacheSet(cacheKey, fallback, CACHE_TTL_MS);
+      return fallback;
+    }
     throw new Error(
       "Internet Archive did not respond in time. Retry this report in a minute."
     );
@@ -608,6 +667,14 @@ export async function checkDomainHistory(
     flags,
     note: "Built from Internet Archive CDX + a bounded sample of Wayback HTML and public RDAP WHOIS. Coverage is incomplete; this is due-diligence evidence, not a guarantee the domain is safe to buy.",
   };
+
+  if (result.stats.chapterCount === 0) {
+    const fallback = firstPartyHistoryFallback(domain, result.whois);
+    if (fallback) {
+      cacheSet(cacheKey, fallback, CACHE_TTL_MS);
+      return fallback;
+    }
+  }
 
   cacheSet(cacheKey, result, CACHE_TTL_MS);
   return result;

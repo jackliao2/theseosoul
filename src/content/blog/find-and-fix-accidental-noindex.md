@@ -16,6 +16,8 @@ Google is not subtle about the mechanism. From [Block indexing with noindex](htt
 
 And they have to **crawl** the page to see it. So accidental noindex is both common and diagnosable. This guide is the order of operations I use before anyone touches content strategy.
 
+If the live HTML is already indexable and Search Console still says **Crawled – currently not indexed**, that is a different status — start with [that guide](/blog/crawled-currently-not-indexed) instead of hunting a missing tag.
+
 If you need the conceptual triangle (robots vs noindex vs canonical), read [that comparison](/blog/robots-txt-vs-noindex-vs-canonical) after this — start here when a specific URL is on fire.
 
 ## What “noindex” actually means in practice

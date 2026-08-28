@@ -1,0 +1,156 @@
+{
+  "success": true,
+  "domain": "theseosoul.com",
+  "checkedAt": "2026-08-28T00:00:00.000Z",
+  "verdict": {
+    "id": "second-hand",
+    "label": "Second-hand domain",
+    "detail": "Archive activity starts in 2010.02, before the current WHOIS creation date, with parking or dead periods in between."
+  },
+  "stats": {
+    "firstSnapshot": "20100224051419",
+    "firstLabel": "2010.02",
+    "lastSnapshot": "20250615133200",
+    "lastLabel": "2025.06",
+    "activeMonths": 97,
+    "uniqueVersions": 58,
+    "chapterCount": 4,
+    "sampledPages": 4
+  },
+  "whois": {
+    "createdAt": "2026-07-01",
+    "createdLabel": "2026.07",
+    "registrar": "NameCheap, Inc.",
+    "ageYears": 0.08,
+    "secondHand": true,
+    "message": "RDAP returned a current registration created in 2026 — far later than the first archive captures."
+  },
+  "years": [
+    { "year": 2010, "monthsActive": 5 },
+    { "year": 2011, "monthsActive": 9 },
+    { "year": 2012, "monthsActive": 11 },
+    { "year": 2013, "monthsActive": 12 },
+    { "year": 2014, "monthsActive": 10 },
+    { "year": 2015, "monthsActive": 8 },
+    { "year": 2016, "monthsActive": 3 },
+    { "year": 2017, "monthsActive": 1 },
+    { "year": 2018, "monthsActive": 4 },
+    { "year": 2019, "monthsActive": 9 },
+    { "year": 2020, "monthsActive": 8 },
+    { "year": 2021, "monthsActive": 7 },
+    { "year": 2022, "monthsActive": 5 },
+    { "year": 2023, "monthsActive": 1 },
+    { "year": 2024, "monthsActive": 1 },
+    { "year": 2025, "monthsActive": 3 },
+    { "year": 2026, "monthsActive": 0 }
+  ],
+  "chapters": [
+    {
+      "id": "201002-content",
+      "index": 1,
+      "kind": "content",
+      "kindLabel": "Content site",
+      "start": "20100224051419",
+      "end": "20100625000000",
+      "startLabel": "2010.02",
+      "endLabel": "2010.06",
+      "durationLabel": "About 4 months",
+      "summary": "A WordPress SEO blog (The SEO Soul) publishing generic optimization tips. First capture is a Hello World era post about keywords and RSS submissions.",
+      "snapshots": [
+        {
+          "timestamp": "20100224051419",
+          "dateLabel": "2010.02",
+          "waybackUrl": "https://web.archive.org/web/20100224051419/http://www.theseosoul.com/",
+          "title": "The SEO Soul — SEO - Search Engine Optimization",
+          "h1": "SEO – Search Engine Optimization",
+          "description": null,
+          "excerpt": "Tricks and Tips OF SEO for Your Website — the first SEO post on The SEO Soul, by Toan Nguyen Minh.",
+          "kind": "content",
+          "kindLabel": "Content site"
+        }
+      ]
+    },
+    {
+      "id": "201009-doorway",
+      "index": 2,
+      "kind": "doorway",
+      "kindLabel": "Doorway / thin affiliate",
+      "start": "20100915000000",
+      "end": "20101231000000",
+      "startLabel": "2010.09",
+      "endLabel": "2010.12",
+      "durationLabel": "About 3 months",
+      "summary": "The homepage flipped into selling dofollow PageRank comment links and “PR7 instantly” lists, plus a $5 premium membership paywall. This is the leftover spam era we now 410 rather than redirect.",
+      "snapshots": [
+        {
+          "timestamp": "20100915000000",
+          "dateLabel": "2010.09",
+          "waybackUrl": "https://web.archive.org/web/20100915000000/http://www.theseosoul.com/",
+          "title": "SEO Tips, Tricks, Tutorials and SEO Techniques for Webmasters",
+          "h1": "SEO Tips, Tricks, Tutorials and SEO Techniques for Webmasters",
+          "description": null,
+          "excerpt": "Posts include “1 Dofollow PR6 Instantly”, “Get 1 x PR 7 Backlink Now”, and a $5 premium membership pitch for auto-approved backlinks.",
+          "kind": "doorway",
+          "kindLabel": "Doorway / thin affiliate"
+        }
+      ]
+    },
+    {
+      "id": "201807-error",
+      "index": 3,
+      "kind": "error",
+      "kindLabel": "Error / offline",
+      "start": "20180712052023",
+      "end": "20180712052023",
+      "startLabel": "2018.07",
+      "endLabel": "2018.07",
+      "durationLabel": "Same month",
+      "summary": "Archive captured a hosting error page (“Page cannot be displayed… contact your service provider”). The name was no longer running a real site.",
+      "snapshots": [
+        {
+          "timestamp": "20180712052023",
+          "dateLabel": "2018.07",
+          "waybackUrl": "https://web.archive.org/web/20180712052023/http://www.theseosoul.com/",
+          "title": null,
+          "h1": null,
+          "description": null,
+          "excerpt": "Error. Page cannot be displayed. Please contact your service provider for more details.",
+          "kind": "error",
+          "kindLabel": "Error / offline"
+        }
+      ]
+    },
+    {
+      "id": "202502-parking",
+      "index": 4,
+      "kind": "parking",
+      "kindLabel": "Parked / for sale",
+      "start": "20250207232701",
+      "end": "20250615133200",
+      "startLabel": "2025.02",
+      "endLabel": "2025.06",
+      "durationLabel": "About 4 months",
+      "summary": "Network Solutions / InquiryGrid parking: “maybe for sale,” related-search doorway links into .cfm parking URLs. Those paths are now 410 on the live site.",
+      "snapshots": [
+        {
+          "timestamp": "20250207232701",
+          "dateLabel": "2025.02",
+          "waybackUrl": "https://web.archive.org/web/20250207232701/https://theseosoul.com/",
+          "title": "Theseosoul.com",
+          "h1": null,
+          "description": null,
+          "excerpt": "The domain theseosoul.com maybe for sale. Related searches include Java Programming Tools, Custom Web Design, and Build a Web Site.",
+          "kind": "parking",
+          "kindLabel": "Parked / for sale"
+        }
+      ]
+    }
+  ],
+  "flags": [
+    "Archive predates current WHOIS creation date",
+    "Parked or for-sale pages appear in history",
+    "Doorway / thin affiliate style pages appear",
+    "Long stretches served errors or dead hosting"
+  ],
+  "note": "Curated first-party snapshot of public Internet Archive captures for theseosoul.com, used when a live CDX fetch is unavailable. Coverage is still incomplete; open the raw Wayback links to verify."
+}

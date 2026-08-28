@@ -31,6 +31,10 @@ const faqs = [
     a: "Yes. noindex asks engines not to show the URL in results; robots.txt may still allow the fetch. Use both the Noindex Checker and the robots.txt checker when diagnosing why a page is missing from Google.",
   },
   {
+    q: "Is “Crawled – currently not indexed” the same as noindex?",
+    a: "No. That Search Console status means Google fetched the URL and chose not to index it. A noindex is an explicit publisher signal. If this checker shows the page is allowed to be indexed, read the crawled-currently-not-indexed guide instead of hunting a missing tag.",
+  },
+  {
     q: "Why check X-Robots-Tag as well as meta robots?",
     a: "Some CDNs, reverse proxies, and PDF/non-HTML responses set indexing rules only in HTTP headers. Checking both avoids false “indexable” conclusions from HTML alone.",
   },
@@ -141,6 +145,13 @@ export default function NoindexCheckerPage() {
         title="Found an accidental noindex? Trace it to the source"
         description="Work through meta robots, X-Robots-Tag, CMS defaults, staging leftovers, and the robots.txt trap—then verify that the production URL is genuinely eligible for indexing."
         cta="Use the noindex recovery checklist"
+      />
+
+      <ToolGuideCard
+        href="/blog/crawled-currently-not-indexed"
+        title="Crawled – currently not indexed is not a noindex"
+        description="Google already fetched the URL and declined to show it. Separate that from a robots/noindex mistake before you request indexing again."
+        cta="Read the crawled-not-indexed checklist"
       />
 
       <ToolFaqSection faqs={faqs} />

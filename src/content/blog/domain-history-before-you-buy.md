@@ -2,7 +2,7 @@
 title: "Check domain history before you buy (Wayback + WHOIS)"
 description: "How to vet an aged or second-hand domain with the Wayback Machine and WHOIS/RDAP — spam eras, brand risk, archive gaps, and when to walk away."
 date: "2026-07-30"
-updated: "2026-08-01"
+updated: "2026-08-28"
 tags: ["Domains", "Wayback", "WHOIS"]
 excerpt: "Domain age isn’t a strategy. Open the archive for the weird years before you wire the money."
 cover: "/images/blog/domain-history.webp"
@@ -23,6 +23,8 @@ Two public lenses before money moves:
 Neither proves Google’s current trust. Both catch obvious disasters for free.
 
 Our [Domain History Checker](/tools/domain-history) gives a chapter-style Wayback summary plus registration clues. For anything expensive, still open raw captures yourself. Tools summarize; your eyes catch the impersonation screenshots.
+
+Worked example on this name: [theseosoul.com domain history](/tools/domain-history/theseosoul.com) — 2010 SEO blog, a PR-link spam chapter we now 410, later parking, then the current tools. Age was never the story. The chapters were.
 
 Internet Archive’s own about page is the right mental model: it’s a library of what was published, not a reputation API — start at [web.archive.org](https://web.archive.org/).
 

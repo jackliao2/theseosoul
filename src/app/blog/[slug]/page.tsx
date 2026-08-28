@@ -65,25 +65,52 @@ export default async function BlogPostPage({ params }: Props) {
   const pageUrl = `${SITE_URL}/blog/${post.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    dateModified: post.updated ?? post.date,
-    image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
-    author: {
-      "@type": "Organization",
-      "@id": `${EDITORIAL_TEAM_URL}#editorial-team`,
-      name: EDITORIAL_TEAM_NAME,
-      url: EDITORIAL_TEAM_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: SITE_NAME,
-      url: SITE_URL,
-    },
-    mainEntityOfPage: pageUrl,
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.description,
+        datePublished: post.date,
+        dateModified: post.updated ?? post.date,
+        image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
+        author: {
+          "@type": "Organization",
+          "@id": `${EDITORIAL_TEAM_URL}#editorial-team`,
+          name: EDITORIAL_TEAM_NAME,
+          url: EDITORIAL_TEAM_URL,
+        },
+        publisher: {
+          "@type": "Organization",
+          "@id": `${SITE_URL}/#organization`,
+          name: SITE_NAME,
+          url: SITE_URL,
+        },
+        mainEntityOfPage: pageUrl,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: SITE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Guides",
+            item: `${SITE_URL}/blog`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: pageUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (

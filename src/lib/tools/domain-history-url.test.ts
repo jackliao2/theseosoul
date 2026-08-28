@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, it } from "node:test";
 
 import { SITE_URL } from "@/lib/audit/types";
@@ -9,6 +11,7 @@ import {
   domainHistoryPathFromInput,
   isIndexableDomainHistory,
 } from "@/lib/tools/domain-history-url";
+
 
 describe("domain history report URLs", () => {
   it("strips www and paths down to the registrable host", () => {
@@ -32,6 +35,24 @@ describe("domain history report URLs", () => {
     assert.equal(canonicalDomainHistoryParam("not a domain"), null);
     assert.equal(canonicalDomainHistoryParam("localhost"), null);
     assert.throws(() => domainHistoryPathFromInput("nope"), /valid domain/i);
+  });
+
+  it("ships a unique first-party archive snapshot for the indexable example", () => {
+    const snapshot = JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "src/lib/tools/theseosoul-history-fallback.json"),
+        "utf8"
+      )
+    ) as {
+      domain: string;
+      success: boolean;
+      chapters: unknown[];
+      verdict: { id: string };
+    };
+    assert.equal(snapshot.domain, "theseosoul.com");
+    assert.equal(snapshot.success, true);
+    assert.ok(snapshot.chapters.length >= 3);
+    assert.equal(snapshot.verdict.id, "second-hand");
   });
 
   it("indexes only the curated first-party example", () => {
