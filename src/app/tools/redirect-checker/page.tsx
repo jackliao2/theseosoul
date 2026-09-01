@@ -8,11 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -106,34 +109,89 @@ export default function RedirectCheckerPage() {
       <ToolBulletSection
         title="What this redirect chain tool reports"
         items={[
-          "Each hop URL in order",
-          "HTTP status codes (301, 302, 307, 308, etc.)",
-          "Final destination after the chain",
-          "Chain length so you can see when hops stack up",
+          "Sequential listing of every intermediate URL hop",
+          "HTTP response status codes (301 Permanent, 302 Temporary, 307/308)",
+          "Final landing destination and canonical alignment",
+          "Chain latency and crawl budget waste warnings",
         ]}
       />
 
-      <ToolProse title="Why short redirect chains matter">
+      <ToolUseCases
+        title="Common Redirect Pitfalls & Architecture Scenarios"
+        intro="Inefficient redirect chains delay page load times and dilute ranking signals during site migrations:"
+        cases={[
+          {
+            badge: "Multi-Hop Chains",
+            scenario: "Accidental 4-Hop Redirect Chains",
+            problem:
+              "Visiting http://example.com/blog/ redirects to http://www.example.com/blog/ -> https://www.example.com/blog/ -> https://example.com/blog, adding hundreds of milliseconds of TTFB latency.",
+            solution:
+              "Consolidate edge rules into a single redirect that immediately points directly to the canonical HTTPS apex/www URL.",
+          },
+          {
+            badge: "PageRank Loss",
+            scenario: "302 Temporary vs 301 Permanent Redirects",
+            problem:
+              "Using 302 or JavaScript/meta refresh redirects during permanent domain or URL migrations prevents search engines from transferring historical ranking equity.",
+            solution:
+              "Always use server-level 301 (Moved Permanently) or 308 (Permanent Redirect) status codes for permanent content relocation.",
+          },
+          {
+            badge: "Infinite Loops",
+            scenario: "Redirect Loops on Trailing Slashes",
+            problem:
+              "Conflicting rules between CDN edges (stripping trailing slash) and application origin servers (enforcing trailing slash) generate 301 redirect loops (ERR_TOO_MANY_REDIRECTS).",
+            solution:
+              "Align trailing slash configuration between CDN (Cloudflare/CloudFront) and your backend framework.",
+          },
+        ]}
+      />
+
+      <ToolProse title="How to Configure Single-Hop 301 Redirects">
         <p>
-          Search engines and AI crawlers prefer a short path to the canonical
-          page. After a migration, run this free redirect checker on key old
-          URLs, then confirm{" "}
-          <Link
-            href="/tools/canonical-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            canonical tags
-          </Link>{" "}
-          and a{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full technical SEO audit
-          </Link>{" "}
-          on the destination host.
+          Configure redirects at the edge or server level to ensure maximum crawl efficiency:
         </p>
+
+        <ToolCodeBlock
+          title="Nginx Single-Hop HTTPS & Apex Canonicalization"
+          language="nginx"
+          code={`# Force HTTP to HTTPS and non-www in a single hop
+server {
+    listen 80;
+    listen 443 ssl;
+    server_name www.example.com;
+    return 301 https://example.com$request_uri;
+}`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js (next.config.ts) Permanent Redirects"
+          language="typescript"
+          description="Enforce clean permanent redirects in Next.js configuration:"
+          code={`import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/old-seo-guide',
+        destination: '/tools/meta-tag-checker',
+        permanent: true, // Emits 308 Permanent Redirect
+      },
+    ];
+  },
+};
+
+export default nextConfig;`}
+        />
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/robots-txt-vs-noindex-vs-canonical"
+        title="Robots.txt vs Noindex vs Canonical & Redirects"
+        description="Learn how search engines process redirect chains alongside canonical tags and robots indexing directives."
+        cta="Read full guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

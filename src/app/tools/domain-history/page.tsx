@@ -9,12 +9,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { domainHistoryPathFromInput } from "@/lib/tools/domain-history-url";
@@ -145,25 +147,64 @@ export default async function DomainHistoryPage({
         />
 
         <ToolBulletSection
-          title="What the report highlights"
-          intro="The goal is a buy-side due-diligence story, not an endless redesign changelog."
+          title="What this domain history report highlights"
+          intro="Due diligence before acquiring or building on aged domains:"
           items={[
-            "Clear verdict: clean trail, mixed reuse, parking history, second-hand, or risky signals",
-            "First and latest archive captures plus active-month count",
-            "Yearly activity bars for scanability",
-            "Life chapters with a few evidence snapshots each",
-            "WHOIS creation date and second-hand contrast",
-            "Direct links into Wayback for manual review",
+            "Clear historical verdict: clean brand trail, parking era, dropped domain, or spam signals",
+            "First and latest Wayback Archive captures plus active longevity metrics",
+            "Timeline role classification: content site, parking farm, doorway redirect, or 404/error state",
+            "WHOIS registration date vs Wayback first-seen date contrast",
           ]}
         />
 
-        <ToolProse title="Honest limits">
+        <ToolUseCases
+          title="Expired Domain Due Diligence Scenarios"
+          intro="Buying an aged domain can jumpstart SEO or permanently inherit Google algorithmic penalties:"
+          cases={[
+            {
+              badge: "Spam PBNs",
+              scenario: "Private Blog Network (PBN) Past Life",
+              problem:
+                "Acquiring an expired domain that was previously hijacked by casino/crypto PBN link networks with toxic spam links.",
+              solution:
+                "Inspect historical Wayback captures for unnatural anchor text or foreign language redirects before purchasing.",
+            },
+            {
+              badge: "Brand Reset",
+              scenario: "Dropped Domain Registration Gaps",
+              problem:
+                "Assuming a domain registered in 2012 has 14 years of continuous authority, when it actually expired and sat parked for 8 years.",
+              solution:
+                "Contrast the WHOIS 'createdDate' against continuous yearly active archive captures to verify true unbroken history.",
+            },
+            {
+              badge: "Rebranding",
+              scenario: "Recovering High-Value Historical URLs",
+              problem:
+                "Launching a new website on an acquired brand domain without recreating top historical URLs that still hold external backlinks.",
+              solution:
+                "Use archive snapshots to identify previous high-traffic slug structures and establish 301 redirects to new pages.",
+            },
+          ]}
+        />
+
+        <ToolProse title="How to Inspect Domain RDAP & Registration Data">
           <p>
-            Archive coverage is uneven. A quiet domain can still have private or
-            robots-blocked history, and a noisy domain can look worse than it is
-            if parking providers churn HTML. Use this as evidence, then verify
-            with your own judgement — and a current technical audit.
+            You can verify domain registration authority and nameserver records directly using RDAP (Registration Data Access Protocol):
           </p>
+
+          <ToolCodeBlock
+            title="Terminal RDAP Domain Lookup Example"
+            language="bash"
+            description="Query the authoritative registry RDAP endpoint for registration lifecycle events:"
+            code={`# Query domain registration metadata
+curl -s https://rdap.verisign.com/com/v1/domain/example.com | jq '{
+  handle: .handle,
+  status: .status,
+  registrationDate: .events[] | select(.eventAction=="registration") | .eventDate,
+  expirationDate: .events[] | select(.eventAction=="expiration") | .eventDate
+}'`}
+          />
         </ToolProse>
 
         <ToolGuideCard

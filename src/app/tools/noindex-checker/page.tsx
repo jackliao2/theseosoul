@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -109,35 +111,82 @@ export default function NoindexCheckerPage() {
       />
 
       <ToolBulletSection
-        title="What we check"
+        title="What this noindex checker inspects"
         items={[
-          "meta name=\"robots\" content (and related robots metas)",
-          "googlebot-specific meta when present",
-          "X-Robots-Tag HTTP header",
-          "Whether the response looks intentionally non-indexable",
+          "HTML <meta name=\"robots\" content=\"noindex\"> declarations",
+          "Engine-specific directives such as <meta name=\"googlebot\" content=\"noindex\">",
+          "HTTP response headers for X-Robots-Tag: noindex, nofollow, or none",
+          "The critical robots.txt trap: ensure noindex pages are NOT blocked in robots.txt so Google can fetch the directive",
         ]}
       />
 
-      <ToolProse title="When to use a noindex checker">
+      <ToolUseCases
+        title="Real-World Noindex Scenarios & Debugging"
+        intro="Accidental noindex tags cause sudden, catastrophic de-indexing in Google Search. Here are the most frequent causes we observe:"
+        cases={[
+          {
+            badge: "Staging Leaks",
+            scenario: "Deploying Staging Metadata to Production",
+            problem:
+              "CI/CD pipelines deploying environment variables or header configs intended for dev.example.com into production, immediately de-indexing core pages.",
+            solution:
+              "Audit production headers for X-Robots-Tag and enforce environment-aware robots metadata in your build step.",
+          },
+          {
+            badge: "CMS Setting",
+            scenario: "WordPress 'Discourage Search Engines' Toggled",
+            problem:
+              "The 'Discourage search engines from indexing this site' option remains checked after launching a new WordPress site, outputting noindex sitewide.",
+            solution:
+              "Uncheck the setting in Settings > Reading, and inspect with this tool to confirm all meta robots tags are clear.",
+          },
+          {
+            badge: "Static / PDF Assets",
+            scenario: "Hidden X-Robots-Tag on CDN Assets",
+            problem:
+              "Cloudflare Transform Rules or Nginx configs injecting X-Robots-Tag on entire MIME types or subdirectories inadvertently.",
+            solution:
+              "Check raw HTTP response headers on PDF documentation, public landing pages, and APIs to isolate header-level blocks.",
+          },
+        ]}
+      />
+
+      <ToolProse title="How to Implement or Remove Noindex Correctly">
         <p>
-          Run this after launching staging domains, filtered e‑commerce URLs,
-          account-only pages, or thin thank-you templates. If crawlers never
-          reach the URL at all, also verify{" "}
-          <Link
-            href="/tools/robots-txt-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            robots.txt
-          </Link>
-          . For title, description, and a SERP-style preview, use the{" "}
-          <Link
-            href="/tools/meta-tag-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Meta Tag Checker
-          </Link>
-          .
+          To prevent a page from appearing in search results while still allowing search engines to follow its links, use the standard HTML meta robots tag:
         </p>
+
+        <ToolCodeBlock
+          title="Standard HTML Meta Robots (Noindex, Follow)"
+          language="html"
+          code={`<!-- Tells Google not to index this page, but still follow outbound links -->
+<head>
+  <meta name="robots" content="noindex, follow" />
+</head>`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router (metadata.robots)"
+          language="typescript"
+          description="In Next.js, declare indexing rules per page or layout:"
+          code={`import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+};`}
+        />
+
+        <ToolCodeBlock
+          title="Nginx HTTP Header (X-Robots-Tag)"
+          language="nginx"
+          description="For non-HTML files (e.g., internal PDF reports, staging subpaths):"
+          code={`location /staging/ {
+    add_header X-Robots-Tag "noindex, nofollow" always;
+}`}
+        />
       </ToolProse>
 
       <ToolGuideCard

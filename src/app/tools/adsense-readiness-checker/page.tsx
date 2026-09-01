@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -351,8 +353,50 @@ export default function AdsenseReadinessCheckerPage() {
           </p>
         </ToolProse>
 
-        <ToolProse title="Official policy still comes first">
+        <ToolUseCases
+          title="Common AdSense Rejection Reasons & Fixes"
+          intro="Understanding why Google rejects monetization requests helps you fix the root architectural and content issues before re-applying:"
+          cases={[
+            {
+              badge: "Low Value Content",
+              scenario: "Thin or AI-Generated Placeholder Pages",
+              problem:
+                "Applying with only 5–10 short or repetitive articles triggering the dreaded 'Low value content' rejection.",
+              solution:
+                "Build at least 20–30 original, high-utility articles with unique insights, structured headings, and zero placeholder text.",
+            },
+            {
+              badge: "Trust & Compliance",
+              scenario: "Missing Mandatory Legal Pages",
+              problem:
+                "Lacking explicit Privacy Policy, About Us, Contact, or Terms of Service links in the footer navigation.",
+              solution:
+                "Publish dedicated trust pages with working contact forms/emails and explicit third-party cookie/advertising disclosures.",
+            },
+            {
+              badge: "Crawl Blockers",
+              scenario: "Blocking Mediapartners-Google in robots.txt",
+              problem:
+                "A strict robots.txt disallowing Google's contextual advertising crawler from analyzing page content.",
+              solution:
+                "Ensure User-agent: Mediapartners-Google is allowed access to all public content areas.",
+            },
+          ]}
+        />
+
+        <ToolProse title="Official policy & ads.txt implementation">
           <p>
+            When approved, place an <code>ads.txt</code> file in your root domain to prevent unauthorized inventory spoofing:
+          </p>
+
+          <ToolCodeBlock
+            title="Standard Google AdSense ads.txt Entry"
+            language="text"
+            code={`# Replace pub-0000000000000000 with your actual publisher ID
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0`}
+          />
+
+          <p className="mt-4">
             Before requesting review, read Google’s current{" "}
             <a
               href="https://support.google.com/adsense/answer/7299563?hl=en"

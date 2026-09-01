@@ -8,11 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -27,7 +30,7 @@ const faqs = [
   },
   {
     q: "What is a good keyword density for SEO?",
-    a: "There is no universal “perfect” density. Aim for clear primary topics and natural language. Stuffing the same phrase repeatedly can hurt readability and trust. Treat density as a diagnostic, not a score to game.",
+    a: "There is no universal “perfect” density. Aim for clear primary topics and natural language (typically 1–2.5% for primary terms). Stuffing the same phrase repeatedly can hurt readability and trigger spam filters. Treat density as a diagnostic, not a score to game.",
   },
   {
     q: "Can I check density from a URL or pasted text?",
@@ -104,38 +107,78 @@ export default function KeywordDensityCheckerPage() {
       />
 
       <ToolBulletSection
-        title="How to use density without stuffing"
-        intro="Density is a lens on focus and repetition — not a ranking guarantee."
+        title="How to use density without keyword stuffing"
+        intro="Modern search engines analyze semantic topic clusters rather than rigid keyword percentages."
         items={[
-          "Confirm your primary topic appears naturally in the opening and headings",
-          "Watch for accidental overuse of the same 2–3 word brand or product phrase",
-          "Compare a competitor URL only as inspiration, not a percentage to copy",
-          "Pair with meta title/description checks so snippets match the page topic",
+          "Confirm your primary topic appears naturally in the opening paragraph and H2 subheadings",
+          "Identify awkward repetition of identical 2-3 word product names or geographical tags",
+          "Ensure secondary and LSI (Latent Semantic Indexing) terms are represented across body text",
+          "Pair with title and meta description checks to maintain thematic consistency",
         ]}
       />
 
-      <ToolProse title="Keyword density and modern SEO">
+      <ToolUseCases
+        title="On-Page Keyword Optimization Scenarios"
+        intro="Auditing keyword frequency reveals why pages get flagged for over-optimization or fail to rank for target phrases:"
+        cases={[
+          {
+            badge: "Over-Optimization",
+            scenario: "Accidental Keyword Stuffing Penalty",
+            problem:
+              "Repeating an exact-match phrase like 'best seo audit tool' 30 times on a 500-word page (6%+ density) triggers algorithmic spam demotions.",
+            solution:
+              "Keep primary keyword density between 1% and 2.5%, replacing excessive instances with synonyms and related conceptual terms.",
+          },
+          {
+            badge: "Cannibalization",
+            scenario: "Internal Keyword Cannibalization",
+            problem:
+              "Multiple blog posts competing for the same dominant bigram, causing Google to alternate which page ranks in SERPs.",
+            solution:
+              "Use the density checker to differentiate the focus terms across posts, consolidating duplicate articles where appropriate.",
+          },
+          {
+            badge: "GEO Readiness",
+            scenario: "Entity Salience for AI Summarization",
+            problem:
+              "Content burying key entities and answers inside long fluff intros, making it difficult for LLMs and search engines to extract factual snippets.",
+            solution:
+              "Structure paragraphs with answer-first sentences featuring clear entity names and definitions.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Semantic Heading & Keyword Structure Example">
         <p>
-          Search engines care about relevance, usefulness, and clear structure
-          far more than hitting a fixed density number. Use this free SEO keyword
-          density tool to catch under-covered topics or clumsy repetition, then
-          fix titles and metas with the{" "}
-          <Link
-            href="/tools/meta-tag-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Meta Tag Checker
-          </Link>{" "}
-          and run a{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full SEO checker
-          </Link>{" "}
-          for structure and technical issues.
+          Organize on-page content hierarchically to distribute keyword relevance without artificial density stuffing:
         </p>
+
+        <ToolCodeBlock
+          title="Semantic On-Page Content Hierarchy"
+          language="html"
+          code={`<article>
+  <!-- Primary Topic in H1 (Once per page) -->
+  <h1>Complete Technical SEO Audit Checklist</h1>
+
+  <!-- Direct Answer in First Paragraph -->
+  <p>A technical SEO audit evaluates website crawlability, indexation, speed, and mobile architecture...</p>
+
+  <!-- Sub-topic Entities in H2s -->
+  <h2>1. Crawlability & Robots.txt Directives</h2>
+  <p>Ensure search bots can access key rendering assets without hitting disallow traps...</p>
+
+  <h2>2. Canonicalization & Duplicate Content</h2>
+  <p>Consolidate URL variants with self-referencing canonical tags...</p>
+</article>`}
+        />
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/geo-llms-txt-practical-guide"
+        title="From Keyword Density to AI Answer Optimization"
+        description="Learn how modern AI engines (ChatGPT Search, Perplexity, Gemini) extract answers from content structures beyond traditional keyword density."
+        cta="Read GEO optimization guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

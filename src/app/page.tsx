@@ -49,17 +49,36 @@ const featuredTools = featuredToolHrefs.map((href) => {
 export default function HomePage() {
   const guides = getAllPosts().slice(0, 6);
 
-  const faqJsonLd = {
+  const pageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: HOME_FAQS.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.a,
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        mainEntity: HOME_FAQS.map((item) => ({
+          "@type": "Question",
+          name: item.q,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.a,
+          },
+        })),
       },
-    })),
+      {
+        "@type": "SoftwareApplication",
+        name: "TheSeoSoul",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        url: "https://theseosoul.com",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        description:
+          "Automated on-page SEO, GEO readiness, keyword density, WHOIS, and technical audits.",
+        publisher: { "@id": `https://theseosoul.com/#organization` },
+      },
+    ],
   };
 
   return (
@@ -67,7 +86,7 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(pageJsonLd).replace(/</g, "\\u003c"),
         }}
       />
       <section className="relative overflow-hidden">

@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -106,36 +108,86 @@ export default function SecurityHeadersCheckerPage() {
       />
 
       <ToolBulletSection
-        title="What we check"
+        title="What this security header tool validates"
         items={[
-          "Strict-Transport-Security (HSTS)",
-          "Content-Security-Policy",
-          "X-Content-Type-Options",
-          "X-Frame-Options",
-          "Referrer-Policy",
-          "Permissions-Policy / COOP / CORP when present",
+          "Strict-Transport-Security (HSTS) and preload eligibility",
+          "Content-Security-Policy (CSP) framing and script controls",
+          "X-Content-Type-Options: nosniff for MIME-sniffing protection",
+          "X-Frame-Options / frame-ancestors to prevent UI redressing",
+          "Referrer-Policy to prevent leaking confidential query parameters",
         ]}
       />
 
-      <ToolProse title="When to use this checker">
+      <ToolUseCases
+        title="Security Headers Architecture & Practical Scenarios"
+        intro="Deploying modern security headers protects user trust and ensures strict protocol compliance across all browsers:"
+        cases={[
+          {
+            badge: "HSTS Policy",
+            scenario: "Enforcing Permanent HTTPS (HSTS)",
+            problem:
+              "Browsers initially requesting http:// before redirecting to https:// remain vulnerable to SSL stripping attacks on insecure networks.",
+            solution:
+              "Serve Strict-Transport-Security with max-age=31536000 and includeSubDomains to force browsers to always use HTTPS.",
+          },
+          {
+            badge: "Clickjacking Defense",
+            scenario: "Preventing Malicious iFrame Embedding",
+            problem:
+              "Third-party sites embedding your application inside hidden <iframe> layers to perform clickjacking attacks on authenticated users.",
+            solution:
+              "Set X-Frame-Options: DENY or Content-Security-Policy: frame-ancestors 'none'.",
+          },
+          {
+            badge: "Referrer Privacy",
+            scenario: "Preventing Query String Leakage in Outbound Clicks",
+            problem:
+              "Default referrer policies leaking internal URLs containing user tokens or private query strings to external domains.",
+            solution:
+              "Deploy Referrer-Policy: strict-origin-when-cross-origin to send full paths only within the same origin.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Production Security Headers Implementation">
         <p>
-          Use it after enabling HTTPS, migrating hosts, or tightening a CDN.
-          Pair with the{" "}
-          <Link
-            href="/tools/ssl-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            SSL days checker
-          </Link>{" "}
-          so certificates do not expire silently, and a{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full audit
-          </Link>{" "}
-          for crawl and on-page issues.
+          Configure headers in your server or edge framework:
         </p>
+
+        <ToolCodeBlock
+          title="Next.js App Router (next.config.ts) Security Headers"
+          language="typescript"
+          code={`import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Content-Security-Policy', value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'" },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;`}
+        />
+
+        <ToolCodeBlock
+          title="Nginx Security Headers Configuration"
+          language="nginx"
+          description="Add to your Nginx server block:"
+          code={`add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;`}
+        />
       </ToolProse>
 
       <ToolGuideCard

@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -104,34 +106,90 @@ export default function SitemapCheckerPage() {
       />
 
       <ToolBulletSection
-        title="What we check"
+        title="What this sitemap checker validates"
         items={[
-          "Presence of /sitemap.xml",
-          "Sitemap: directives in robots.txt",
-          "urlset vs sitemapindex shape",
-          "Approximate <loc> count and sample URLs",
+          "Presence and HTTP 200 status of /sitemap.xml",
+          "Explicit Sitemap: declarations inside robots.txt",
+          "XML structure compliance (<urlset> vs nested <sitemapindex>)",
+          "Verification that listed <loc> entries are 100% indexable 200 OK canonical URLs",
         ]}
       />
 
-      <ToolProse title="When to use a sitemap checker">
+      <ToolUseCases
+        title="XML Sitemap Pitfalls & Large Site Architecture"
+        intro="Search engines treat XML sitemaps as discovery roadmaps. Common issues that derail indexing include:"
+        cases={[
+          {
+            badge: "Dirty Sitemaps",
+            scenario: "Sitemaps Containing 404s or Redirects",
+            problem:
+              "Listing outdated 404 pages or 301 redirects in your sitemap degrades Googlebot's trust in your sitemap, slowing down crawl discovery.",
+            solution:
+              "Ensure only 200 OK, self-canonical, indexable URLs are included in XML sitemaps.",
+          },
+          {
+            badge: "Scale Limits",
+            scenario: "Exceeding 50,000 URLs / 50MB File Limit",
+            problem:
+              "Large e-commerce or directory sites attempting to output 100,000 URLs into a single monolithic sitemap get rejected by search crawlers.",
+            solution:
+              "Split large catalogs into nested sitemaps grouped under a master <sitemapindex> file.",
+          },
+          {
+            badge: "Lastmod Signals",
+            scenario: "Artificial or Stale lastmod Timestamps",
+            problem:
+              "Updating all <lastmod> timestamps to current time on every build causes Googlebot to ignore the lastmod directive completely.",
+            solution:
+              "Set <lastmod> to true content modification dates to help search engines prioritize re-crawling updated pages.",
+          },
+        ]}
+      />
+
+      <ToolProse title="XML Sitemap Standards & Next.js Implementation">
         <p>
-          Run this after a CMS migration, CDN cutover, or when Search Console
-          reports sitemap errors. Pair with the{" "}
-          <Link
-            href="/tools/robots-txt-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            robots.txt Checker
-          </Link>{" "}
-          if crawl rules look wrong, and a{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full technical audit
-          </Link>{" "}
-          for indexability and on-page issues.
+          A clean XML sitemap follows the sitemaps.org schema. For large sites, use a sitemap index file:
         </p>
+
+        <ToolCodeBlock
+          title="Standard XML Sitemap Index Format"
+          language="xml"
+          code={`<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://example.com/sitemap-posts.xml</loc>
+    <lastmod>2026-09-01T12:00:00Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://example.com/sitemap-tools.xml</loc>
+    <lastmod>2026-09-01T12:00:00Z</lastmod>
+  </sitemap>
+</sitemapindex>`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router (app/sitemap.ts)"
+          language="typescript"
+          description="Generate dynamic XML sitemaps in Next.js with lastmod dates:"
+          code={`import type { MetadataRoute } from 'next';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return [
+    {
+      url: 'https://example.com',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 1.0,
+    },
+    {
+      url: 'https://example.com/tools',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+  ];
+}`}
+        />
       </ToolProse>
 
       <ToolGuideCard

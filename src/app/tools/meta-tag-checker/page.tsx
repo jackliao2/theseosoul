@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -28,7 +30,7 @@ const faqs = [
   },
   {
     q: "What is a good title and meta description length?",
-    a: "Common working ranges are roughly 30–60 characters for titles and 120–160 for descriptions. Google may rewrite snippets; this tool shows what you declared, not a guaranteed live SERP.",
+    a: "Common working ranges are roughly 30–60 characters for titles (under ~580px width) and 120–160 for descriptions. Google may rewrite snippets; this tool shows what you declared, not a guaranteed live SERP.",
   },
   {
     q: "Is this also a SERP preview / simulator?",
@@ -108,34 +110,73 @@ export default function MetaTagCheckerPage() {
       <ToolBulletSection
         title="What this meta title & description checker covers"
         items={[
-          "Document <title> presence and character length",
-          "meta name=\"description\" presence and length",
-          "Quick status for empty, short, OK, or long fields",
-          "SERP-style preview for drafting or QA",
+          "Document <title> presence, truncation limits, and character count",
+          "meta name=\"description\" presence, search intent alignment, and length",
+          "Character count boundaries: 30–60 for titles, 120–160 for descriptions",
+          "Live search snippet simulator for desktop and mobile previewing",
         ]}
       />
 
-      <ToolProse title="Length guidelines (and caveats)">
+      <ToolUseCases
+        title="Meta Tag Optimization Scenarios & Fixes"
+        intro="Search engines evaluate your title and description for relevance and click-through rate. Here is how to fix common snippet mistakes:"
+        cases={[
+          {
+            badge: "CTR Optimization",
+            scenario: "Google SERP Title Rewriting",
+            problem:
+              "When your <title> is keyword-stuffed, repetitive, or doesn't match the primary H1 heading, Google replaces your title with automated page text.",
+            solution:
+              "Keep titles under 60 characters, front-load your primary keyword, and ensure the H1 heading naturally mirrors the title tag.",
+          },
+          {
+            badge: "Mobile Usability",
+            scenario: "Truncated Mobile SERP Snippets",
+            problem:
+              "Long meta descriptions (>160 chars) get truncated mid-sentence on mobile displays, cutting off your primary call-to-action.",
+            solution:
+              "Front-load the core value proposition and call-to-action in the first 120 characters of the meta description.",
+          },
+          {
+            badge: "Architecture",
+            scenario: "Duplicate Sitewide Boilerplate Metas",
+            problem:
+              "Every category or blog post reusing the company slogan as its meta description causes Google to ignore the description entirely.",
+            solution:
+              "Craft distinct, page-specific descriptions answering the exact searcher intent for every indexable URL.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Production Meta Tags Implementation">
         <p>
-          Pixel width varies by device and query, so character counts are
-          guidelines — not hard limits. Google may rewrite titles and
-          descriptions using on-page content. Still, clear unique metas help
-          humans and reduce weak automatic snippets. For social shares, use the{" "}
-          <Link
-            href="/tools/open-graph-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Open Graph Checker
-          </Link>
-          ; for full-page SEO, run the{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            website SEO checker
-          </Link>
-          .
+          A compliant HTML <code>&lt;head&gt;</code> should provide search engines with concise, unique metadata:
         </p>
+
+        <ToolCodeBlock
+          title="Standard HTML5 Head Metadata Boilerplate"
+          language="html"
+          code={`<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free Meta Tag Checker — TheSeoSoul</title>
+  <meta name="description" content="Inspect your HTML title and meta description for optimal length, SERP display, and click-through rates. Free tool." />
+</head>`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router Dynamic Metadata"
+          language="typescript"
+          description="Generate dynamic titles and descriptions with template fallbacks in Next.js:"
+          code={`import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  return {
+    title: 'Product Title | BrandName',
+    description: 'Detailed product summary for optimal SERP snippet display.',
+  };
+}`}
+        />
       </ToolProse>
 
       <ToolGuideCard

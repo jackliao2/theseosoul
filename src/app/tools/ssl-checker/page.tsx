@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -100,27 +102,67 @@ export default function SslCheckerPage() {
       />
 
       <ToolBulletSection
-        title="What we check"
+        title="What this TLS / SSL certificate checker inspects"
         items={[
-          "Certificate validity window (days remaining)",
-          "Issuer organization / CN when available",
-          "Whether the final URL after redirects is HTTPS",
-          "Redirect hop chain for the HTTPS entry URL",
+          "Certificate validity window and precise days remaining",
+          "Certificate Authority (CA) issuer details and common names",
+          "SNI hostname match to prevent certificate name mismatch errors",
+          "End-to-end HTTPS enforcement across the full redirect path",
         ]}
       />
 
-      <ToolProse title="When to use an SSL days checker">
+      <ToolUseCases
+        title="TLS Expiry Pitfalls & HTTPS Scenarios"
+        intro="An expired SSL certificate immediately drives away 90%+ of organic traffic due to full-screen browser security warnings:"
+        cases={[
+          {
+            badge: "Certbot Failures",
+            scenario: "Silent Let's Encrypt Renewal Breaks",
+            problem:
+              "Automated Certbot cron jobs failing silently due to HTTP-01 challenge firewall blocks, leading to 90-day certs expiring without notice.",
+            solution:
+              "Monitor certificate days remaining and set proactive renewal triggers when certificates drop below 30 days.",
+          },
+          {
+            badge: "Mixed Content",
+            scenario: "Passive & Active Mixed Content Warnings",
+            problem:
+              "Loading images or scripts via insecure http:// URLs on an https:// page triggers browser 'Not Secure' warnings and blocks asset execution.",
+            solution:
+              "Deploy Content-Security-Policy: upgrade-insecure-requests to auto-rewrite all asset requests to HTTPS.",
+          },
+          {
+            badge: "Subdomain Wildcards",
+            scenario: "Hostname Mismatch (SSL_ERROR_BAD_CERT_DOMAIN)",
+            problem:
+              "Using a single-domain certificate for deep subdomains (e.g. app.sub.example.com) that are not covered by a standard wildcard (*.example.com).",
+            solution:
+              "Verify SAN (Subject Alternative Names) or obtain dedicated multi-domain certificates for multi-tier architectures.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Enforcing HTTPS & Upgrading Mixed Content">
         <p>
-          Put this on a calendar before Let’s Encrypt renewals, CDN cutovers, or
-          apex/www migrations. Combine with the{" "}
-          <Link
-            href="/tools/security-headers-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Security Headers Checker
-          </Link>{" "}
-          for HSTS after HTTPS is stable.
+          Ensure all visitors and assets communicate strictly over encrypted channels:
         </p>
+
+        <ToolCodeBlock
+          title="Nginx HTTP to HTTPS 301 Redirect"
+          language="nginx"
+          code={`server {
+    listen 80;
+    server_name example.com www.example.com;
+    return 301 https://example.com$request_uri;
+}`}
+        />
+
+        <ToolCodeBlock
+          title="CSP Automatic HTTPS Upgrade Header"
+          language="text"
+          description="Force browsers to upgrade all insecure HTTP image and script links automatically:"
+          code={`Content-Security-Policy: upgrade-insecure-requests;`}
+        />
       </ToolProse>
 
       <ToolGuideCard

@@ -8,11 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -107,35 +110,81 @@ export default function CanonicalCheckerPage() {
       <ToolBulletSection
         title="What this canonical link checker reports"
         items={[
-          "Whether a canonical link tag is present",
-          "Resolved canonical absolute URL when possible",
+          "Whether a canonical link tag is present in the document <head>",
+          "Resolved canonical absolute URL and protocol validity",
           "Self-referencing vs points-elsewhere status",
-          "Cross-host canonicals that change the preferred domain",
+          "Cross-host canonicals that nominate an external domain as the authoritative source",
         ]}
       />
 
-      <ToolProse title="Why canonicals matter for duplicate URLs">
+      <ToolUseCases
+        title="Common Canonical Tag Pitfalls & Scenarios"
+        intro="Misconfigured canonical tags are among the leading causes of search cannibalization and indexing drops. Here is how to diagnose them."
+        cases={[
+          {
+            badge: "E-Commerce",
+            scenario: "Tracking & Filter Parameter Duplication",
+            problem:
+              "Query parameters like ?sort=price_asc, ?color=blue, or UTM tags create dozens of near-identical URLs competing for the same keywords.",
+            solution:
+              "Point rel=canonical on all filtered/sorted variations back to the clean, parameterless master category or product URL.",
+          },
+          {
+            badge: "Infrastructure",
+            scenario: "Protocol & Subdomain Splitting (HTTP/HTTPS & Apex/WWW)",
+            problem:
+              "If http://site.com and https://www.site.com both serve 200 OK without self-canonicalization, Google splits ranking signals between 4 distinct URLs.",
+            solution:
+              "Pair a 301 redirect rule to the primary host with a strict self-referencing canonical URL on every rendered page.",
+          },
+          {
+            badge: "Content Syndication",
+            scenario: "Cross-Domain Republishing",
+            problem:
+              "Publishing an article on Medium, Substack, or LinkedIn before your own site can result in the third-party platform outranking your original domain.",
+            solution:
+              "Specify a cross-domain rel=canonical pointing to your original canonical post URL on the external platform.",
+          },
+        ]}
+      />
+
+      <ToolProse title="How to Implement Clean Canonical Tags">
         <p>
-          Parameterized listings, HTTP vs HTTPS, and www vs apex variants often
-          look like the “same” page to users but different URLs to crawlers. A
-          clear preferred URL consolidates signals. If the hop chain is messy,
-          run the{" "}
-          <Link
-            href="/tools/redirect-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Redirect Checker
-          </Link>{" "}
-          next, then a{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full technical SEO audit
-          </Link>
-          .
+          Always ensure your canonical URLs are <strong>absolute</strong> (including{" "}
+          <code>https://</code> and full hostname) rather than relative paths.
+          Relative URLs can be resolved incorrectly by search engines during domain migrations or proxy caching.
         </p>
+
+        <ToolCodeBlock
+          title="HTML Canonical Link Tag Boilerplate"
+          language="html"
+          code={`<!-- Self-referencing canonical on https://example.com/blog/seo-guide -->
+<head>
+  <link rel="canonical" href="https://example.com/blog/seo-guide" />
+</head>`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router (metadata.alternates.canonical)"
+          language="typescript"
+          description="In Next.js App Router, specify canonical URLs directly in page metadata:"
+          code={`import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'SEO Best Practices Guide',
+  alternates: {
+    canonical: 'https://example.com/blog/seo-guide',
+  },
+};`}
+        />
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/robots-txt-vs-noindex-vs-canonical"
+        title="Robots.txt vs Noindex vs Canonical: The Technical Decision Matrix"
+        description="Confused about when to block in robots.txt versus adding a noindex header or canonical tag? Read our comprehensive architectural breakdown."
+        cta="Read full guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -104,35 +106,65 @@ export default function GeoContentCheckerPage() {
       />
 
       <ToolBulletSection
-        title="What this is (and isn’t)"
+        title="What GEO citation readiness evaluates"
         items={[
-          "A heuristic for citation-friendly writing — not a live ChatGPT mention tracker",
-          "No paid generative API required",
-          "Does not invent Domain Authority or traffic stats",
-          "Complements technical checks (robots, schema, llms.txt) on the full audit",
+          "Direct, answer-first sentence structure that LLMs can quote without heavy summarization",
+          "Presence of verifiable data points, tables, and authoritative metrics",
+          "Author and organizational attribution signals",
+          "Formatting compatibility for AI training feeds (such as llms.txt)",
         ]}
       />
 
-      <ToolProse title="GEO writing vs classic on-page SEO">
+      <ToolUseCases
+        title="GEO Optimization Scenarios & Best Practices"
+        intro="As search shifts toward AI Overviews, Perplexity, and ChatGPT Search, content must be formatted for direct machine citation:"
+        cases={[
+          {
+            badge: "AI Overviews",
+            scenario: "Extractable Direct Answer Snippets",
+            problem:
+              "Burying key answers under 500 words of conversational preamble causes LLMs to synthesize answers from competitor pages.",
+            solution:
+              "Provide a concise 1-2 sentence direct answer immediately beneath the primary H2 question heading.",
+          },
+          {
+            badge: "Factual Density",
+            scenario: "Tabular & Comparative Data Structuring",
+            problem:
+              "Presenting benchmarks or feature comparisons in dense unstructured paragraphs, making entity extraction difficult.",
+            solution:
+              "Format comparisons in semantic HTML <table> or clear definition lists for high-confidence AI extraction.",
+          },
+          {
+            badge: "LLM Feeds",
+            scenario: "Publishing Standard llms.txt Feeds",
+            problem:
+              "AI web crawlers spending tokens parsing bloated navigation HTML rather than your authoritative core documentation.",
+            solution:
+              "Publish an /llms.txt Markdown index summarizing your core services, tools, and technical documentation.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Standard llms.txt & Structured Data Implementation">
         <p>
-          Classic SEO still needs clear titles, metas, and crawlability. GEO
-          adds: answerable openings, verifiable facts, and distinctive expertise
-          that models can attribute. Use the{" "}
-          <Link
-            href="/tools/keyword-density-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Keyword Density Checker
-          </Link>{" "}
-          for phrase focus, then the{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            technical SEO + GEO audit
-          </Link>{" "}
-          for the live site.
+          Publish a clean <code>/llms.txt</code> at the root of your domain to guide LLM crawlers:
         </p>
+
+        <ToolCodeBlock
+          title="Root /llms.txt Standard Template"
+          language="markdown"
+          code={`# TheSeoSoul
+> Free technical SEO audit and inspection reports for any public domain.
+
+## Core Free Tools
+- [Canonical Tag Checker](https://theseosoul.com/tools/canonical-checker): Inspect rel=canonical tags.
+- [Robots.txt Checker](https://theseosoul.com/tools/robots-txt-checker): Validate crawl rules and AI bot blocks.
+- [Noindex Checker](https://theseosoul.com/tools/noindex-checker): Audit meta robots and X-Robots-Tag headers.
+
+## Technical Guides
+- [Robots.txt vs Noindex vs Canonical](https://theseosoul.com/blog/robots-txt-vs-noindex-vs-canonical): Architectural decision guide.`}
+        />
       </ToolProse>
 
       <ToolGuideCard

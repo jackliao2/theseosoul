@@ -8,11 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
+  ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -108,27 +111,95 @@ export default function OpenGraphCheckerPage() {
         items={[
           "og:title, og:description, og:image, og:url, og:type",
           "Twitter Card fields (card, title, description, image)",
-          "Whether an image URL is present for rich previews",
-          "Gaps that force platforms to invent a weak fallback snippet",
+          "Optimal 1.91:1 aspect ratio (1200x630px) for social cards",
+          "Missing fallbacks that cause social networks to scrape random page images",
         ]}
       />
 
-      <ToolProse title="Open Graph vs search meta tags">
+      <ToolUseCases
+        title="Social Sharing Pitfalls & Real-World Fixes"
+        intro="Rich social cards drive referral clicks and brand recognition. Here are the most common Open Graph bugs:"
+        cases={[
+          {
+            badge: "Image Cropping",
+            scenario: "Tiny Thumbnail vs Large Hero Card",
+            problem:
+              "Images under 300x200px or missing twitter:card summary_large_image trigger a tiny square thumbnail instead of a prominent full-width card.",
+            solution:
+              "Supply an og:image of exactly 1200x630px and set twitter:card to summary_large_image.",
+          },
+          {
+            badge: "Cache Invalidation",
+            scenario: "Stale Social Previews After Updates",
+            problem:
+              "Facebook, LinkedIn, and Discord cache OG images indefinitely. Editing your HTML doesn't update existing shared previews.",
+            solution:
+              "Append a version query parameter (e.g. ?v=2) to your og:image URL or use each platform's post-inspector to purge cache.",
+          },
+          {
+            badge: "Dynamic Social Cards",
+            scenario: "Headless & Dynamic Blog Sharing",
+            problem:
+              "Sharing blog articles with generic homepage OG banners dilutes click-through rates across social channels.",
+            solution:
+              "Use dynamic server-side image generation (e.g., Next.js ImageResponse) to generate custom titles and author badges per post.",
+          },
+        ]}
+      />
+
+      <ToolProse title="Complete Open Graph & Twitter Card Boilerplate">
         <p>
-          Open Graph controls social shares;{" "}
-          <code className="text-[13px]">&lt;title&gt;</code> and meta
-          description primarily influence search snippets. Keep them aligned but
-          not identical when social needs a punchier hook. Check search metas
-          with the{" "}
-          <Link
-            href="/tools/meta-tag-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Meta Tag Checker
-          </Link>
-          .
+          Include standard Open Graph tags alongside Twitter Card directives in your document <code>&lt;head&gt;</code>:
         </p>
+
+        <ToolCodeBlock
+          title="HTML Open Graph & Twitter Cards Standard"
+          language="html"
+          code={`<head>
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://example.com/article" />
+  <meta property="og:title" content="How to Audit Technical SEO Like a Pro" />
+  <meta property="og:description" content="Step-by-step checklist to find and fix crawl blockers, canonical loops, and index drops." />
+  <meta property="og:image" content="https://example.com/images/og-banner.webp" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How to Audit Technical SEO Like a Pro" />
+  <meta name="twitter:description" content="Step-by-step checklist to find and fix crawl blockers, canonical loops, and index drops." />
+  <meta name="twitter:image" content="https://example.com/images/og-banner.webp" />
+</head>`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router (opengraph-image.tsx)"
+          language="typescript"
+          description="Generate dynamic 1200x630 share banners natively in Next.js:"
+          code={`import { ImageResponse } from 'next/og';
+
+export const runtime = 'edge';
+export const size = { width: 1200, height: 630 };
+export const contentType = 'image/png';
+
+export default async function Image() {
+  return new ImageResponse(
+    (
+      <div style={{ display: 'flex', width: '100%', height: '100%', background: '#0b1220', color: '#fff', padding: 60 }}>
+        <h1 style={{ fontSize: 60, fontWeight: 'bold' }}>TheSeoSoul Technical Audit</h1>
+      </div>
+    ),
+    { ...size }
+  );
+}`}
+        />
       </ToolProse>
+
+      <ToolGuideCard
+        href="/blog/free-meta-tag-checker-titles-descriptions"
+        title="Meta Tags, Social Shares & Search Engine Snippets"
+        description="Understand the interplay between document title, meta descriptions, and Open Graph share previews across search and social."
+        cta="Read full guide"
+      />
 
       <ToolFaqSection faqs={faqs} />
 

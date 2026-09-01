@@ -292,3 +292,100 @@ export function ToolProse({
     </section>
   );
 }
+
+export function ToolCodeBlock({
+  title,
+  description,
+  language = "html",
+  code,
+}: {
+  title: string;
+  description?: string;
+  language?: string;
+  code: string;
+}) {
+  return (
+    <div className="mt-6 overflow-hidden rounded-xl border border-slate-300/80 bg-slate-950 text-slate-100 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/90 px-4 py-2.5 text-xs">
+        <span className="font-mono font-medium text-slate-300">{title}</span>
+        <span className="font-mono text-[11px] uppercase tracking-wider text-teal-400">
+          {language}
+        </span>
+      </div>
+      {description ? (
+        <p className="border-b border-slate-800 bg-slate-900/40 px-4 py-2 text-xs text-slate-400">
+          {description}
+        </p>
+      ) : null}
+      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-200">
+        <code>{code.trim()}</code>
+      </pre>
+    </div>
+  );
+}
+
+export type UseCaseItem = {
+  badge?: string;
+  scenario: string;
+  problem: string;
+  solution: string;
+};
+
+export function ToolUseCases({
+  title = "Real-world engineering scenarios & use cases",
+  intro,
+  cases,
+}: {
+  title?: string;
+  intro?: string;
+  cases: UseCaseItem[];
+}) {
+  return (
+    <section className="mt-14 border-t border-slate-300/70 pt-12 dark:border-slate-700">
+      <div className="max-w-2xl">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">
+          Scenarios
+        </p>
+        <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          {title}
+        </h2>
+        {intro ? (
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {intro}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {cases.map((c, i) => (
+          <div
+            key={i}
+            className="flex flex-col justify-between rounded-xl border border-slate-300/70 bg-[color:var(--surface)]/50 p-4.5 transition-colors dark:border-slate-800 dark:bg-slate-900/30"
+          >
+            <div>
+              {c.badge ? (
+                <span className="inline-block rounded bg-teal-800/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-teal-800 dark:bg-teal-400/10 dark:text-teal-300">
+                  {c.badge}
+                </span>
+              ) : null}
+              <h3 className="mt-2 font-display text-base font-semibold text-slate-900 dark:text-slate-50">
+                {c.scenario}
+              </h3>
+              <div className="mt-3 space-y-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                <p>
+                  <strong className="text-slate-900 dark:text-slate-200">The Problem:</strong>{" "}
+                  {c.problem}
+                </p>
+                <p>
+                  <strong className="text-teal-800 dark:text-teal-300">The Fix:</strong>{" "}
+                  {c.solution}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+

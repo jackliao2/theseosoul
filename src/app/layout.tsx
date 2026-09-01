@@ -85,8 +85,6 @@ export default function RootLayout({
         description:
           "Free technical SEO audit and inspection reports for any domain.",
         publisher: { "@id": `${SITE_URL}/#organization` },
-        // No SearchAction → /audit/{term}: that pushed Google toward thin
-        // noindex report URLs instead of indexable tools and guides.
       },
       {
         "@type": "Organization",
@@ -109,21 +107,6 @@ export default function RootLayout({
           contactType: "customer support",
           url: `${SITE_URL}/contact`,
         },
-      },
-      {
-        "@type": "SoftwareApplication",
-        name: SITE_NAME,
-        applicationCategory: "BusinessApplication",
-        operatingSystem: "Web",
-        url: SITE_URL,
-        offers: {
-          "@type": "Offer",
-          price: "0",
-          priceCurrency: "USD",
-        },
-        description:
-          "Automated on-page SEO, GEO readiness, keyword density, WHOIS, and technical audits.",
-        publisher: { "@id": `${SITE_URL}/#organization` },
       },
     ],
   };

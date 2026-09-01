@@ -8,12 +8,14 @@ import {
 } from "@/components/layout/content-page";
 import {
   ToolBulletSection,
+  ToolCodeBlock,
   ToolFaqJsonLd,
   ToolFaqSection,
   ToolGuideCard,
   ToolHowItWorks,
   ToolProse,
   ToolRelated,
+  ToolUseCases,
 } from "@/components/tools/tool-page-guide";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 import { createSocialMetadata } from "@/lib/social-metadata";
@@ -121,41 +123,79 @@ export default function RobotsTxtCheckerPage() {
         ]}
       />
 
-      <ToolProse title="robots.txt vs noindex (common mix-up)">
-        <p>
-          robots.txt controls <em>crawl access</em> at the path level. A{" "}
-          <code className="text-[13px]">Disallow</code> can stop a bot from
-          downloading a URL, but it is not a substitute for telling Google not
-          to index a URL that was already discovered. Indexing directives live
-          in meta robots and <code className="text-[13px]">X-Robots-Tag</code>.
-        </p>
-        <p>
-          After you confirm robots.txt, run the{" "}
-          <Link
-            href="/tools/noindex-checker"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            Noindex Checker
-          </Link>{" "}
-          on key templates (staging, thank-you pages, filtered listings) and the{" "}
-          <Link
-            href="/#home-audit-url"
-            className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
-          >
-            full website SEO checker
-          </Link>{" "}
-          for Meta, Structure, Technical, and GEO together.
-        </p>
-      </ToolProse>
+      <ToolUseCases
+        title="Critical Robots.txt Scenarios & Mistakes"
+        intro="Robots.txt syntax errors can invisibly dismantle organic rankings overnight. Common scenarios include:"
+        cases={[
+          {
+            badge: "Crawl Disasters",
+            scenario: "Accidental Disallow: / in Production",
+            problem:
+              "Deploying a staging robots.txt with Disallow: / immediately shuts out Googlebot, wiping the domain from SERPs within days.",
+            solution:
+              "Always verify production robots.txt explicitly specifies Allow: / for User-agent: * and lists the canonical XML sitemap.",
+          },
+          {
+            badge: "Rendering Issues",
+            scenario: "Blocking CSS & JavaScript Assets",
+            problem:
+              "Disallowing /_next/static/ or /wp-content/ prevents Googlebot from rendering the DOM, failing Mobile-Friendly and Core Web Vitals audits.",
+            solution:
+              "Never block access to CSS, JS, fonts, or image assets required to render modern client/server applications.",
+          },
+          {
+            badge: "AI Crawler Policy",
+            scenario: "Targeted AI Scraper Blocking",
+            problem:
+              "You want to block automated LLM training scrapers (GPTBot, CCBot) without blocking Google Search or Bing indexation.",
+            solution:
+              "Target individual bot User-agents (e.g., User-agent: GPTBot Disallow: /) while keeping User-agent: * open for search engines.",
+          },
+        ]}
+      />
 
-      <ToolProse title="When to run a robots txt checker">
+      <ToolProse title="Standard Production robots.txt Templates">
         <p>
-          Use this free robots.txt checker after CMS or CDN changes, before a
-          migration, when organic traffic drops after a deploy, or when you
-          intentionally block AI training bots and need proof the public file
-          matches policy. Always keep a Sitemap line pointing at your current
-          XML sitemap when you want discovery help.
+          A clean robots.txt allows search crawlers full access while keeping internal endpoints and unwanted scrapers out:
         </p>
+
+        <ToolCodeBlock
+          title="Production robots.txt Template"
+          language="text"
+          code={`# Allow all legitimate search engine crawlers
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Optional: Block LLM training crawlers
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+# Canonical XML Sitemap
+Sitemap: https://example.com/sitemap.xml`}
+        />
+
+        <ToolCodeBlock
+          title="Next.js App Router (app/robots.ts)"
+          language="typescript"
+          description="Generate your robots.txt dynamically with type safety in Next.js:"
+          code={`import type { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/api/', '/admin/'],
+    },
+    sitemap: 'https://example.com/sitemap.xml',
+  };
+}`}
+        />
       </ToolProse>
 
       <ToolGuideCard
