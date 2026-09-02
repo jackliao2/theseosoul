@@ -156,7 +156,7 @@ export default function SeoLadderPage() {
               problem:
                 "Passing Stage 2 (Crawlable) but getting stuck at Stage 3 (Indexed) with URLs marked 'Crawled - currently not indexed'.",
               solution:
-                "Strengthen internal linking, deepen page utility, and eliminate duplicate boilerplate across your tool/blog pages.",
+                "Strengthen internal linking, deepen page utility, and eliminate duplicate boilerplate. Read our dedicated guide on Crawled – Currently Not Indexed to diagnose the difference between quality filters and crawl blockers.",
             },
             {
               badge: "Stage 4 to 5 Traction",

@@ -2,18 +2,20 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import { BlogMarkdown } from "@/components/blog/blog-markdown";
+import { EditorialTrustBox } from "@/components/blog/editorial-trust-box";
 import {
   ContentEyebrow,
   ContentPage,
   ContentTitle,
 } from "@/components/layout/content-page";
-import { getAllSlugs, getPost } from "@/lib/blog";
+import { getAllPosts, getAllSlugs, getPost } from "@/lib/blog";
 import { SITE_NAME, SITE_URL } from "@/lib/audit/types";
 
 type Props = { params: Promise<{ slug: string }> };
 
-const EDITORIAL_TEAM_NAME = "TheSeoSoul editorial team";
+const EDITORIAL_TEAM_NAME = "TheSeoSoul Technical SEO & Infrastructure Team";
 const EDITORIAL_TEAM_URL = `${SITE_URL}/about`;
 
 export function generateStaticParams() {
@@ -62,17 +64,32 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPost(slug);
   if (!post) notFound();
 
+  const allPosts = getAllPosts();
+  // Find up to 3 related posts based on tag overlap, falling back to other recent posts
+  const relatedPosts = allPosts
+    .filter((p) => p.slug !== post.slug)
+    .map((p) => {
+      const sharedTags =
+        p.tags?.filter((t) => post.tags?.includes(t)).length ?? 0;
+      return { post: p, relevance: sharedTags };
+    })
+    .sort((a, b) => b.relevance - a.relevance)
+    .slice(0, 3)
+    .map((item) => item.post);
+
   const pageUrl = `${SITE_URL}/blog/${post.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Article",
+        "@type": "TechArticle",
         headline: post.title,
         description: post.description,
         datePublished: post.date,
         dateModified: post.updated ?? post.date,
         image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
+        inLanguage: "en-US",
+        isAccessibleForFree: true,
         author: {
           "@type": "Organization",
           "@id": `${EDITORIAL_TEAM_URL}#editorial-team`,
@@ -152,6 +169,19 @@ export default async function BlogPostPage({ params }: Props) {
           </>
         ) : null}
       </div>
+
+      {post.excerpt ? (
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-teal-800/20 bg-teal-950/[0.035] p-4 text-sm leading-relaxed text-slate-700 dark:border-teal-400/20 dark:bg-teal-400/[0.04] dark:text-slate-200">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-teal-700 dark:text-teal-300" />
+          <div>
+            <strong className="font-semibold text-slate-900 dark:text-slate-100">
+              Key Takeaway:{" "}
+            </strong>
+            {post.excerpt}
+          </div>
+        </div>
+      ) : null}
+
       <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-300">
         {post.description}
       </p>
@@ -174,7 +204,49 @@ export default async function BlogPostPage({ params }: Props) {
         <BlogMarkdown content={post.content} />
       </article>
 
-      <div className="mt-14 border-t border-slate-200 pt-8 dark:border-slate-700">
+      <EditorialTrustBox
+        readingMinutes={post.readingMinutes}
+        tags={post.tags}
+        lastUpdated={post.updated ? formatDate(post.updated) : formatDate(post.date)}
+      />
+
+      {relatedPosts.length > 0 ? (
+        <section className="mt-14 border-t border-slate-200 pt-10 dark:border-slate-700">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-800 dark:text-teal-300">
+            Topic cluster
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            Related Technical Guides
+          </h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {relatedPosts.map((related) => (
+              <Link
+                key={related.slug}
+                href={`/blog/${related.slug}`}
+                className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-[color:var(--surface)] p-4 transition-[border-color,background-color] hover:border-teal-700/40 hover:bg-teal-800/[0.02] dark:border-slate-800 dark:hover:border-teal-400/30 dark:hover:bg-teal-400/[0.04]"
+              >
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                    {related.readingMinutes} min read
+                  </div>
+                  <h3 className="mt-1.5 font-display text-sm font-semibold text-slate-900 group-hover:text-teal-800 dark:text-slate-50 dark:group-hover:text-teal-300">
+                    {related.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    {related.excerpt ?? related.description}
+                  </p>
+                </div>
+                <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-teal-800 dark:text-teal-300">
+                  Read guide
+                  <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <div className="mt-12 border-t border-slate-200 pt-8 dark:border-slate-700">
         <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
           Run the related checks for free —{" "}
           <Link
@@ -195,7 +267,7 @@ export default async function BlogPostPage({ params }: Props) {
             href="/blog"
             className="font-semibold text-teal-800 hover:underline dark:text-teal-300"
           >
-            more guides
+            browse all guides
           </Link>
           .
         </p>
